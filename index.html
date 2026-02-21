@@ -9,7 +9,7 @@
             --primary-color: #007b43;
             --bg-color: #0d1117;
             --error-color: #e74c3c;
-            --success-color: #00ff85; /* 正解時の明るい緑 */
+            --success-color: #00ff85;
         }
 
         body { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; background: var(--bg-color); color: var(--primary-color); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
@@ -40,20 +40,19 @@
             align-items: center;
             justify-content: center;
             text-transform: uppercase;
-            transition: border-color 0.1s;
         }
 
-        /* 不正解の点滅（赤） */
+        /* アニメーション：赤点滅（間違い） */
         .flash-error { animation: error-flash 0.4s ease-in-out; }
         @keyframes error-flash {
-            0%, 100% { border-color: var(--primary-color); }
+            0%, 100% { border-color: var(--primary-color); box-shadow: none; }
             50% { border-color: var(--error-color); box-shadow: 0 0 25px var(--error-color); }
         }
 
-        /* 正解の点滅（明るい緑） */
+        /* アニメーション：緑点滅（正解） */
         .flash-correct { animation: correct-flash 0.4s ease-in-out; }
         @keyframes correct-flash {
-            0%, 100% { border-color: var(--primary-color); }
+            0%, 100% { border-color: var(--primary-color); box-shadow: none; }
             50% { border-color: var(--success-color); box-shadow: 0 0 30px var(--success-color); border-width: 4px; }
         }
 
@@ -119,6 +118,7 @@ let isWaitingNext = false;
 
 const DOT_TIME = 0.08, FREQUENCY = 700;
 const mobileInput = document.getElementById('mobile-input');
+const displayFrame = document.getElementById('input-display');
 
 function initAudio() {
     if (!audioCtx) {
@@ -137,6 +137,10 @@ function killCurrentAudio() {
 function prepareGame() {
     initAudio();
     if (audioCtx.state === 'suspended') audioCtx.resume();
+    
+    // エフェクトクラスを完全に除去して開始
+    displayFrame.classList.remove('flash-correct', 'flash-error');
+    
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
     mobileInput.focus();
@@ -188,7 +192,7 @@ function focusMobile() { if (isPlaying) mobileInput.focus(); }
 function playMorseLoop() {
     if (!isPlaying || isWaitingNext) return;
     const duration = playMorse(currentWord);
-    audioLoopId = setTimeout(playMorseLoop, (duration * 1000) + 1000); // リピート1秒
+    audioLoopId = setTimeout(playMorseLoop, (duration * 1000) + 1000);
 }
 
 function playMorse(text) {
@@ -217,30 +221,30 @@ function playMorse(text) {
     return offset + 0.1;
 }
 
-// 入力イベント（リアルタイム表示用）
+// 入力イベント（リアルタイム反映）
 mobileInput.addEventListener('input', () => {
     if (!isPlaying || isWaitingNext) return;
     userInput = mobileInput.value.toUpperCase().replace(/[^A-Z]/g, '');
     updateDisplay();
 });
 
-// Enter判定ロジックを強化
+// 判定ロジック：一字一句の厳密チェック
 mobileInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-        const display = document.getElementById('input-display');
-        // Enterが押された瞬間の最新の入力値を取得
+        // 現在の入力値を再取得
         const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z]/g, '');
         
+        // クラスを一度リセット（連続ミス時でもアニメーションを再トリガーするため）
+        displayFrame.classList.remove('flash-correct', 'flash-error');
+        void displayFrame.offsetWidth; // リフロー強制
+
         if (finalInput === currentWord && currentWord !== "") {
-            // 【正解時】
+            // 【完全一致：正解】
             score++;
             document.getElementById('score').innerText = score;
             isWaitingNext = true;
             
-            // 明るい緑で点滅
-            display.classList.remove('flash-correct');
-            void display.offsetWidth; 
-            display.classList.add('flash-correct');
+            displayFrame.classList.add('flash-correct');
             
             userInput = ""; mobileInput.value = "";
             updateDisplay();
@@ -252,12 +256,11 @@ mobileInput.addEventListener('keydown', (e) => {
                 isWaitingNext = false;
                 document.getElementById('status-msg').innerText = "受信中...";
                 nextWord();
-            }, 500); // 次の単語まで0.5秒
+            }, 500);
         } else {
-            // 【ミス時】FOXに対してFOXXなど、不一致なら必ずここを通る
-            display.classList.remove('flash-error');
-            void display.offsetWidth; 
-            display.classList.add('flash-error');
+            // 【不一致：間違い】FOXに対してFOXX、FO、空欄、すべてここに飛ばす
+            displayFrame.classList.add('flash-error');
+            // ここでプログラムは止まらないので、ユーザーは入力を修正して再度Enterを押せる
         }
     }
 });
