@@ -12,7 +12,7 @@
             --success-color: #00ff85; /* 正解時の明るい緑 */
         }
 
-        body { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; background: var(--bg-color); color: var(--primary-color); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; -webkit-touch-callout: none; -webkit-user-select: none; }
+        body { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; background: var(--bg-color); color: var(--primary-color); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
         
         #game-container { 
             background: #161b22; 
@@ -40,20 +40,21 @@
             align-items: center;
             justify-content: center;
             text-transform: uppercase;
+            transition: border-color 0.1s;
         }
 
         /* 不正解の点滅（赤） */
         .flash-error { animation: error-flash 0.4s ease-in-out; }
         @keyframes error-flash {
             0%, 100% { border-color: var(--primary-color); }
-            50% { border-color: var(--error-color); box-shadow: 0 0 20px var(--error-color); }
+            50% { border-color: var(--error-color); box-shadow: 0 0 25px var(--error-color); }
         }
 
         /* 正解の点滅（明るい緑） */
         .flash-correct { animation: correct-flash 0.4s ease-in-out; }
         @keyframes correct-flash {
             0%, 100% { border-color: var(--primary-color); }
-            50% { border-color: var(--success-color); box-shadow: 0 0 25px var(--success-color); border-width: 4px; }
+            50% { border-color: var(--success-color); box-shadow: 0 0 30px var(--success-color); border-width: 4px; }
         }
 
         .cursor { display: inline-block; width: 3px; height: 35px; background: var(--primary-color); animation: blink 1s infinite; margin-left: 5px; }
@@ -72,7 +73,7 @@
 
 <div id="game-container">
     <h1>モールス打</h1>
-    <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text">
 
     <div id="start-screen">
         <p>信号を解読せよ。Enterで判定。</p>
@@ -84,7 +85,7 @@
                 <option value="240">4分間</option>
                 <option value="300">5分間</option>
             </select>
-            <button id="start-button" onclick="prepareGame()">ミッション開始</button>
+            <button onclick="prepareGame()">ミッション開始</button>
         </div>
     </div>
 
@@ -119,16 +120,11 @@ let isWaitingNext = false;
 const DOT_TIME = 0.08, FREQUENCY = 700;
 const mobileInput = document.getElementById('mobile-input');
 
-// iOS用：AudioContextを初期化・再開する関数
-function unlockAudio() {
+function initAudio() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         masterGain = audioCtx.createGain();
         masterGain.connect(audioCtx.destination);
-    }
-    // iOS Safariではユーザー操作内でresume()を呼ぶ必要がある
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
     }
 }
 
@@ -139,34 +135,27 @@ function killCurrentAudio() {
 }
 
 function prepareGame() {
-    unlockAudio(); // iOSのためにここで叩く
-    
+    initAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
-    
     mobileInput.focus();
-    setTimeout(startGame, 500); // 0.5秒のタメ
+    setTimeout(startGame, 500);
 }
 
 function startGame() {
     initialSeconds = parseInt(document.getElementById('time-select').value);
     timeLeft = initialSeconds;
-    score = 0;
-    isPlaying = true;
-    isWaitingNext = false;
-    
+    score = 0; isPlaying = true; isWaitingNext = false;
     masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
     document.getElementById('status-msg').innerText = "受信中...";
-    
     nextWord();
     timerId = setInterval(tick, 1000);
     updateTimerDisplay();
 }
 
 function quitGame() {
-    isPlaying = false;
-    clearInterval(timerId);
-    killCurrentAudio();
+    isPlaying = false; clearInterval(timerId); killCurrentAudio();
     mobileInput.blur();
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('start-screen').classList.remove('hidden');
@@ -174,8 +163,7 @@ function quitGame() {
 
 function tick() {
     if (!isPlaying) return;
-    timeLeft--;
-    updateTimerDisplay();
+    timeLeft--; updateTimerDisplay();
     if (timeLeft <= 0) endGame();
 }
 
@@ -185,8 +173,7 @@ function updateTimerDisplay() {
 }
 
 function nextWord() {
-    userInput = "";
-    mobileInput.value = "";
+    userInput = ""; mobileInput.value = "";
     let newWord;
     do { newWord = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)]; } while (newWord === currentWord);
     currentWord = newWord;
@@ -208,7 +195,6 @@ function playMorse(text) {
     killCurrentAudio();
     const startTime = audioCtx.currentTime + 0.1; 
     let offset = 0;
-
     text.split('').forEach(char => {
         const code = MORSE_CODE[char];
         if (!code) return;
@@ -216,20 +202,13 @@ function playMorse(text) {
             const duration = (symbol === '.') ? DOT_TIME : DOT_TIME * 3;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            
-            osc.type = 'sine';
-            osc.frequency.value = FREQUENCY;
-
+            osc.type = 'sine'; osc.frequency.value = FREQUENCY;
             gain.gain.setValueAtTime(0, startTime + offset);
             gain.gain.linearRampToValueAtTime(0.5, startTime + offset + 0.005);
             gain.gain.setValueAtTime(0.5, startTime + offset + duration);
             gain.gain.linearRampToValueAtTime(0, startTime + offset + duration + 0.005);
-            
-            osc.connect(gain);
-            gain.connect(masterGain);
-            
-            osc.start(startTime + offset);
-            osc.stop(startTime + offset + duration + 0.01);
+            osc.connect(gain); gain.connect(masterGain);
+            osc.start(startTime + offset); osc.stop(startTime + offset + duration + 0.01);
             activeOscillators.push(osc);
             offset += duration + DOT_TIME;
         });
@@ -238,28 +217,32 @@ function playMorse(text) {
     return offset + 0.1;
 }
 
-mobileInput.addEventListener('input', (e) => {
+// 入力イベント（リアルタイム表示用）
+mobileInput.addEventListener('input', () => {
     if (!isPlaying || isWaitingNext) return;
     userInput = mobileInput.value.toUpperCase().replace(/[^A-Z]/g, '');
     updateDisplay();
 });
 
+// Enter判定ロジックを強化
 mobileInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         const display = document.getElementById('input-display');
-        if (userInput === currentWord) {
+        // Enterが押された瞬間の最新の入力値を取得
+        const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z]/g, '');
+        
+        if (finalInput === currentWord && currentWord !== "") {
             // 【正解時】
             score++;
             document.getElementById('score').innerText = score;
             isWaitingNext = true;
             
-            // 枠を明るい緑に点滅
+            // 明るい緑で点滅
             display.classList.remove('flash-correct');
             void display.offsetWidth; 
             display.classList.add('flash-correct');
             
-            userInput = ""; 
-            mobileInput.value = "";
+            userInput = ""; mobileInput.value = "";
             updateDisplay();
             killCurrentAudio();
             
@@ -268,10 +251,10 @@ mobileInput.addEventListener('keydown', (e) => {
                 if (!isPlaying) return;
                 isWaitingNext = false;
                 document.getElementById('status-msg').innerText = "受信中...";
-                nextWord(); // 0.5秒後に次へ
-            }, 500);
+                nextWord();
+            }, 500); // 次の単語まで0.5秒
         } else {
-            // 【ミス時】
+            // 【ミス時】FOXに対してFOXXなど、不一致なら必ずここを通る
             display.classList.remove('flash-error');
             void display.offsetWidth; 
             display.classList.add('flash-error');
@@ -280,9 +263,7 @@ mobileInput.addEventListener('keydown', (e) => {
 });
 
 function endGame() {
-    isPlaying = false;
-    clearInterval(timerId);
-    killCurrentAudio();
+    isPlaying = false; clearInterval(timerId); killCurrentAudio();
     mobileInput.blur();
     const wordLabel = (score === 1) ? "word" : "words";
     const minutes = Math.round(initialSeconds / 60);
