@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>モールス打 - Morse-Da</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>モールス打 - Contest Edition</title>
     <style>
         :root {
             --primary-color: #007b43;
@@ -12,7 +12,7 @@
             --success-color: #00ff85;
         }
 
-        body { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; background: var(--bg-color); color: var(--primary-color); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        body { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; background: var(--bg-color); color: var(--primary-color); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; touch-action: manipulation; }
         
         #game-container { 
             background: #161b22; 
@@ -26,11 +26,11 @@
             position: relative; 
         }
         
-        h1 { margin-top: 0; letter-spacing: 4px; font-size: 2rem; color: var(--primary-color); }
+        h1 { margin-top: 0; letter-spacing: 4px; font-size: 1.8rem; color: var(--primary-color); }
         .stats { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; font-size: 1rem; border-bottom: 1px solid rgba(0,123,67,0.3); padding-bottom: 10px; }
         
         #input-display { 
-            font-size: 2.5rem; 
+            font-size: 2.2rem; 
             letter-spacing: 5px; 
             min-height: 4.5rem; 
             border: 4px solid var(--primary-color); 
@@ -42,14 +42,12 @@
             text-transform: uppercase;
         }
 
-        /* アニメーション：赤点滅（間違い） */
         .flash-error { animation: error-flash 0.4s ease-in-out; }
         @keyframes error-flash {
             0%, 100% { border-color: var(--primary-color); box-shadow: none; }
             50% { border-color: var(--error-color); box-shadow: 0 0 25px var(--error-color); }
         }
 
-        /* アニメーション：緑点滅（正解） */
         .flash-correct { animation: correct-flash 0.4s ease-in-out; }
         @keyframes correct-flash {
             0%, 100% { border-color: var(--primary-color); box-shadow: none; }
@@ -59,12 +57,12 @@
         .cursor { display: inline-block; width: 3px; height: 35px; background: var(--primary-color); animation: blink 1s infinite; margin-left: 5px; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        button { background: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); padding: 10px 25px; font-size: 1.1rem; cursor: pointer; border-radius: 4px; transition: 0.3s; margin-top: 10px; outline: none; }
+        button { background: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); padding: 12px 35px; font-size: 1.2rem; cursor: pointer; border-radius: 4px; transition: 0.3s; margin-top: 10px; outline: none; -webkit-tap-highlight-color: transparent; }
         button:hover { background: var(--primary-color); color: #fff; }
         
         .quit-btn { font-size: 0.8rem; padding: 5px 10px; margin-top: 20px; opacity: 0.6; }
         #mobile-input { position: absolute; opacity: 0; pointer-events: none; left: -9999px; }
-        select { background: #000; color: var(--primary-color); border: 1px solid var(--primary-color); font-size: 1rem; padding: 5px; margin-right: 10px; border-radius: 4px; }
+        select { background: #000; color: var(--primary-color); border: 1px solid var(--primary-color); font-size: 1rem; padding: 8px; margin-right: 10px; border-radius: 4px; }
         .hidden { display: none; }
     </style>
 </head>
@@ -75,8 +73,9 @@
     <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text">
 
     <div id="start-screen">
-        <p>信号を解読せよ。Enterで判定。</p>
+        <p>コールサインとRSTを交互に受信せよ。<br>Enterで判定。</p>
         <div style="margin: 20px 0;">
+            制限時間: 
             <select id="time-select">
                 <option value="60">1分間</option>
                 <option value="120">2分間</option>
@@ -84,7 +83,7 @@
                 <option value="240">4分間</option>
                 <option value="300">5分間</option>
             </select>
-            <button onclick="prepareGame()">ミッション開始</button>
+            <button onclick="unlockAndPrepare()">ミッション開始</button>
         </div>
     </div>
 
@@ -108,38 +107,51 @@
 </div>
 
 <script>
-const WORD_LIST = ["ACE", "BEE", "FOX", "SKY", "TEA", "SEA", "CODE", "WIRE", "FAST", "DARK", "BLUE", "JAZZ", "RADIO", "LIGHT", "SPACE", "GREEN", "PIZZA", "HELLO", "WORLD", "TOWER", "PLANE", "MUSIC", "WATER"];
-const MORSE_CODE = {'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--', 'Z': '--..'};
+const MORSE_CODE = {'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--', 'Z': '--..', '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.'};
 
 let audioCtx = null, masterGain = null;
 let timeLeft, initialSeconds, score = 0, currentWord = "", userInput = "", isPlaying = false;
 let timerId, audioLoopId, activeOscillators = [];
-let isWaitingNext = false;
+let isWaitingNext = false, nextType = "CALLSIGN";
 
-const DOT_TIME = 0.08, FREQUENCY = 700;
+const DOT_TIME = 0.07, FREQUENCY = 750; // コンテスト用に少し高め・速めのデフォルト
 const mobileInput = document.getElementById('mobile-input');
 const displayFrame = document.getElementById('input-display');
 
-function initAudio() {
+// 単語生成：①コールサイン
+function generateCallsign() {
+    const rAZ = () => String.fromCharCode(65 + Math.floor(Math.random() * 26));
+    const r09 = () => Math.floor(Math.random() * 10).toString();
+    const first = Math.random() < 0.5 ? 'J' : '7';
+    return first + rAZ() + r09() + rAZ() + rAZ() + rAZ();
+}
+
+// 単語生成：②RST+市郡番号
+function generateRST() {
+    const areas = ["101","102","103","104","105","106","107","108","109","110","111","112","113","114"];
+    for (let i = 2; i <= 48; i++) areas.push(i.toString().padStart(2, '0'));
+    const area = areas[Math.floor(Math.random() * areas.length)];
+    const suffix = ["H", "M", "L", "P"][Math.floor(Math.random() * 4)];
+    return "599" + area + suffix;
+}
+
+// iOS Safari音声ブロック解除
+function unlockAndPrepare() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         masterGain = audioCtx.createGain();
         masterGain.connect(audioCtx.destination);
     }
-}
+    // 無音を再生してロック解除
+    const osc = audioCtx.createOscillator();
+    const silentGain = audioCtx.createGain();
+    silentGain.gain.value = 0;
+    osc.connect(silentGain);
+    silentGain.connect(audioCtx.destination);
+    osc.start(0);
+    osc.stop(0.1);
 
-function killCurrentAudio() {
-    if (audioLoopId) clearTimeout(audioLoopId);
-    activeOscillators.forEach(osc => { try { osc.stop(); } catch(e) {} });
-    activeOscillators = [];
-}
-
-function prepareGame() {
-    initAudio();
     if (audioCtx.state === 'suspended') audioCtx.resume();
-    
-    // エフェクトクラスを完全に除去して開始
-    displayFrame.classList.remove('flash-correct', 'flash-error');
     
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
@@ -150,44 +162,39 @@ function prepareGame() {
 function startGame() {
     initialSeconds = parseInt(document.getElementById('time-select').value);
     timeLeft = initialSeconds;
-    score = 0; isPlaying = true; isWaitingNext = false;
+    score = 0; isPlaying = true; isWaitingNext = false; nextType = "CALLSIGN";
     masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
     document.getElementById('status-msg').innerText = "受信中...";
     nextWord();
     timerId = setInterval(tick, 1000);
-    updateTimerDisplay();
 }
 
-function quitGame() {
-    isPlaying = false; clearInterval(timerId); killCurrentAudio();
-    mobileInput.blur();
-    document.getElementById('game-screen').classList.add('hidden');
-    document.getElementById('start-screen').classList.remove('hidden');
+function killCurrentAudio() {
+    if (audioLoopId) clearTimeout(audioLoopId);
+    activeOscillators.forEach(osc => { try { osc.stop(); } catch(e) {} });
+    activeOscillators = [];
 }
 
 function tick() {
     if (!isPlaying) return;
-    timeLeft--; updateTimerDisplay();
-    if (timeLeft <= 0) endGame();
-}
-
-function updateTimerDisplay() {
+    timeLeft--;
     const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
     document.getElementById('timer').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    if (timeLeft <= 0) endGame();
 }
 
 function nextWord() {
     userInput = ""; mobileInput.value = "";
-    let newWord;
-    do { newWord = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)]; } while (newWord === currentWord);
-    currentWord = newWord;
-    updateDisplay();
+    if (nextType === "CALLSIGN") {
+        currentWord = generateCallsign();
+        nextType = "RST";
+    } else {
+        currentWord = generateRST();
+        nextType = "CALLSIGN";
+    }
+    document.getElementById('typed-text').innerText = "";
     playMorseLoop();
 }
-
-function updateDisplay() { document.getElementById('typed-text').innerText = userInput; }
-
-function focusMobile() { if (isPlaying) mobileInput.focus(); }
 
 function playMorseLoop() {
     if (!isPlaying || isWaitingNext) return;
@@ -221,35 +228,26 @@ function playMorse(text) {
     return offset + 0.1;
 }
 
-// 入力イベント（リアルタイム反映）
+function focusMobile() { if (isPlaying) mobileInput.focus(); }
+
 mobileInput.addEventListener('input', () => {
     if (!isPlaying || isWaitingNext) return;
-    userInput = mobileInput.value.toUpperCase().replace(/[^A-Z]/g, '');
-    updateDisplay();
+    userInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    document.getElementById('typed-text').innerText = userInput;
 });
 
-// 判定ロジック：一字一句の厳密チェック
 mobileInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-        // 現在の入力値を再取得
-        const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z]/g, '');
-        
-        // クラスを一度リセット（連続ミス時でもアニメーションを再トリガーするため）
+        const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
         displayFrame.classList.remove('flash-correct', 'flash-error');
-        void displayFrame.offsetWidth; // リフロー強制
+        void displayFrame.offsetWidth;
 
         if (finalInput === currentWord && currentWord !== "") {
-            // 【完全一致：正解】
             score++;
             document.getElementById('score').innerText = score;
             isWaitingNext = true;
-            
             displayFrame.classList.add('flash-correct');
-            
-            userInput = ""; mobileInput.value = "";
-            updateDisplay();
             killCurrentAudio();
-            
             document.getElementById('status-msg').innerText = "正解！";
             setTimeout(() => {
                 if (!isPlaying) return;
@@ -258,16 +256,18 @@ mobileInput.addEventListener('keydown', (e) => {
                 nextWord();
             }, 500);
         } else {
-            // 【不一致：間違い】FOXに対してFOXX、FO、空欄、すべてここに飛ばす
             displayFrame.classList.add('flash-error');
-            // ここでプログラムは止まらないので、ユーザーは入力を修正して再度Enterを押せる
         }
     }
 });
 
+function quitGame() {
+    isPlaying = false; clearInterval(timerId); killCurrentAudio();
+    location.reload();
+}
+
 function endGame() {
     isPlaying = false; clearInterval(timerId); killCurrentAudio();
-    mobileInput.blur();
     const wordLabel = (score === 1) ? "word" : "words";
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText = `${score} ${wordLabel} / ${minutes} min`;
