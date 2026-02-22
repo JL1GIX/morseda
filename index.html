@@ -114,11 +114,12 @@ let timeLeft, initialSeconds, score = 0, currentWord = "", userInput = "", isPla
 let timerId, audioLoopId, activeOscillators = [];
 let isWaitingNext = false, nextType = "CALLSIGN";
 
-const DOT_TIME = 0.07, FREQUENCY = 750; // コンテスト用に少し高め・速めのデフォルト
+const DOT_TIME = 0.07, FREQUENCY = 750;
 const mobileInput = document.getElementById('mobile-input');
 const displayFrame = document.getElementById('input-display');
+const typedDisplay = document.getElementById('typed-text');
 
-// 単語生成：①コールサイン
+// ①コールサイン生成
 function generateCallsign() {
     const rAZ = () => String.fromCharCode(65 + Math.floor(Math.random() * 26));
     const r09 = () => Math.floor(Math.random() * 10).toString();
@@ -126,7 +127,7 @@ function generateCallsign() {
     return first + rAZ() + r09() + rAZ() + rAZ() + rAZ();
 }
 
-// 単語生成：②RST+市郡番号
+// ②RST+エリア番号生成
 function generateRST() {
     const areas = ["101","102","103","104","105","106","107","108","109","110","111","112","113","114"];
     for (let i = 2; i <= 48; i++) areas.push(i.toString().padStart(2, '0'));
@@ -135,21 +136,20 @@ function generateRST() {
     return "599" + area + suffix;
 }
 
-// iOS Safari音声ブロック解除
+// iOS音声ロック解除
 function unlockAndPrepare() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         masterGain = audioCtx.createGain();
         masterGain.connect(audioCtx.destination);
     }
-    // 無音を再生してロック解除
-    const osc = audioCtx.createOscillator();
-    const silentGain = audioCtx.createGain();
-    silentGain.gain.value = 0;
-    osc.connect(silentGain);
-    silentGain.connect(audioCtx.destination);
-    osc.start(0);
-    osc.stop(0.1);
+    
+    // iOS Safari対策: バッファを生成して即座に再生
+    const buffer = audioCtx.createBuffer(1, 1, 22050);
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioCtx.destination);
+    source.start(0);
 
     if (audioCtx.state === 'suspended') audioCtx.resume();
     
@@ -192,7 +192,7 @@ function nextWord() {
         currentWord = generateRST();
         nextType = "CALLSIGN";
     }
-    document.getElementById('typed-text').innerText = "";
+    typedDisplay.innerText = "";
     playMorseLoop();
 }
 
@@ -233,22 +233,30 @@ function focusMobile() { if (isPlaying) mobileInput.focus(); }
 mobileInput.addEventListener('input', () => {
     if (!isPlaying || isWaitingNext) return;
     userInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    document.getElementById('typed-text').innerText = userInput;
+    typedDisplay.innerText = userInput;
 });
 
 mobileInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        
+        // ラグ防止のため、まず画面上のエフェクトクラスをリセット
         displayFrame.classList.remove('flash-correct', 'flash-error');
         void displayFrame.offsetWidth;
 
         if (finalInput === currentWord && currentWord !== "") {
+            // ★最優先：文字を即座に消去
+            typedDisplay.innerText = "";
+            mobileInput.value = "";
+            
+            // その他の正解処理
             score++;
             document.getElementById('score').innerText = score;
             isWaitingNext = true;
             displayFrame.classList.add('flash-correct');
             killCurrentAudio();
             document.getElementById('status-msg').innerText = "正解！";
+            
             setTimeout(() => {
                 if (!isPlaying) return;
                 isWaitingNext = false;
