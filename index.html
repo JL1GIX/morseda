@@ -6,228 +6,737 @@
     <title>モールス打 - Contest Edition</title>
     <style>
         :root {
-            --primary-color: #007b43;
-            --bg-color: #0d1117;
-            --error-color: #e74c3c;
-            --success-color: #00ff85;
+            --primary: #007b43;
+            --primary-dim: #00663a;
+            --bg: #080f0b;
+            --panel: #0e1f16;
+            --border: #1e5c38;
+            --glow: rgba(0, 123, 67, 0.28);
+            --error: #e74c3c;
+            --success: #00cc66;
+            --scope-bg: #050f08;
+            --scope-trace: #007b43;
         }
 
-        body { font-family: 'Consolas', 'Monaco', 'Courier New', monospace; background: var(--bg-color); color: var(--primary-color); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; touch-action: manipulation; }
-        
-        #game-container { 
-            background: #161b22; 
-            border: 2px solid var(--primary-color); 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 0 30px rgba(0,123,67,0.1); 
-            width: 90%; 
-            max-width: 600px; 
-            text-align: center; 
-            position: relative; 
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            touch-action: manipulation;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
         }
-        
-        h1 { margin-top: 0; letter-spacing: 4px; font-size: 1.8rem; color: var(--primary-color); }
-        .stats { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; font-size: 1rem; border-bottom: 1px solid rgba(0,123,67,0.3); padding-bottom: 10px; }
-        
-        #input-display { 
-            font-size: 2.2rem; 
-            letter-spacing: 5px; 
-            min-height: 4.5rem; 
-            border: 4px solid var(--primary-color); 
-            padding: 15px;
-            background: rgba(0, 123, 67, 0.02);
+
+        /* Scanline overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.12) 2px,
+                rgba(0,0,0,0.12) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        #game-container {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--primary);
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow:
+                0 0 50px rgba(0,100,55,0.35),
+                0 0 100px rgba(0,80,40,0.12),
+                inset 0 1px 0 rgba(0,123,67,0.18);
+            width: 95%;
+            max-width: 640px;
+            text-align: center;
+            position: relative;
+            transition: max-width 0.3s ease;
+        }
+
+        #game-container.with-table {
+            max-width: 960px;
+        }
+
+        /* Header */
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 4px;
+        }
+        .header-bar::before, .header-bar::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary-dim));
+        }
+        .header-bar::after {
+            background: linear-gradient(to left, transparent, var(--primary-dim));
+        }
+
+        h1 {
+            margin: 0;
+            letter-spacing: 6px;
+            font-size: 1.6rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5), 0 0 80px rgba(0,123,67,0.2);
+        }
+
+        .subtitle {
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            letter-spacing: 4px;
+            margin-bottom: 16px;
+            opacity: 0.65;
+        }
+
+        /* Stats bar */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.5);
+            padding: 8px 15px;
+            border-radius: 2px;
+        }
+        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .stat-label { color: var(--primary-dim); font-size: 0.6rem; letter-spacing: 2px; opacity: 0.9; }
+        .stat-value { color: var(--primary); font-size: 1.05rem; font-weight: bold; text-shadow: 0 0 10px rgba(0,123,67,0.9), 0 0 20px rgba(0,123,67,0.4); }
+
+        /* Oscilloscope */
+        #scope-container {
+            position: relative;
+            background: var(--scope-bg);
+            border: 1px solid #2a6040;
+            border-radius: 2px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        #scope-label {
+            position: absolute;
+            top: 5px;
+            left: 8px;
+            font-size: 0.5rem;
+            color: var(--primary-dim);
+            opacity: 0.85;
+            letter-spacing: 2px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        #scope-freq {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            font-size: 0.5rem;
+            color: var(--primary-dim);
+            opacity: 0.85;
+            letter-spacing: 1px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        /* Vignette over scope */
+        #scope-container::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.5) 100%),
+                linear-gradient(to right, rgba(0,0,0,0.3) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.3) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        #scope-canvas {
+            display: block;
+            width: 100%;
+            height: 90px;
+        }
+
+        /* Input display */
+        #input-display {
+            font-size: 2rem;
+            letter-spacing: 5px;
+            min-height: 4rem;
+            border: 1px solid var(--primary-dim);
+            border-top: 2px solid var(--primary);
+            padding: 12px;
+            background: rgba(0, 15, 8, 0.95);
             display: flex;
             align-items: center;
             justify-content: center;
             text-transform: uppercase;
+            text-shadow: 0 0 12px rgba(0,123,67,0.9), 0 0 25px rgba(0,123,67,0.4);
+            border-radius: 2px;
+            position: relative;
+        }
+        #input-display::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px;
+            width: 10px; height: 10px;
+            border-top: 2px solid var(--success);
+            border-left: 2px solid var(--success);
+        }
+        #input-display::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; right: -1px;
+            width: 10px; height: 10px;
+            border-bottom: 2px solid var(--success);
+            border-right: 2px solid var(--success);
         }
 
         .flash-error { animation: error-flash 0.4s ease-in-out; }
         @keyframes error-flash {
-            0%, 100% { border-color: var(--primary-color); box-shadow: none; }
-            50% { border-color: var(--error-color); box-shadow: 0 0 25px var(--error-color); }
+            0%, 100% { border-top-color: var(--primary); border-color: var(--primary-dim); }
+            50% { border-color: var(--error); border-top-color: var(--error); box-shadow: 0 0 30px var(--error), inset 0 0 20px rgba(231,76,60,0.1); }
         }
-
         .flash-correct { animation: correct-flash 0.4s ease-in-out; }
         @keyframes correct-flash {
-            0%, 100% { border-color: var(--primary-color); box-shadow: none; }
-            50% { border-color: var(--success-color); box-shadow: 0 0 30px var(--success-color); border-width: 4px; }
+            0%, 100% { border-top-color: var(--primary); border-color: var(--primary-dim); }
+            50% { border-color: var(--success); border-top-color: var(--success); box-shadow: 0 0 30px var(--success), inset 0 0 20px rgba(0,255,133,0.08); }
         }
 
-        .cursor { display: inline-block; width: 3px; height: 35px; background: var(--primary-color); animation: blink 1s infinite; margin-left: 5px; }
+        .cursor { display: inline-block; width: 2px; height: 32px; background: var(--primary); animation: blink 1s infinite; margin-left: 5px; box-shadow: 0 0 12px var(--primary), 0 0 25px rgba(0,123,67,0.5); }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        button { background: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); padding: 12px 35px; font-size: 1.2rem; cursor: pointer; border-radius: 4px; transition: 0.3s; margin-top: 10px; outline: none; -webkit-tap-highlight-color: transparent; }
-        button:hover { background: var(--primary-color); color: #fff; }
-        
-        .quit-btn { font-size: 0.8rem; padding: 5px 10px; margin-top: 20px; opacity: 0.6; }
+        /* Buttons */
+        button {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 10px 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s;
+            margin-top: 10px;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            letter-spacing: 2px;
+            font-family: inherit;
+        }
+        button:hover {
+            background: rgba(0,123,67,0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0,123,67,0.35);
+            color: #fff;
+        }
+        .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.45; }
+        .quit-btn:hover { opacity: 1; }
+
         #mobile-input { position: absolute; opacity: 0; pointer-events: none; left: -9999px; }
-        select { background: #000; color: var(--primary-color); border: 1px solid var(--primary-color); font-size: 1rem; padding: 8px; margin-right: 10px; border-radius: 4px; }
+
+        /* Select */
+        select {
+            background: rgba(0,0,0,0.85);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            font-size: 0.9rem;
+            padding: 8px 30px 8px 10px;
+            border-radius: 2px;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23007b43' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+        select:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(0,123,67,0.3); }
+
         .hidden { display: none; }
+
+        /* Start screen */
+        #start-screen p {
+            color: var(--primary);
+            font-size: 0.82rem;
+            line-height: 1.9;
+            letter-spacing: 1px;
+            border-left: 2px solid var(--primary);
+            padding-left: 12px;
+            text-align: left;
+            margin: 15px 0;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 18px 0;
+        }
+        .setting-item {
+            background: rgba(0,0,0,0.45);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 2px;
+            text-align: left;
+        }
+        .setting-label {
+            font-size: 0.6rem;
+            color: var(--primary);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: block;
+            opacity: 0.85;
+        }
+        .checkbox-item {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .checkbox-item input[type="checkbox"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 1px solid var(--primary-dim);
+            background: rgba(0,0,0,0.6);
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            border-radius: 1px;
+        }
+        .checkbox-item input[type="checkbox"]:checked {
+            background: rgba(0,123,67,0.2);
+            border-color: var(--primary);
+        }
+        .checkbox-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: -3px;
+            left: 2px;
+            color: var(--primary);
+            font-size: 14px;
+            text-shadow: 0 0 6px var(--primary);
+        }
+        .checkbox-item label {
+            font-size: 0.78rem;
+            color: var(--primary);
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            line-height: 1.5;
+        }
+
+        /* Signal indicators */
+        .signal-indicators {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .sig-label {
+            font-size: 0.5rem;
+            color: var(--primary-dim);
+            opacity: 0.5;
+            letter-spacing: 1px;
+            margin-right: 4px;
+        }
+        .sig-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(0,70,35,0.4);
+            border: 1px solid rgba(0,100,50,0.5);
+        }
+        .sig-dot.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 6px var(--primary);
+        }
+        .sig-dot.blink-active {
+            animation: sig-blink 0.6s infinite alternate;
+        }
+        @keyframes sig-blink {
+            from { opacity: 0.3; box-shadow: none; }
+            to { opacity: 1; box-shadow: 0 0 8px var(--primary); }
+        }
+
+        /* Status msg */
+        #status-msg {
+            font-size: 0.72rem;
+            opacity: 0.9;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* Game layout with table */
+        #game-layout {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .game-main { flex: 1; min-width: 0; }
+
+        /* Morse table panel */
+        #morse-table-panel {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 10px;
+            text-align: left;
+            width: 265px;
+            flex-shrink: 0;
+        }
+        #morse-table-panel h3 {
+            margin: 0 0 8px 0;
+            font-size: 0.62rem;
+            letter-spacing: 3px;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+        }
+        .morse-table-section-label {
+            font-size: 0.52rem;
+            color: var(--primary);
+            opacity: 0.75;
+            letter-spacing: 2px;
+            margin: 6px 0 3px 0;
+        }
+        .morse-table-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+        }
+        .morse-entry {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            padding: 2px 3px;
+        }
+        .morse-char {
+            color: var(--primary);
+            font-weight: bold;
+            width: 14px;
+            text-align: center;
+            font-size: 0.72rem;
+        }
+        .morse-code {
+            color: var(--primary);
+            font-size: 0.62rem;
+            opacity: 0.7;
+        }
+
+        /* Result screen */
+        #result-screen h2 {
+            letter-spacing: 6px;
+            font-size: 1.4rem;
+            text-shadow: 0 0 20px rgba(0,123,67,1.0), 0 0 50px rgba(0,123,67,0.4);
+        }
+        #final-result-text {
+            font-size: 2rem;
+            color: var(--success);
+            text-shadow: 0 0 20px rgba(0,180,90,0.9), 0 0 50px rgba(0,180,90,0.4);
+        }
+
+        /* Decorative corner pieces on main container */
+        #game-container::before {
+            content: '◈';
+            position: absolute;
+            top: 8px; left: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        #game-container::after {
+            content: '◈';
+            position: absolute;
+            top: 8px; right: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <h1>モールス打</h1>
+    <div class="header-bar">
+        <h1>モールス打</h1>
+    </div>
+    <div class="subtitle">▸ AMATEUR RADIO CONTEST TRAINER ◂</div>
+
     <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text">
 
+    <!-- ═══ START SCREEN ═══ -->
     <div id="start-screen">
-        <p>コールサインとRSTを交互に受信せよ。<br>Enterで判定。</p>
-        <div style="margin: 20px 0;">
-            制限時間: 
-            <select id="time-select">
-                <option value="60">1分間</option>
-                <option value="120">2分間</option>
-                <option value="180">3分間</option>
-                <option value="240">4分間</option>
-                <option value="300">5分間</option>
-            </select>
-            <button onclick="unlockAndPrepare()">ミッション開始</button>
+        <p>コールサインとRSTを交互に受信せよ。<br>Enterで判定。正確にコピーせよ。</p>
+        <div class="settings-grid">
+            <div class="setting-item">
+                <span class="setting-label">⏱ 制限時間</span>
+                <select id="time-select">
+                    <option value="60">1分間</option>
+                    <option value="120">2分間</option>
+                    <option value="180">3分間</option>
+                    <option value="240">4分間</option>
+                    <option value="300">5分間</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">📡 モールス速度</span>
+                <select id="wpm-select">
+                    <option value="10">10 WPM</option>
+                    <option value="20" selected>20 WPM</option>
+                    <option value="30">30 WPM</option>
+                </select>
+            </div>
+            <div class="setting-item checkbox-item">
+                <input type="checkbox" id="show-table-check">
+                <label for="show-table-check">ミッション中にモールス表を表示する（初心者向け）</label>
+            </div>
         </div>
+        <button onclick="unlockAndPrepare()">▶ ミッション開始</button>
     </div>
 
+    <!-- ═══ GAME SCREEN ═══ -->
     <div id="game-screen" class="hidden">
+        <div class="signal-indicators">
+            <span class="sig-label">SIG</span>
+            <div class="sig-dot" id="sig1"></div>
+            <div class="sig-dot" id="sig2"></div>
+            <div class="sig-dot active" id="sig3"></div>
+            <div class="sig-dot active blink-active" id="sig4"></div>
+        </div>
+
         <div class="stats">
-            <div>TIME: <span id="timer">00:00</span></div>
-            <div>SCORE: <span id="score">0</span></div>
+            <div class="stat-item">
+                <span class="stat-label">▸ TIME</span>
+                <span class="stat-value" id="timer">00:00</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">▸ SCORE</span>
+                <span class="stat-value" id="score">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">▸ WPM</span>
+                <span class="stat-value" id="wpm-display">20</span>
+            </div>
         </div>
-        <div id="input-display" onclick="focusMobile()">
-            <span id="typed-text"></span><span class="cursor"></span>
+
+        <!-- Oscilloscope -->
+        <div id="scope-container">
+            <span id="scope-label">SCOPE ─ 750Hz CW</span>
+            <span id="scope-freq">▌</span>
+            <canvas id="scope-canvas" width="600" height="90"></canvas>
         </div>
-        <div id="status-msg" style="font-size: 0.8rem; opacity: 0.6; margin-top: 15px;">READY...</div>
-        <button class="quit-btn" onclick="quitGame()">QUIT (中断)</button>
+
+        <div id="game-layout">
+            <div class="game-main">
+                <div id="input-display" onclick="focusMobile()">
+                    <span id="typed-text"></span><span class="cursor"></span>
+                </div>
+                <div id="status-msg">READY...</div>
+                <button class="quit-btn" onclick="quitGame()">■ QUIT (中断)</button>
+            </div>
+            <div id="morse-table-panel" class="hidden">
+                <h3>▸ MORSE TABLE</h3>
+                <div class="morse-table-section-label">ALPHABET</div>
+                <div class="morse-table-grid" id="morse-alpha-grid"></div>
+                <div class="morse-table-section-label" style="margin-top:8px;">NUMBERS &amp; PORTABLE</div>
+                <div class="morse-table-grid" id="morse-num-grid"></div>
+            </div>
+        </div>
     </div>
 
+    <!-- ═══ RESULT SCREEN ═══ -->
     <div id="result-screen" class="hidden">
         <h2>MISSION END</h2>
-        <p id="final-result-text" style="font-size: 1.8rem; margin: 20px 0;"></p>
-        <button onclick="location.reload()">再挑戦</button>
+        <p id="final-result-text" style="margin: 20px 0;"></p>
+        <button onclick="location.reload()">▶ 再挑戦</button>
     </div>
 </div>
 
 <script>
-const MORSE_CODE = {'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--', 'Z': '--..', '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.'};
+// ── Morse code table ─────────────────────────────────────────────────────────
+const MORSE_CODE = {
+    'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---',
+    'K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-',
+    'U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..',
+    '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....',
+    '6':'-....','7':'--...','8':'---..','9':'----.',
+    '/':'-..-.', // ポータブル
+};
 
+// ── State ────────────────────────────────────────────────────────────────────
 let audioCtx = null, masterGain = null;
-let timeLeft, initialSeconds, score = 0, currentWord = "", userInput = "", isPlaying = false;
+let timeLeft, initialSeconds, score = 0, currentWord = '', userInput = '', isPlaying = false;
 let timerId, audioLoopId, activeOscillators = [];
-let isWaitingNext = false, nextType = "CALLSIGN";
+let isWaitingNext = false, nextType = 'CALLSIGN';
+let DOT_TIME = 0.06; // 20wpm default
+let currentWpm = 20;
 
-const DOT_TIME = 0.07, FREQUENCY = 750;
+// Oscilloscope
+let scopeRunning = false;
+const SCOPE_W = 600, SCOPE_H = 90;
+let scopeBuffer = new Array(SCOPE_W).fill(SCOPE_H / 2);
+let scopePhase = 0;
+let scopeSineAmp = 0, scopeNoiseAmp = 1.5;
+const SINE_AMP_TARGET = 24;
+
+// Tone schedule for oscilloscope sync
+let toneSchedule = []; // [{onTime, offTime}] in Date.now() ms
+
 const mobileInput = document.getElementById('mobile-input');
 const displayFrame = document.getElementById('input-display');
 const typedDisplay = document.getElementById('typed-text');
 
-// ①コールサイン生成
+// ── Build morse table ────────────────────────────────────────────────────────
+function buildMorseTable() {
+    const alphaGrid = document.getElementById('morse-alpha-grid');
+    const numGrid   = document.getElementById('morse-num-grid');
+    const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const nums  = ['0','1','2','3','4','5','6','7','8','9','/'];
+    const makeEntry = (ch) => {
+        const d = document.createElement('div');
+        d.className = 'morse-entry';
+        d.innerHTML = `<span class="morse-char">${ch}</span><span class="morse-code">${MORSE_CODE[ch]}</span>`;
+        return d;
+    };
+    alpha.forEach(c => alphaGrid.appendChild(makeEntry(c)));
+    nums.forEach(c  => numGrid.appendChild(makeEntry(c)));
+}
+buildMorseTable();
+
+// ── WPM ──────────────────────────────────────────────────────────────────────
+function wpmToDotTime(wpm) { return 1.2 / wpm; }
+
+// ── Callsign / RST generation ────────────────────────────────────────────────
 function generateCallsign() {
     const rAZ = () => String.fromCharCode(65 + Math.floor(Math.random() * 26));
     const r09 = () => Math.floor(Math.random() * 10).toString();
-    const first = Math.random() < 0.5 ? 'J' : '7';
-    return first + rAZ() + r09() + rAZ() + rAZ() + rAZ();
+    return (Math.random() < 0.5 ? 'J' : '7') + rAZ() + r09() + rAZ() + rAZ() + rAZ();
 }
-
-// ②RST+エリア番号生成
 function generateRST() {
-    const areas = ["101","102","103","104","105","106","107","108","109","110","111","112","113","114"];
-    for (let i = 2; i <= 48; i++) areas.push(i.toString().padStart(2, '0'));
-    const area = areas[Math.floor(Math.random() * areas.length)];
-    const suffix = ["H", "M", "L", "P"][Math.floor(Math.random() * 4)];
-    return "599" + area + suffix;
+    const areas = ['101','102','103','104','105','106','107','108','109','110','111','112','113','114'];
+    for (let i = 2; i <= 48; i++) areas.push(i.toString().padStart(2,'0'));
+    return '599' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
 }
 
-// iOS音声ロック解除
+// ── Audio unlock + prepare ───────────────────────────────────────────────────
 function unlockAndPrepare() {
+    const wpmVal = parseInt(document.getElementById('wpm-select').value);
+    currentWpm = wpmVal;
+    DOT_TIME = wpmToDotTime(wpmVal);
+    document.getElementById('wpm-display').innerText = wpmVal;
+
+    // Morse table
+    if (document.getElementById('show-table-check').checked) {
+        document.getElementById('morse-table-panel').classList.remove('hidden');
+        document.getElementById('game-container').classList.add('with-table');
+    }
+
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         masterGain = audioCtx.createGain();
         masterGain.connect(audioCtx.destination);
     }
-    
-    // iOS Safari対策: バッファを生成して即座に再生
-    const buffer = audioCtx.createBuffer(1, 1, 22050);
-    const source = audioCtx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(audioCtx.destination);
-    source.start(0);
-
+    const buf = audioCtx.createBuffer(1, 1, 22050);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf; src.connect(audioCtx.destination); src.start(0);
     if (audioCtx.state === 'suspended') audioCtx.resume();
-    
+
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
     mobileInput.focus();
+
+    initScope();
+    startScopeAnimation();
     setTimeout(startGame, 500);
 }
 
 function startGame() {
     initialSeconds = parseInt(document.getElementById('time-select').value);
     timeLeft = initialSeconds;
-    score = 0; isPlaying = true; isWaitingNext = false; nextType = "CALLSIGN";
+    score = 0; isPlaying = true; isWaitingNext = false; nextType = 'CALLSIGN';
     masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
-    document.getElementById('status-msg').innerText = "受信中...";
+    document.getElementById('status-msg').innerText = '受信中...';
     nextWord();
     timerId = setInterval(tick, 1000);
 }
 
+// ── Audio ─────────────────────────────────────────────────────────────────────
 function killCurrentAudio() {
     if (audioLoopId) clearTimeout(audioLoopId);
-    activeOscillators.forEach(osc => { try { osc.stop(); } catch(e) {} });
+    activeOscillators.forEach(o => { try { o.stop(); } catch(e){} });
     activeOscillators = [];
+    toneSchedule = [];
 }
 
 function tick() {
     if (!isPlaying) return;
     timeLeft--;
     const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-    document.getElementById('timer').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     if (timeLeft <= 0) endGame();
 }
 
 function nextWord() {
-    userInput = ""; mobileInput.value = "";
-    if (nextType === "CALLSIGN") {
-        currentWord = generateCallsign();
-        nextType = "RST";
-    } else {
-        currentWord = generateRST();
-        nextType = "CALLSIGN";
-    }
-    typedDisplay.innerText = "";
+    userInput = ''; mobileInput.value = '';
+    currentWord = (nextType === 'CALLSIGN') ? generateCallsign() : generateRST();
+    nextType = (nextType === 'CALLSIGN') ? 'RST' : 'CALLSIGN';
+    typedDisplay.innerText = '';
     playMorseLoop();
 }
 
 function playMorseLoop() {
     if (!isPlaying || isWaitingNext) return;
     const duration = playMorse(currentWord);
-    audioLoopId = setTimeout(playMorseLoop, (duration * 1000) + 1000);
+    audioLoopId = setTimeout(playMorseLoop, duration * 1000 + 1000);
 }
 
 function playMorse(text) {
     killCurrentAudio();
-    const startTime = audioCtx.currentTime + 0.1; 
+    const startTime = audioCtx.currentTime + 0.1;
+    const startMs   = Date.now() + 100;
     let offset = 0;
+
     text.split('').forEach(char => {
         const code = MORSE_CODE[char];
         if (!code) return;
         code.split('').forEach(symbol => {
-            const duration = (symbol === '.') ? DOT_TIME : DOT_TIME * 3;
-            const osc = audioCtx.createOscillator();
+            const dur = (symbol === '.') ? DOT_TIME : DOT_TIME * 3;
+            const osc  = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.type = 'sine'; osc.frequency.value = FREQUENCY;
+            osc.type = 'sine';
+            osc.frequency.value = 750;
             gain.gain.setValueAtTime(0, startTime + offset);
             gain.gain.linearRampToValueAtTime(0.5, startTime + offset + 0.005);
-            gain.gain.setValueAtTime(0.5, startTime + offset + duration);
-            gain.gain.linearRampToValueAtTime(0, startTime + offset + duration + 0.005);
+            gain.gain.setValueAtTime(0.5, startTime + offset + dur);
+            gain.gain.linearRampToValueAtTime(0, startTime + offset + dur + 0.005);
             osc.connect(gain); gain.connect(masterGain);
-            osc.start(startTime + offset); osc.stop(startTime + offset + duration + 0.01);
+            osc.start(startTime + offset);
+            osc.stop(startTime + offset + dur + 0.01);
             activeOscillators.push(osc);
-            offset += duration + DOT_TIME;
+            // Oscilloscope schedule
+            toneSchedule.push({ onTime: startMs + offset * 1000, offTime: startMs + (offset + dur) * 1000 });
+            offset += dur + DOT_TIME;
         });
         offset += DOT_TIME * 2;
     });
     return offset + 0.1;
 }
 
+// ── Input handling ────────────────────────────────────────────────────────────
 function focusMobile() { if (isPlaying) mobileInput.focus(); }
 
 mobileInput.addEventListener('input', () => {
@@ -237,48 +746,141 @@ mobileInput.addEventListener('input', () => {
 });
 
 mobileInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-        
-        // ラグ防止のため、まず画面上のエフェクトクラスをリセット
-        displayFrame.classList.remove('flash-correct', 'flash-error');
-        void displayFrame.offsetWidth;
-
-        if (finalInput === currentWord && currentWord !== "") {
-            // ★最優先：文字を即座に消去
-            typedDisplay.innerText = "";
-            mobileInput.value = "";
-            
-            // その他の正解処理
-            score++;
-            document.getElementById('score').innerText = score;
-            isWaitingNext = true;
-            displayFrame.classList.add('flash-correct');
-            killCurrentAudio();
-            document.getElementById('status-msg').innerText = "正解！";
-            
-            setTimeout(() => {
-                if (!isPlaying) return;
-                isWaitingNext = false;
-                document.getElementById('status-msg').innerText = "受信中...";
-                nextWord();
-            }, 500);
-        } else {
-            displayFrame.classList.add('flash-error');
-        }
+    if (e.key !== 'Enter') return;
+    const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    displayFrame.classList.remove('flash-correct', 'flash-error');
+    void displayFrame.offsetWidth;
+    if (finalInput === currentWord && currentWord !== '') {
+        typedDisplay.innerText = ''; mobileInput.value = '';
+        score++;
+        document.getElementById('score').innerText = score;
+        isWaitingNext = true;
+        displayFrame.classList.add('flash-correct');
+        killCurrentAudio();
+        document.getElementById('status-msg').innerText = '✓ COPY OK';
+        setTimeout(() => {
+            if (!isPlaying) return;
+            isWaitingNext = false;
+            document.getElementById('status-msg').innerText = '受信中...';
+            nextWord();
+        }, 500);
+    } else {
+        displayFrame.classList.add('flash-error');
     }
 });
 
+// ── Oscilloscope ──────────────────────────────────────────────────────────────
+function initScope() {
+    scopeBuffer = new Array(SCOPE_W).fill(SCOPE_H / 2);
+    scopeSineAmp = 0; scopeNoiseAmp = 1.5; scopePhase = 0;
+    scopeRunning = false;
+}
+
+function isToneOn() {
+    const now = Date.now();
+    return toneSchedule.some(s => now >= s.onTime && now <= s.offTime);
+}
+
+function startScopeAnimation() {
+    scopeRunning = true;
+    const canvas = document.getElementById('scope-canvas');
+    const ctx = canvas.getContext('2d');
+    const mid = SCOPE_H / 2;
+
+    function draw() {
+        if (!scopeRunning) return;
+        requestAnimationFrame(draw);
+
+        const toneActive = isPlaying && isToneOn();
+
+        // Smoothly animate amplitude
+        if (toneActive) {
+            scopeSineAmp = Math.min(SINE_AMP_TARGET, scopeSineAmp + 3.5);
+            scopeNoiseAmp = Math.max(0.4, scopeNoiseAmp - 0.5);
+        } else {
+            scopeSineAmp = Math.max(0, scopeSineAmp - 2.5);
+            scopeNoiseAmp = Math.min(1.8, scopeNoiseAmp + 0.25);
+        }
+
+        scopePhase += 0.18;
+
+        // Shift buffer left, add new sample
+        scopeBuffer.shift();
+        let newY;
+        if (scopeSineAmp > 0.5) {
+            newY = mid - Math.sin(scopePhase) * scopeSineAmp + (Math.random() - 0.5) * 0.8;
+        } else {
+            newY = mid + (Math.random() - 0.5) * scopeNoiseAmp * 2.5;
+        }
+        scopeBuffer.push(newY);
+
+        // Clear
+        ctx.fillStyle = '#020f06';
+        ctx.fillRect(0, 0, SCOPE_W, SCOPE_H);
+
+        // Grid
+        ctx.strokeStyle = 'rgba(0,110,60,0.35)';
+        ctx.lineWidth = 0.5;
+        for (let x = 0; x <= SCOPE_W; x += 60) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, SCOPE_H); ctx.stroke();
+        }
+        for (let y = 0; y <= SCOPE_H; y += 22) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(SCOPE_W, y); ctx.stroke();
+        }
+        // Centre axis (brighter)
+        ctx.strokeStyle = 'rgba(0,140,75,0.45)';
+        ctx.beginPath(); ctx.moveTo(0, mid); ctx.lineTo(SCOPE_W, mid); ctx.stroke();
+
+        // Glow layer (only when tone is strong)
+        if (scopeSineAmp > 5) {
+            ctx.strokeStyle = `rgba(0,123,67,${0.18 * (scopeSineAmp / SINE_AMP_TARGET)})`;
+            ctx.lineWidth = 10;
+            ctx.beginPath();
+            for (let x = 0; x < SCOPE_W; x++) {
+                x === 0 ? ctx.moveTo(x, scopeBuffer[x]) : ctx.lineTo(x, scopeBuffer[x]);
+            }
+            ctx.stroke();
+        }
+
+        // Main trace
+        const alpha = 0.65 + 0.35 * (scopeSineAmp / SINE_AMP_TARGET);
+        ctx.strokeStyle = `rgba(0,160,85,${alpha})`;
+        ctx.lineWidth = 1.8;
+        ctx.shadowColor = 'rgba(0,123,67,0.9)';
+        ctx.shadowBlur = scopeSineAmp > 5 ? 7 : 2;
+        ctx.beginPath();
+        for (let x = 0; x < SCOPE_W; x++) {
+            x === 0 ? ctx.moveTo(x, scopeBuffer[x]) : ctx.lineTo(x, scopeBuffer[x]);
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Phosphor dot at tip
+        if (scopeSineAmp > 3) {
+            const lastY = scopeBuffer[SCOPE_W - 1];
+            ctx.fillStyle = `rgba(0,210,110,${0.85 * (scopeSineAmp / SINE_AMP_TARGET)})`;
+            ctx.beginPath();
+            ctx.arc(SCOPE_W - 1, lastY, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    draw();
+}
+
+// ── End/Quit ──────────────────────────────────────────────────────────────────
 function quitGame() {
-    isPlaying = false; clearInterval(timerId); killCurrentAudio();
+    isPlaying = false; scopeRunning = false;
+    clearInterval(timerId); killCurrentAudio();
     location.reload();
 }
 
 function endGame() {
-    isPlaying = false; clearInterval(timerId); killCurrentAudio();
-    const wordLabel = (score === 1) ? "word" : "words";
+    isPlaying = false; scopeRunning = false;
+    clearInterval(timerId); killCurrentAudio();
     const minutes = Math.round(initialSeconds / 60);
-    document.getElementById('final-result-text').innerText = `${score} ${wordLabel} / ${minutes} min`;
+    document.getElementById('final-result-text').innerText =
+        `${score} ${score === 1 ? 'word' : 'words'} / ${minutes} min`;
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
 }
