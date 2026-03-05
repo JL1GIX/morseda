@@ -420,21 +420,25 @@
         }
         .morse-entry {
             display: flex;
-            gap: 5px;
+            gap: 6px;
             align-items: center;
-            padding: 2px 3px;
+            padding: 3px 4px;
+            border-bottom: 1px solid rgba(0,123,67,0.08);
         }
         .morse-char {
             color: var(--primary);
             font-weight: bold;
-            width: 14px;
+            width: 16px;
             text-align: center;
-            font-size: 0.72rem;
+            font-size: 0.92rem;
+            flex-shrink: 0;
         }
         .morse-code {
             color: var(--primary);
-            font-size: 0.62rem;
-            opacity: 0.7;
+            font-size: 0.82rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            opacity: 0.85;
         }
 
         /* Result screen */
@@ -447,6 +451,50 @@
             font-size: 2rem;
             color: var(--success);
             text-shadow: 0 0 20px rgba(0,180,90,0.9), 0 0 50px rgba(0,180,90,0.4);
+        }
+
+        /* ── Mobile layout for morse table ─────────────────────────── */
+        @media (max-width: 700px) {
+            body { justify-content: flex-start; padding: 10px 0; overflow-y: auto; overflow-x: hidden; }
+
+            #game-container {
+                padding: 14px;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                width: 100%;
+                max-width: 100% !important;
+            }
+
+            #game-container.with-table {
+                max-width: 100% !important;
+            }
+
+            /* Stack game + table vertically */
+            #game-layout {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            /* Table takes full width below game area */
+            #morse-table-panel {
+                width: 100%;
+                flex-shrink: unset;
+            }
+
+            /* More columns for wider horizontal morse grid */
+            #morse-alpha-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            #morse-num-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            /* Slightly smaller scope on mobile */
+            #scope-canvas { height: 70px; }
+
+            /* Input text smaller on narrow screens */
+            #input-display { font-size: 1.6rem; min-height: 3.5rem; }
         }
 
         /* Decorative corner pieces on main container */
@@ -633,6 +681,8 @@ function generateRST() {
 }
 
 // ── Audio unlock + prepare ───────────────────────────────────────────────────
+// iOS Safari では AudioContext の生成・resume・ノード再生をすべてユーザー操作の
+// 同期コールスタック内で行う必要がある。以下はその対策済み実装。
 function unlockAndPrepare() {
     const wpmVal = parseInt(document.getElementById('wpm-select').value);
     currentWpm = wpmVal;
@@ -645,15 +695,31 @@ function unlockAndPrepare() {
         document.getElementById('game-container').classList.add('with-table');
     }
 
+    // ① ユーザー操作の同期コールスタック内で AudioContext を生成（iOS必須）
     if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
         masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(1, 0);
         masterGain.connect(audioCtx.destination);
     }
-    const buf = audioCtx.createBuffer(1, 1, 22050);
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf; src.connect(audioCtx.destination); src.start(0);
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    // ② suspended 状態なら同期的に resume（iOS では必ずここで呼ぶ）
+    const doResume = (audioCtx.state === 'suspended')
+        ? audioCtx.resume()
+        : Promise.resolve();
+
+    // ③ 無音バッファを masterGain 経由で再生してロック解除（iOS必須）
+    const unlockBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+    const unlockSrc = audioCtx.createBufferSource();
+    unlockSrc.buffer = unlockBuf;
+    unlockSrc.connect(masterGain);
+    unlockSrc.start(0);
+
+    // ④ 電話割り込みなどで suspended になったとき自動 resume
+    audioCtx.onstatechange = () => {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    };
 
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
@@ -661,7 +727,13 @@ function unlockAndPrepare() {
 
     initScope();
     startScopeAnimation();
-    setTimeout(startGame, 500);
+
+    // ⑤ resume 完了後にゲーム開始（iOS で resume が非同期になるケースに対応）
+    doResume.then(() => {
+        setTimeout(startGame, 300);
+    }).catch(() => {
+        setTimeout(startGame, 300);
+    });
 }
 
 function startGame() {
@@ -720,12 +792,13 @@ function playMorse(text) {
             osc.type = 'sine';
             osc.frequency.value = 750;
             gain.gain.setValueAtTime(0, startTime + offset);
-            gain.gain.linearRampToValueAtTime(0.5, startTime + offset + 0.005);
-            gain.gain.setValueAtTime(0.5, startTime + offset + dur);
-            gain.gain.linearRampToValueAtTime(0, startTime + offset + dur + 0.005);
+            gain.gain.linearRampToValueAtTime(0.5, startTime + offset + 0.006);
+            gain.gain.setValueAtTime(0.5, startTime + offset + dur - 0.003);
+            gain.gain.linearRampToValueAtTime(0, startTime + offset + dur + 0.006);
             osc.connect(gain); gain.connect(masterGain);
             osc.start(startTime + offset);
-            osc.stop(startTime + offset + dur + 0.01);
+            // iOS では stop() の余裕を少し長めにする
+            osc.stop(startTime + offset + dur + 0.05);
             activeOscillators.push(osc);
             // Oscilloscope schedule
             toneSchedule.push({ onTime: startMs + offset * 1000, offTime: startMs + (offset + dur) * 1000 });
