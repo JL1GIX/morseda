@@ -11,11 +11,9 @@
             --bg: #080f0b;
             --panel: #0e1f16;
             --border: #1e5c38;
-            --glow: rgba(0, 123, 67, 0.28);
             --error: #e74c3c;
             --success: #00cc66;
             --scope-bg: #050f08;
-            --scope-trace: #007b43;
         }
 
         * { box-sizing: border-box; }
@@ -67,11 +65,24 @@
             max-width: 640px;
             text-align: center;
             position: relative;
-            transition: max-width 0.3s ease;
         }
 
-        #game-container.with-table {
-            max-width: 960px;
+        /* Decorative corner pieces */
+        #game-container::before {
+            content: '◈';
+            position: absolute;
+            top: 8px; left: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        #game-container::after {
+            content: '◈';
+            position: absolute;
+            top: 8px; right: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
         }
 
         /* Header */
@@ -82,13 +93,16 @@
             gap: 15px;
             margin-bottom: 4px;
         }
-        .header-bar::before, .header-bar::after {
+        .header-bar::before {
             content: '';
             flex: 1;
             height: 1px;
             background: linear-gradient(to right, transparent, var(--primary-dim));
         }
         .header-bar::after {
+            content: '';
+            flex: 1;
+            height: 1px;
             background: linear-gradient(to left, transparent, var(--primary-dim));
         }
 
@@ -133,8 +147,7 @@
         }
         #scope-label {
             position: absolute;
-            top: 5px;
-            left: 8px;
+            top: 5px; left: 8px;
             font-size: 0.5rem;
             color: var(--primary-dim);
             opacity: 0.85;
@@ -144,8 +157,7 @@
         }
         #scope-freq {
             position: absolute;
-            top: 5px;
-            right: 8px;
+            top: 5px; right: 8px;
             font-size: 0.5rem;
             color: var(--primary-dim);
             opacity: 0.85;
@@ -153,7 +165,6 @@
             z-index: 2;
             pointer-events: none;
         }
-        /* Vignette over scope */
         #scope-container::after {
             content: '';
             position: absolute;
@@ -170,14 +181,54 @@
             height: 90px;
         }
 
+        /* ── 初心者モード: 文字ごとのモールス表示 ────────────────── */
+        #beginner-display {
+            min-height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(0,123,67,0.25);
+            border-radius: 2px;
+        }
+        /* dot shape */
+        .msym-dot {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary), 0 0 22px rgba(0,123,67,0.5);
+            flex-shrink: 0;
+            animation: msym-in 0.07s ease-out;
+        }
+        /* dash shape */
+        .msym-dash {
+            display: inline-block;
+            width: 38px;
+            height: 14px;
+            border-radius: 7px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary), 0 0 22px rgba(0,123,67,0.5);
+            flex-shrink: 0;
+            animation: msym-in 0.07s ease-out;
+        }
+        @keyframes msym-in {
+            from { opacity: 0; transform: scaleX(0.2); }
+            to   { opacity: 1; transform: scaleX(1); }
+        }
+
         /* Input display */
         #input-display {
             font-size: 2rem;
             letter-spacing: 5px;
-            min-height: 4rem;
+            min-height: 5rem;
             border: 1px solid var(--primary-dim);
             border-top: 2px solid var(--primary);
-            padding: 12px;
+            padding: 14px 12px;
             background: rgba(0, 15, 8, 0.95);
             display: flex;
             align-items: center;
@@ -323,8 +374,7 @@
         .checkbox-item input[type="checkbox"]:checked::after {
             content: '✓';
             position: absolute;
-            top: -3px;
-            left: 2px;
+            top: -3px; left: 2px;
             color: var(--primary);
             font-size: 14px;
             text-shadow: 0 0 6px var(--primary);
@@ -345,183 +395,61 @@
             margin-bottom: 8px;
             align-items: center;
         }
-        .sig-label {
-            font-size: 0.5rem;
-            color: var(--primary-dim);
-            opacity: 0.5;
-            letter-spacing: 1px;
-            margin-right: 4px;
-        }
+        .sig-label { font-size: 0.5rem; color: var(--primary-dim); opacity: 0.5; letter-spacing: 1px; margin-right: 4px; }
         .sig-dot {
-            width: 7px;
-            height: 7px;
+            width: 7px; height: 7px;
             border-radius: 50%;
             background: rgba(0,70,35,0.4);
             border: 1px solid rgba(0,100,50,0.5);
         }
-        .sig-dot.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            box-shadow: 0 0 6px var(--primary);
-        }
-        .sig-dot.blink-active {
-            animation: sig-blink 0.6s infinite alternate;
-        }
+        .sig-dot.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 6px var(--primary); }
+        .sig-dot.blink-active { animation: sig-blink 0.6s infinite alternate; }
         @keyframes sig-blink {
             from { opacity: 0.3; box-shadow: none; }
-            to { opacity: 1; box-shadow: 0 0 8px var(--primary); }
+            to   { opacity: 1; box-shadow: 0 0 8px var(--primary); }
         }
 
         /* Status msg */
-        #status-msg {
-            font-size: 0.72rem;
-            opacity: 0.9;
-            margin-top: 10px;
-            letter-spacing: 2px;
-        }
-
-        /* Game layout with table */
-        #game-layout {
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-        }
-        .game-main { flex: 1; min-width: 0; }
-
-        /* Morse table panel */
-        #morse-table-panel {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid var(--border);
-            border-radius: 2px;
-            padding: 10px;
-            text-align: left;
-            width: 265px;
-            flex-shrink: 0;
-        }
-        #morse-table-panel h3 {
-            margin: 0 0 8px 0;
-            font-size: 0.62rem;
-            letter-spacing: 3px;
-            color: var(--primary);
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 6px;
-        }
-        .morse-table-section-label {
-            font-size: 0.52rem;
-            color: var(--primary);
-            opacity: 0.75;
-            letter-spacing: 2px;
-            margin: 6px 0 3px 0;
-        }
-        .morse-table-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-        }
-        .morse-entry {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            padding: 3px 4px;
-            border-bottom: 1px solid rgba(0,123,67,0.08);
-        }
-        .morse-char {
-            color: var(--primary);
-            font-weight: bold;
-            width: 16px;
-            text-align: center;
-            font-size: 0.92rem;
-            flex-shrink: 0;
-        }
-        .morse-code {
-            color: var(--primary);
-            font-size: 0.82rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            opacity: 0.85;
-        }
+        #status-msg { font-size: 0.72rem; opacity: 0.9; margin-top: 10px; letter-spacing: 2px; }
 
         /* Result screen */
-        #result-screen h2 {
-            letter-spacing: 6px;
-            font-size: 1.4rem;
-            text-shadow: 0 0 20px rgba(0,123,67,1.0), 0 0 50px rgba(0,123,67,0.4);
-        }
-        #final-result-text {
-            font-size: 2rem;
-            color: var(--success);
-            text-shadow: 0 0 20px rgba(0,180,90,0.9), 0 0 50px rgba(0,180,90,0.4);
-        }
+        #result-screen h2 { letter-spacing: 6px; font-size: 1.4rem; text-shadow: 0 0 20px rgba(0,123,67,1.0), 0 0 50px rgba(0,123,67,0.4); }
+        #final-result-text { font-size: 2rem; color: var(--success); text-shadow: 0 0 20px rgba(0,180,90,0.9), 0 0 50px rgba(0,180,90,0.4); }
 
-        /* ── Mobile layout for morse table ─────────────────────────── */
+        /* ── Mobile ─────────────────────────────────────────────────── */
         @media (max-width: 700px) {
-            body { justify-content: flex-start; padding: 10px 0; overflow-y: auto; overflow-x: hidden; }
+            body { justify-content: flex-start; padding: 8px 0; overflow-y: auto; }
 
             #game-container {
-                padding: 14px;
+                padding: 12px;
                 border-radius: 0;
                 border-left: none;
                 border-right: none;
                 width: 100%;
-                max-width: 100% !important;
+                max-width: 100%;
             }
 
-            #game-container.with-table {
-                max-width: 100% !important;
+            h1 { font-size: 1.3rem; letter-spacing: 4px; }
+
+            /* 入力ボックスを最初から大きく確保 */
+            #input-display {
+                font-size: 1.8rem;
+                min-height: 6rem;
+                padding: 16px 12px;
             }
 
-            /* Stack game + table vertically */
-            #game-layout {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            /* Table takes full width below game area */
-            #morse-table-panel {
-                width: 100%;
-                flex-shrink: unset;
-            }
-
-            /* More columns for wider horizontal morse grid */
-            #morse-alpha-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            #morse-num-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-
-            /* Slightly smaller scope on mobile */
             #scope-canvas { height: 70px; }
 
-            /* Input text smaller on narrow screens */
-            #input-display { font-size: 1.6rem; min-height: 3.5rem; }
-        }
-
-        /* Decorative corner pieces on main container */
-        #game-container::before {
-            content: '◈';
-            position: absolute;
-            top: 8px; left: 12px;
-            font-size: 0.6rem;
-            color: var(--primary-dim);
-            opacity: 0.4;
-        }
-        #game-container::after {
-            content: '◈';
-            position: absolute;
-            top: 8px; right: 12px;
-            font-size: 0.6rem;
-            color: var(--primary-dim);
-            opacity: 0.4;
+            /* 初心者モードのドット・ダッシュも少し小さく */
+            .msym-dot  { width: 12px; height: 12px; }
+            .msym-dash { width: 30px; height: 12px; }
         }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <div class="header-bar">
-        <h1>モールス打</h1>
-    </div>
+    <div class="header-bar"><h1>モールス打</h1></div>
     <div class="subtitle">▸ AMATEUR RADIO CONTEST TRAINER ◂</div>
 
     <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text">
@@ -549,8 +477,8 @@
                 </select>
             </div>
             <div class="setting-item checkbox-item">
-                <input type="checkbox" id="show-table-check">
-                <label for="show-table-check">ミッション中にモールス表を表示する（初心者向け）</label>
+                <input type="checkbox" id="beginner-mode-check">
+                <label for="beginner-mode-check">初心者モード（送出中の文字のモールスをリアルタイム表示）</label>
             </div>
         </div>
         <button onclick="unlockAndPrepare()">▶ ミッション開始</button>
@@ -588,22 +516,14 @@
             <canvas id="scope-canvas" width="600" height="90"></canvas>
         </div>
 
-        <div id="game-layout">
-            <div class="game-main">
-                <div id="input-display" onclick="focusMobile()">
-                    <span id="typed-text"></span><span class="cursor"></span>
-                </div>
-                <div id="status-msg">READY...</div>
-                <button class="quit-btn" onclick="quitGame()">■ QUIT (中断)</button>
-            </div>
-            <div id="morse-table-panel" class="hidden">
-                <h3>▸ MORSE TABLE</h3>
-                <div class="morse-table-section-label">ALPHABET</div>
-                <div class="morse-table-grid" id="morse-alpha-grid"></div>
-                <div class="morse-table-section-label" style="margin-top:8px;">NUMBERS &amp; PORTABLE</div>
-                <div class="morse-table-grid" id="morse-num-grid"></div>
-            </div>
+        <!-- 初心者モード: 現在送出中の文字のモールス表示 -->
+        <div id="beginner-display" class="hidden"></div>
+
+        <div id="input-display" onclick="focusMobile()">
+            <span id="typed-text"></span><span class="cursor"></span>
         </div>
+        <div id="status-msg">READY...</div>
+        <button class="quit-btn" onclick="quitGame()">■ QUIT (中断)</button>
     </div>
 
     <!-- ═══ RESULT SCREEN ═══ -->
@@ -615,7 +535,7 @@
 </div>
 
 <script>
-// ── Morse code table ─────────────────────────────────────────────────────────
+// ── Morse code ────────────────────────────────────────────────────────────────
 const MORSE_CODE = {
     'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---',
     'K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-',
@@ -625,13 +545,13 @@ const MORSE_CODE = {
     '/':'-..-.', // ポータブル
 };
 
-// ── State ────────────────────────────────────────────────────────────────────
+// ── State ─────────────────────────────────────────────────────────────────────
 let audioCtx = null, masterGain = null;
-let timeLeft, initialSeconds, score = 0, currentWord = '', userInput = '', isPlaying = false;
+let timeLeft, initialSeconds, score = 0, currentWord = '', isPlaying = false;
 let timerId, audioLoopId, activeOscillators = [];
 let isWaitingNext = false, nextType = 'CALLSIGN';
 let DOT_TIME = 0.06; // 20wpm default
-let currentWpm = 20;
+let beginnerMode = false;
 
 // Oscilloscope
 let scopeRunning = false;
@@ -641,34 +561,21 @@ let scopePhase = 0;
 let scopeSineAmp = 0, scopeNoiseAmp = 1.5;
 const SINE_AMP_TARGET = 24;
 
-// Tone schedule for oscilloscope sync
-let toneSchedule = []; // [{onTime, offTime}] in Date.now() ms
+// Tone schedule for oscilloscope sync: [{onTime, offTime}] ms
+let toneSchedule = [];
+
+// Character schedule for beginner mode: [{morse, startMs, endMs}]
+let charSchedule = [];
 
 const mobileInput = document.getElementById('mobile-input');
 const displayFrame = document.getElementById('input-display');
 const typedDisplay = document.getElementById('typed-text');
+const beginnerDisplay = document.getElementById('beginner-display');
 
-// ── Build morse table ────────────────────────────────────────────────────────
-function buildMorseTable() {
-    const alphaGrid = document.getElementById('morse-alpha-grid');
-    const numGrid   = document.getElementById('morse-num-grid');
-    const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    const nums  = ['0','1','2','3','4','5','6','7','8','9','/'];
-    const makeEntry = (ch) => {
-        const d = document.createElement('div');
-        d.className = 'morse-entry';
-        d.innerHTML = `<span class="morse-char">${ch}</span><span class="morse-code">${MORSE_CODE[ch]}</span>`;
-        return d;
-    };
-    alpha.forEach(c => alphaGrid.appendChild(makeEntry(c)));
-    nums.forEach(c  => numGrid.appendChild(makeEntry(c)));
-}
-buildMorseTable();
-
-// ── WPM ──────────────────────────────────────────────────────────────────────
+// ── WPM ───────────────────────────────────────────────────────────────────────
 function wpmToDotTime(wpm) { return 1.2 / wpm; }
 
-// ── Callsign / RST generation ────────────────────────────────────────────────
+// ── Callsign / RST ────────────────────────────────────────────────────────────
 function generateCallsign() {
     const rAZ = () => String.fromCharCode(65 + Math.floor(Math.random() * 26));
     const r09 = () => Math.floor(Math.random() * 10).toString();
@@ -680,31 +587,26 @@ function generateRST() {
     return '599' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
 }
 
-// ── Audio unlock + prepare ───────────────────────────────────────────────────
+// ── Audio unlock + prepare ────────────────────────────────────────────────────
 // iOS Safari では AudioContext の生成・resume・ノード再生をすべてユーザー操作の
-// 同期コールスタック内で行う必要がある。以下はその対策済み実装。
+// 同期コールスタック内で行う必要がある。
 function unlockAndPrepare() {
     const wpmVal = parseInt(document.getElementById('wpm-select').value);
-    currentWpm = wpmVal;
     DOT_TIME = wpmToDotTime(wpmVal);
     document.getElementById('wpm-display').innerText = wpmVal;
-
-    // Morse table
-    if (document.getElementById('show-table-check').checked) {
-        document.getElementById('morse-table-panel').classList.remove('hidden');
-        document.getElementById('game-container').classList.add('with-table');
-    }
+    beginnerMode = document.getElementById('beginner-mode-check').checked;
+    if (beginnerMode) beginnerDisplay.classList.remove('hidden');
 
     // ① ユーザー操作の同期コールスタック内で AudioContext を生成（iOS必須）
     if (!audioCtx) {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AudioContextClass();
+        const AC = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AC();
         masterGain = audioCtx.createGain();
         masterGain.gain.setValueAtTime(1, 0);
         masterGain.connect(audioCtx.destination);
     }
 
-    // ② suspended 状態なら同期的に resume（iOS では必ずここで呼ぶ）
+    // ② suspended なら同期的に resume（iOS では必ずここで呼ぶ）
     const doResume = (audioCtx.state === 'suspended')
         ? audioCtx.resume()
         : Promise.resolve();
@@ -728,12 +630,9 @@ function unlockAndPrepare() {
     initScope();
     startScopeAnimation();
 
-    // ⑤ resume 完了後にゲーム開始（iOS で resume が非同期になるケースに対応）
-    doResume.then(() => {
-        setTimeout(startGame, 300);
-    }).catch(() => {
-        setTimeout(startGame, 300);
-    });
+    // ⑤ resume 完了後にゲーム開始
+    doResume.then(() => { setTimeout(startGame, 300); })
+            .catch(() => { setTimeout(startGame, 300); });
 }
 
 function startGame() {
@@ -746,12 +645,13 @@ function startGame() {
     timerId = setInterval(tick, 1000);
 }
 
-// ── Audio ─────────────────────────────────────────────────────────────────────
+// ── Audio ──────────────────────────────────────────────────────────────────────
 function killCurrentAudio() {
     if (audioLoopId) clearTimeout(audioLoopId);
     activeOscillators.forEach(o => { try { o.stop(); } catch(e){} });
     activeOscillators = [];
     toneSchedule = [];
+    charSchedule = [];
 }
 
 function tick() {
@@ -763,10 +663,10 @@ function tick() {
 }
 
 function nextWord() {
-    userInput = ''; mobileInput.value = '';
+    mobileInput.value = '';
+    typedDisplay.innerText = '';
     currentWord = (nextType === 'CALLSIGN') ? generateCallsign() : generateRST();
     nextType = (nextType === 'CALLSIGN') ? 'RST' : 'CALLSIGN';
-    typedDisplay.innerText = '';
     playMorseLoop();
 }
 
@@ -781,10 +681,14 @@ function playMorse(text) {
     const startTime = audioCtx.currentTime + 0.1;
     const startMs   = Date.now() + 100;
     let offset = 0;
+    const charEntries = [];
 
     text.split('').forEach(char => {
         const code = MORSE_CODE[char];
         if (!code) return;
+
+        const charStartOffset = offset;
+
         code.split('').forEach(symbol => {
             const dur = (symbol === '.') ? DOT_TIME : DOT_TIME * 3;
             const osc  = audioCtx.createOscillator();
@@ -797,25 +701,35 @@ function playMorse(text) {
             gain.gain.linearRampToValueAtTime(0, startTime + offset + dur + 0.006);
             osc.connect(gain); gain.connect(masterGain);
             osc.start(startTime + offset);
-            // iOS では stop() の余裕を少し長めにする
-            osc.stop(startTime + offset + dur + 0.05);
+            osc.stop(startTime + offset + dur + 0.05); // iOS: 余裕を持たせる
             activeOscillators.push(osc);
-            // Oscilloscope schedule
+
             toneSchedule.push({ onTime: startMs + offset * 1000, offTime: startMs + (offset + dur) * 1000 });
             offset += dur + DOT_TIME;
         });
+
+        charEntries.push({ morse: code, startOffset: charStartOffset });
         offset += DOT_TIME * 2;
     });
+
+    // 各文字の表示区間: 自分のstartから次のcharのstartまで（最後は単語末尾まで）
+    charEntries.forEach((entry, i) => {
+        entry.startMs = startMs + entry.startOffset * 1000;
+        entry.endMs   = i < charEntries.length - 1
+            ? startMs + charEntries[i + 1].startOffset * 1000
+            : startMs + (offset + 0.5) * 1000;
+    });
+    charSchedule = charEntries;
+
     return offset + 0.1;
 }
 
-// ── Input handling ────────────────────────────────────────────────────────────
+// ── Input ──────────────────────────────────────────────────────────────────────
 function focusMobile() { if (isPlaying) mobileInput.focus(); }
 
 mobileInput.addEventListener('input', () => {
     if (!isPlaying || isWaitingNext) return;
-    userInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    typedDisplay.innerText = userInput;
+    typedDisplay.innerText = mobileInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
 });
 
 mobileInput.addEventListener('keydown', (e) => {
@@ -830,6 +744,7 @@ mobileInput.addEventListener('keydown', (e) => {
         isWaitingNext = true;
         displayFrame.classList.add('flash-correct');
         killCurrentAudio();
+        if (beginnerMode) beginnerDisplay.innerHTML = '';
         document.getElementById('status-msg').innerText = '✓ COPY OK';
         setTimeout(() => {
             if (!isPlaying) return;
@@ -842,11 +757,37 @@ mobileInput.addEventListener('keydown', (e) => {
     }
 });
 
+// ── Beginner mode display ─────────────────────────────────────────────────────
+let lastDisplayedMorse = null;
+
+function updateBeginnerDisplay() {
+    if (!beginnerMode) return;
+    const now = Date.now();
+
+    // 現在送出中の文字を探す
+    const current = charSchedule.find(s => now >= s.startMs && now < s.endMs);
+    const morse = current ? current.morse : null;
+
+    if (morse === lastDisplayedMorse) return; // 変化なしなら再描画しない
+    lastDisplayedMorse = morse;
+
+    if (!morse) {
+        beginnerDisplay.innerHTML = '';
+        return;
+    }
+
+    // dot/dashのシェイプを生成
+    beginnerDisplay.innerHTML = morse.split('').map(sym =>
+        `<span class="${sym === '.' ? 'msym-dot' : 'msym-dash'}"></span>`
+    ).join('');
+}
+
 // ── Oscilloscope ──────────────────────────────────────────────────────────────
 function initScope() {
     scopeBuffer = new Array(SCOPE_W).fill(SCOPE_H / 2);
     scopeSineAmp = 0; scopeNoiseAmp = 1.5; scopePhase = 0;
     scopeRunning = false;
+    lastDisplayedMorse = null;
 }
 
 function isToneOn() {
@@ -864,9 +805,11 @@ function startScopeAnimation() {
         if (!scopeRunning) return;
         requestAnimationFrame(draw);
 
+        // 初心者モード更新
+        updateBeginnerDisplay();
+
         const toneActive = isPlaying && isToneOn();
 
-        // Smoothly animate amplitude
         if (toneActive) {
             scopeSineAmp = Math.min(SINE_AMP_TARGET, scopeSineAmp + 3.5);
             scopeNoiseAmp = Math.max(0.4, scopeNoiseAmp - 0.5);
@@ -874,10 +817,8 @@ function startScopeAnimation() {
             scopeSineAmp = Math.max(0, scopeSineAmp - 2.5);
             scopeNoiseAmp = Math.min(1.8, scopeNoiseAmp + 0.25);
         }
-
         scopePhase += 0.18;
 
-        // Shift buffer left, add new sample
         scopeBuffer.shift();
         let newY;
         if (scopeSineAmp > 0.5) {
@@ -887,31 +828,23 @@ function startScopeAnimation() {
         }
         scopeBuffer.push(newY);
 
-        // Clear
         ctx.fillStyle = '#020f06';
         ctx.fillRect(0, 0, SCOPE_W, SCOPE_H);
 
         // Grid
         ctx.strokeStyle = 'rgba(0,110,60,0.35)';
         ctx.lineWidth = 0.5;
-        for (let x = 0; x <= SCOPE_W; x += 60) {
-            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, SCOPE_H); ctx.stroke();
-        }
-        for (let y = 0; y <= SCOPE_H; y += 22) {
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(SCOPE_W, y); ctx.stroke();
-        }
-        // Centre axis (brighter)
+        for (let x = 0; x <= SCOPE_W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,SCOPE_H); ctx.stroke(); }
+        for (let y = 0; y <= SCOPE_H; y += 22) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(SCOPE_W,y); ctx.stroke(); }
         ctx.strokeStyle = 'rgba(0,140,75,0.45)';
-        ctx.beginPath(); ctx.moveTo(0, mid); ctx.lineTo(SCOPE_W, mid); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,mid); ctx.lineTo(SCOPE_W,mid); ctx.stroke();
 
-        // Glow layer (only when tone is strong)
+        // Glow layer
         if (scopeSineAmp > 5) {
             ctx.strokeStyle = `rgba(0,123,67,${0.18 * (scopeSineAmp / SINE_AMP_TARGET)})`;
             ctx.lineWidth = 10;
             ctx.beginPath();
-            for (let x = 0; x < SCOPE_W; x++) {
-                x === 0 ? ctx.moveTo(x, scopeBuffer[x]) : ctx.lineTo(x, scopeBuffer[x]);
-            }
+            for (let x = 0; x < SCOPE_W; x++) { x===0 ? ctx.moveTo(x,scopeBuffer[x]) : ctx.lineTo(x,scopeBuffer[x]); }
             ctx.stroke();
         }
 
@@ -922,26 +855,22 @@ function startScopeAnimation() {
         ctx.shadowColor = 'rgba(0,123,67,0.9)';
         ctx.shadowBlur = scopeSineAmp > 5 ? 7 : 2;
         ctx.beginPath();
-        for (let x = 0; x < SCOPE_W; x++) {
-            x === 0 ? ctx.moveTo(x, scopeBuffer[x]) : ctx.lineTo(x, scopeBuffer[x]);
-        }
+        for (let x = 0; x < SCOPE_W; x++) { x===0 ? ctx.moveTo(x,scopeBuffer[x]) : ctx.lineTo(x,scopeBuffer[x]); }
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // Phosphor dot at tip
+        // Phosphor dot
         if (scopeSineAmp > 3) {
             const lastY = scopeBuffer[SCOPE_W - 1];
             ctx.fillStyle = `rgba(0,210,110,${0.85 * (scopeSineAmp / SINE_AMP_TARGET)})`;
-            ctx.beginPath();
-            ctx.arc(SCOPE_W - 1, lastY, 2.5, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(SCOPE_W - 1, lastY, 2.5, 0, Math.PI * 2); ctx.fill();
         }
     }
 
     draw();
 }
 
-// ── End/Quit ──────────────────────────────────────────────────────────────────
+// ── End / Quit ────────────────────────────────────────────────────────────────
 function quitGame() {
     isPlaying = false; scopeRunning = false;
     clearInterval(timerId); killCurrentAudio();
