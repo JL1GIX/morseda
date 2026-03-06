@@ -629,25 +629,15 @@
             <span id="scope-freq">SPAN 3kHz</span>
             <canvas id="scope-canvas" width="600" height="160"></canvas>
         </div>
-        <!-- TX paddle buttons (スマホ用) -->
+        <!-- TX paddle buttons (タッチ端末専用) -->
         <div id="tx-paddle-area" class="hidden">
             <button class="tx-paddle-btn" id="pad-dot"
-                ontouchstart="event.preventDefault();padDown(false);"
-                ontouchend="event.preventDefault();padUp(false);"
-                ontouchcancel="padUp(false);"
-                onmousedown="padDown(false);"
-                onmouseup="padUp(false);"
-                onmouseleave="padUp(false);">
+                ontouchstart="event.preventDefault();tapSymbol(false);">
                 <span class="tx-paddle-sym">・</span>
                 <span class="tx-paddle-label">トン</span>
             </button>
             <button class="tx-paddle-btn" id="pad-dash"
-                ontouchstart="event.preventDefault();padDown(true);"
-                ontouchend="event.preventDefault();padUp(true);"
-                ontouchcancel="padUp(true);"
-                onmousedown="padDown(true);"
-                onmouseup="padUp(true);"
-                onmouseleave="padUp(true);">
+                ontouchstart="event.preventDefault();tapSymbol(true);">
                 <span class="tx-paddle-sym">ー</span>
                 <span class="tx-paddle-label">ツー</span>
             </button>
@@ -1186,7 +1176,9 @@ function startTxGame() {
     dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
     document.getElementById('rx-area').classList.add('hidden');
     document.getElementById('tx-area').classList.remove('hidden');
-    document.getElementById('tx-paddle-area').classList.remove('hidden');
+    // パドルボタンはタッチ端末のみ表示
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (isTouch) document.getElementById('tx-paddle-area').classList.remove('hidden');
     document.getElementById('status-msg').innerText = 'TRANSMIT...';
     document.addEventListener('keydown', onTxKeyDown);
     document.addEventListener('keyup',   onTxKeyUp);
@@ -1273,20 +1265,15 @@ function startKeyerLoop() {
     if (!keyerPending) keyerStep();
 }
 
-// ── Touch paddle buttons ───────────────────────────────────────────────────────
-function padDown(isDash) {
+// ── Touch paddle buttons (タッチ端末・単押し専用) ─────────────────────────────
+function tapSymbol(isDash) {
     if (!isPlaying || gameMode !== 'TX') return;
-    const btn = document.getElementById(isDash ? 'pad-dash' : 'pad-dot');
-    if (btn) btn.classList.add('pressed');
-    if (isDash) { if (!dashHeld) { dashHeld = true; startKeyerLoop(); } }
-    else        { if (!dotHeld)  { dotHeld  = true; startKeyerLoop(); } }
-}
-
-function padUp(isDash) {
-    const btn = document.getElementById(isDash ? 'pad-dash' : 'pad-dot');
-    if (btn) btn.classList.remove('pressed');
-    if (isDash) dashHeld = false;
-    else        dotHeld  = false;
+    if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
+    const sym = isDash ? '-' : '.';
+    playSidetone(isDash);
+    txMorseInput += sym;
+    renderTxInput();
+    txCharTimer = setTimeout(decodeTxChar, TX_CHAR_GAP);
 }
 
 function onTxKeyDown(e) {
