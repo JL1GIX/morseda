@@ -496,7 +496,7 @@
                         <option value="300">5分間</option>
                     </select>
                 </div>
-                <div class="setting-item">
+                <div class="setting-item" id="wpm-setting-item">
                     <span class="setting-label">📡 モールス速度</span>
                     <select id="wpm-select">
                         <option value="10">10 WPM</option>
@@ -605,7 +605,12 @@ let beginnerMode = false;
 let gameMode = 'RX'; // 'RX' | 'TX'
 let txWord = [], txCharIndex = 0, txMorseInput = '';
 let txCharTimer = null;
-const TX_CHAR_GAP = 650; // ms pause before auto-decode
+const TX_CHAR_GAP = 400;    // ms after last element ends → auto-decode
+const TX_DOT_TIME = 0.06;   // sec — fixed keyer element speed (20 WPM)
+// Iambic keyer state
+let dotHeld = false, dashHeld = false;
+let lastSentSym = null;  // for iambic alternation ('.' or '-')
+let keyerPending = false; // true while keyer setTimeout is in flight
 // IC-7300 Style Spectrum Scope
 let scopeRunning = false;
 const SCOPE_W = 600, SCOPE_H = 160;
@@ -643,9 +648,14 @@ function generateRST() {
 }
 // ── Audio unlock + prepare ────────────────────────────────────────────────────
 function unlockAndPrepare() {
-    const wpmVal = parseInt(document.getElementById('wpm-select').value);
-    DOT_TIME = wpmToDotTime(wpmVal);
-    document.getElementById('wpm-display').innerText = wpmVal;
+    if (gameMode === 'RX') {
+        const wpmVal = parseInt(document.getElementById('wpm-select').value);
+        DOT_TIME = wpmToDotTime(wpmVal);
+        document.getElementById('wpm-display').innerText = wpmVal;
+    } else {
+        DOT_TIME = TX_DOT_TIME; // TX uses fixed keyer speed
+        document.getElementById('wpm-display').innerText = 'KEY';
+    }
     beginnerMode = document.getElementById('beginner-mode-check').checked;
     if (beginnerMode) beginnerDisplay.classList.remove('hidden');
     if (!audioCtx) {
@@ -1033,15 +1043,18 @@ function selectMode(mode) {
     gameMode = mode;
     document.getElementById('mode-select').classList.add('hidden');
     document.getElementById('mode-settings').classList.remove('hidden');
-    const desc = document.getElementById('mode-description');
+    const desc    = document.getElementById('mode-description');
+    const wpmItem = document.getElementById('wpm-setting-item');
     if (mode === 'RX') {
         desc.innerHTML = 'コールサインとRSTを交互に受信せよ。<br>Enterで判定。正確にコピーせよ。';
         document.querySelector('label[for="beginner-mode-check"]').innerText =
             '初心者モード（送出中の文字のモールスをリアルタイム表示）';
+        wpmItem.style.display = '';
     } else {
-        desc.innerHTML = 'コールサインとRSTが表示される。<br>スペース＝短点（・）、Jキー＝長点（－）で打鍵せよ。<br>1文字ずつ自動判定。正確に送信せよ。';
+        desc.innerHTML = 'コールサインとRSTが表示される。<br>スペース長押し＝連続短点（・・・）、Jキー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。';
         document.querySelector('label[for="beginner-mode-check"]').innerText =
-            '初心者モード（現在の文字のモールスを表示）';
+            '初心者モード（現在打つ文字のモールスを表示）';
+        wpmItem.style.display = 'none';
     }
 }
 
@@ -1052,18 +1065,21 @@ function backToModeSelect() {
 
 function startTxGame() {
     txCharIndex = 0; txMorseInput = ''; txCharTimer = null;
+    dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
     document.getElementById('rx-area').classList.add('hidden');
     document.getElementById('tx-area').classList.remove('hidden');
     document.getElementById('status-msg').innerText = 'TRANSMIT...';
-    document.addEventListener('keydown', onTxKey);
+    document.addEventListener('keydown', onTxKeyDown);
+    document.addEventListener('keyup',   onTxKeyUp);
     nextTxWord();
 }
 
 function nextTxWord() {
     const type = (score % 2 === 0) ? 'CALLSIGN' : 'RST';
-    const raw = (type === 'CALLSIGN') ? generateCallsign() : generateRST();
+    const raw  = (type === 'CALLSIGN') ? generateCallsign() : generateRST();
     txWord = raw.split('');
     txCharIndex = 0; txMorseInput = '';
+    renderTxInput();
     updateTxDisplay();
     if (beginnerMode) updateTxBeginnerDisplay();
     document.getElementById('status-msg').innerText = 'TRANSMIT...';
@@ -1094,24 +1110,71 @@ function updateTxBeginnerDisplay() {
 }
 
 function renderTxInput() {
-    document.getElementById('tx-input-render').innerText = txMorseInput || '·';
+    document.getElementById('tx-input-render').innerText = txMorseInput;
 }
 
-function addTxSymbol(sym) {
-    // Clear pending decode timer
+// ── Iambic keyer loop ─────────────────────────────────────────────────────────
+function keyerStep() {
+    keyerPending = false;
+    if (!isPlaying || gameMode !== 'TX') return;
+
+    if (!dotHeld && !dashHeld) {
+        // Both paddles released → start character gap timer
+        if (txMorseInput && !txCharTimer) {
+            txCharTimer = setTimeout(decodeTxChar, TX_CHAR_GAP);
+        }
+        return; // stop loop; onTxKeyDown will restart it
+    }
+
+    // New element incoming → cancel any pending decode
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
+
+    // Iambic: if both held, alternate from last sent; else follow held paddle
+    let sym;
+    if (dotHeld && dashHeld) {
+        sym = (lastSentSym === '.') ? '-' : '.';
+    } else {
+        sym = dotHeld ? '.' : '-';
+    }
+    lastSentSym = sym;
+
+    // Play element and accumulate input
+    playSidetone(sym === '-');
     txMorseInput += sym;
     renderTxInput();
-    playSidetone(sym === '-');
-    // Set new decode timer
-    txCharTimer = setTimeout(decodeTxChar, TX_CHAR_GAP);
+
+    // Schedule next step: element duration + inter-element gap (1 dot)
+    const elemMs = (sym === '.' ? TX_DOT_TIME : TX_DOT_TIME * 3) * 1000;
+    const gapMs  = TX_DOT_TIME * 1000;
+    keyerPending = true;
+    setTimeout(keyerStep, elemMs + gapMs);
+}
+
+function startKeyerLoop() {
+    if (!keyerPending) keyerStep();
+}
+
+function onTxKeyDown(e) {
+    if (!isPlaying || gameMode !== 'TX') return;
+    if (e.code === 'Space') {
+        e.preventDefault();
+        if (!dotHeld) { dotHeld = true; startKeyerLoop(); }
+    } else if (e.code === 'KeyJ') {
+        e.preventDefault();
+        if (!dashHeld) { dashHeld = true; startKeyerLoop(); }
+    }
+}
+
+function onTxKeyUp(e) {
+    if (e.code === 'Space')  dotHeld  = false;
+    else if (e.code === 'KeyJ') dashHeld = false;
 }
 
 function playSidetone(isDash) {
     if (!audioCtx) return;
-    const dur = isDash ? Math.max(0.25, DOT_TIME * 3) : Math.max(0.10, DOT_TIME);
-    const t = audioCtx.currentTime;
-    const ms = Date.now();
+    const dur = isDash ? TX_DOT_TIME * 3 : TX_DOT_TIME;
+    const t   = audioCtx.currentTime;
+    const ms  = Date.now();
     const osc = audioCtx.createOscillator();
     const gn  = audioCtx.createGain();
     osc.type = 'sine';
@@ -1127,37 +1190,31 @@ function playSidetone(isDash) {
 
 function decodeTxChar() {
     txCharTimer = null;
-    const decoded = MORSE_REVERSE[txMorseInput] || null;
+    const decoded  = MORSE_REVERSE[txMorseInput] || null;
     const expected = txWord[txCharIndex];
-    const txArea = document.getElementById('tx-area');
+    const txArea   = document.getElementById('tx-area');
+    txMorseInput = '';
+    renderTxInput();
+    lastSentSym = null; // reset iambic alternation for next character
 
     if (decoded === expected) {
         // Correct
         txCharIndex++;
-        txMorseInput = '';
-        document.getElementById('tx-input-render').innerText = '';
         txArea.classList.remove('flash-error');
         txArea.classList.add('flash-correct');
         setTimeout(() => txArea.classList.remove('flash-correct'), 400);
         document.getElementById('status-msg').innerText = `✓ ${expected}`;
-
         if (txCharIndex >= txWord.length) {
-            // Word complete
             score++;
             document.getElementById('score').innerText = score;
             document.getElementById('status-msg').innerText = '✓ WORD OK';
-            setTimeout(() => {
-                if (!isPlaying) return;
-                nextTxWord();
-            }, 600);
+            setTimeout(() => { if (!isPlaying) return; nextTxWord(); }, 600);
         } else {
             updateTxDisplay();
             if (beginnerMode) updateTxBeginnerDisplay();
         }
     } else {
         // Wrong — retry same character
-        txMorseInput = '';
-        document.getElementById('tx-input-render').innerText = '';
         txArea.classList.remove('flash-correct');
         txArea.classList.add('flash-error');
         setTimeout(() => txArea.classList.remove('flash-error'), 400);
@@ -1165,15 +1222,10 @@ function decodeTxChar() {
     }
 }
 
-function onTxKey(e) {
-    if (!isPlaying || gameMode !== 'TX') return;
-    if (e.repeat) return;
-    if (e.code === 'Space') { e.preventDefault(); addTxSymbol('.'); }
-    else if (e.code === 'KeyJ') { e.preventDefault(); addTxSymbol('-'); }
-}
-
 function cleanupTx() {
-    document.removeEventListener('keydown', onTxKey);
+    document.removeEventListener('keydown', onTxKeyDown);
+    document.removeEventListener('keyup',   onTxKeyUp);
+    dotHeld = false; dashHeld = false; keyerPending = false;
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
 }
 
