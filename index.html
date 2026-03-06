@@ -575,9 +575,7 @@
                     <span class="setting-label">⏱ 制限時間</span>
                     <select id="time-select">
                         <option value="60">1分間</option>
-                        <option value="120">2分間</option>
                         <option value="180">3分間</option>
-                        <option value="240">4分間</option>
                         <option value="300">5分間</option>
                     </select>
                 </div>
@@ -885,7 +883,7 @@ mobileInput.addEventListener('keydown', (e) => {
     void displayFrame.offsetWidth;
     if (finalInput === currentWord && currentWord !== '') {
         typedDisplay.innerText = ''; mobileInput.value = '';
-        score++;
+        score += currentWord.length;
         document.getElementById('score').innerText = score;
         isWaitingNext = true;
         displayFrame.classList.add('flash-correct');
@@ -1328,7 +1326,7 @@ function decodeTxChar() {
         setTimeout(() => txArea.classList.remove('flash-correct'), 400);
         document.getElementById('status-msg').innerText = `✓ ${expected}`;
         if (txCharIndex >= txWord.length) {
-            score++;
+            score += txWord.length;
             document.getElementById('score').innerText = score;
             document.getElementById('status-msg').innerText = '✓ WORD OK';
             setTimeout(() => { if (!isPlaying) return; nextTxWord(); }, 600);
@@ -1360,7 +1358,7 @@ function getShareText() {
     const modeLabel = gameMode === 'TX' ? '送信' : '受信';
     const wpm = gameMode === 'RX' ? document.getElementById('wpm-display').innerText : '';
     const wpmStr = gameMode === 'RX' ? ` / ${wpm} WPM` : '';
-    return `【モールス打】${modeLabel}モード${wpmStr}\n${minutes}分間で ${score} words コピー完了！\n#モールス打 #アマチュア無線 #CW\nhttps://jl1gix.com`;
+    return `【モールス打】${modeLabel}モード${wpmStr}\n${minutes}分間で${score}文字！\n#モールス打 #アマチュア無線 #CW\nhttps://jl1gix.com`;
 }
 
 function shareX() {
@@ -1382,7 +1380,7 @@ function endGame() {
     if (gameMode === 'TX') cleanupTx();
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
-        `${score} ${score === 1 ? 'word' : 'words'} / ${minutes} min`;
+        `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min`;
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
 }
