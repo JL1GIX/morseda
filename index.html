@@ -168,7 +168,7 @@
         #scope-canvas {
             display: block;
             width: 100%;
-            height: 90px;
+            height: 160px;
         }
         /* ── 初心者モード: 文字ごとのモールス表示 ────────────────── */
         #beginner-display {
@@ -410,7 +410,7 @@
                 min-height: 6rem;
                 padding: 16px 12px;
             }
-            #scope-canvas { height: 70px; }
+            #scope-canvas { height: 120px; }
             /* 初心者モードのドット・ダッシュも少し小さく */
             .msym-dot  { width: 12px; height: 12px; }
             .msym-dash { width: 30px; height: 12px; }
@@ -476,11 +476,11 @@
                 <span class="stat-value" id="wpm-display">20</span>
             </div>
         </div>
-        <!-- Oscilloscope -->
+        <!-- Spectrum Scope + Waterfall -->
         <div id="scope-container">
-            <span id="scope-label">SCOPE ─ 750Hz CW</span>
-            <span id="scope-freq">▌</span>
-            <canvas id="scope-canvas" width="600" height="90"></canvas>
+            <span id="scope-label">SPECTRUM ─ CW 750Hz</span>
+            <span id="scope-freq">SPAN 3kHz</span>
+            <canvas id="scope-canvas" width="600" height="160"></canvas>
         </div>
         <!-- 初心者モード: 現在送出中の文字のモールス表示 -->
         <div id="beginner-display" class="hidden"></div>
@@ -529,14 +529,20 @@ let timerId, audioLoopId, activeOscillators = [];
 let isWaitingNext = false, nextType = 'CALLSIGN';
 let DOT_TIME = 0.06; // 20wpm default
 let beginnerMode = false;
-// Oscilloscope
+// IC-7300 Style Spectrum Scope
 let scopeRunning = false;
-const SCOPE_W = 600, SCOPE_H = 90;
-let scopeBuffer = new Array(SCOPE_W).fill(SCOPE_H / 2);
-let scopePhase = 0;
-let scopeSineAmp = 0, scopeNoiseAmp = 1.5;
-const SINE_AMP_TARGET = 24;
-// Tone schedule for oscilloscope sync: [{onTime, offTime}] ms
+const SCOPE_W = 600, SCOPE_H = 160;
+const SPEC_H = 92, FALL_H = 68; // spectrum top, waterfall bottom
+// Frequency axis: 0–3000 Hz, CW tone at 750 Hz
+const FREQ_MIN = 0, FREQ_MAX = 3000, CW_FREQ = 750;
+const CW_X = Math.round((CW_FREQ - FREQ_MIN) / (FREQ_MAX - FREQ_MIN) * SCOPE_W); // 150px
+// CW filter passband ±250 Hz
+const FILT_X1 = Math.round((CW_FREQ - 250 - FREQ_MIN) / (FREQ_MAX - FREQ_MIN) * SCOPE_W);
+const FILT_X2 = Math.round((CW_FREQ + 250 - FREQ_MIN) / (FREQ_MAX - FREQ_MIN) * SCOPE_W);
+let waterfallRows = [];        // each entry = Float32Array(SCOPE_W), 0–1
+let smoothSpectrum = new Float32Array(SCOPE_W).fill(0);
+let toneStrength = 0;          // 0–1, smoothed tone presence
+// Tone schedule: [{onTime, offTime}] ms
 let toneSchedule = [];
 // Character schedule for beginner mode: [{morse, startMs, endMs}]
 let charSchedule = [];
@@ -712,12 +718,40 @@ function updateBeginnerDisplay() {
         `<span class="${sym === '.' ? 'msym-dot' : 'msym-dash'}"></span>`
     ).join('');
 }
-// ── Oscilloscope ──────────────────────────────────────────────────────────────
+// ── IC-7300 Spectrum Scope ────────────────────────────────────────────────────
 function initScope() {
-    scopeBuffer = new Array(SCOPE_W).fill(SCOPE_H / 2);
-    scopeSineAmp = 0; scopeNoiseAmp = 1.5; scopePhase = 0;
+    waterfallRows = [];
+    for (let i = 0; i < FALL_H; i++) waterfallRows.push(new Float32Array(SCOPE_W).fill(0));
+    smoothSpectrum = new Float32Array(SCOPE_W).fill(0);
+    toneStrength = 0;
     scopeRunning = false;
     lastDisplayedMorse = null;
+}
+// Generate instant spectrum (signal strength 0–1 per X pixel)
+function genSpectrum(active) {
+    const s = new Float32Array(SCOPE_W);
+    for (let x = 0; x < SCOPE_W; x++) {
+        s[x] = 0.04 + Math.random() * 0.055;
+        if (Math.random() < 0.004) s[x] += Math.random() * 0.12; // occasional noise spike
+    }
+    if (active) {
+        // Narrow gaussian CW spike at CW_X
+        const peak = 0.78 + Math.random() * 0.09;
+        const sig  = 3.5; // sigma in pixels (narrow CW)
+        for (let x = Math.max(0, CW_X - 28); x < Math.min(SCOPE_W, CW_X + 28); x++) {
+            const d = x - CW_X;
+            s[x] = Math.max(s[x], peak * Math.exp(-(d * d) / (2 * sig * sig)));
+        }
+    }
+    return s;
+}
+// ICOM-style waterfall color (dark→teal→green→yellow→white), green-tinted for game theme
+function wfColor(v) {
+    if (v < 0.10) { const t = v / 0.10; return [0, Math.round(8 + t * 22), Math.round(18 + t * 28)]; }
+    if (v < 0.30) { const t = (v - 0.10) / 0.20; return [0, Math.round(30 + t * 80), Math.round(46 - t * 26)]; }
+    if (v < 0.58) { const t = (v - 0.30) / 0.28; return [Math.round(t * 40), Math.round(110 + t * 105), Math.round(20 - t * 18)]; }
+    if (v < 0.82) { const t = (v - 0.58) / 0.24; return [Math.round(40 + t * 185), Math.round(215 + t * 40), 2]; }
+    { const t = Math.min(1, (v - 0.82) / 0.18); return [Math.round(225 + t * 30), 255, Math.round(t * 210)]; }
 }
 function isToneOn() {
     const now = Date.now();
@@ -727,61 +761,183 @@ function startScopeAnimation() {
     scopeRunning = true;
     const canvas = document.getElementById('scope-canvas');
     const ctx = canvas.getContext('2d');
-    const mid = SCOPE_H / 2;
+    const fallImgData = ctx.createImageData(SCOPE_W, FALL_H);
+    let frameCount = 0;
+
     function draw() {
         if (!scopeRunning) return;
         requestAnimationFrame(draw);
         updateBeginnerDisplay();
+
         const toneActive = isPlaying && isToneOn();
-        if (toneActive) {
-            scopeSineAmp = Math.min(SINE_AMP_TARGET, scopeSineAmp + 3.5);
-            scopeNoiseAmp = Math.max(0.4, scopeNoiseAmp - 0.5);
-        } else {
-            scopeSineAmp = Math.max(0, scopeSineAmp - 2.5);
-            scopeNoiseAmp = Math.min(1.8, scopeNoiseAmp + 0.25);
+        // Smooth tone strength
+        toneStrength = toneActive
+            ? Math.min(1, toneStrength + 0.14)
+            : Math.max(0, toneStrength - 0.09);
+
+        // Build instant spectrum and smooth it
+        const instant = genSpectrum(toneStrength > 0.25);
+        for (let x = 0; x < SCOPE_W; x++) {
+            smoothSpectrum[x] = smoothSpectrum[x] * 0.60 + instant[x] * 0.40;
         }
-        scopePhase += 0.18;
-        scopeBuffer.shift();
-        let newY;
-        if (scopeSineAmp > 0.5) {
-            newY = mid - Math.sin(scopePhase) * scopeSineAmp + (Math.random() - 0.5) * 0.8;
-        } else {
-            newY = mid + (Math.random() - 0.5) * scopeNoiseAmp * 2.5;
+
+        // Update waterfall (~20fps)
+        frameCount++;
+        if (frameCount % 3 === 0) {
+            const row = new Float32Array(SCOPE_W);
+            for (let x = 0; x < SCOPE_W; x++) row[x] = smoothSpectrum[x];
+            waterfallRows.unshift(row);
+            if (waterfallRows.length > FALL_H) waterfallRows.pop();
         }
-        scopeBuffer.push(newY);
-        ctx.fillStyle = '#020f06';
+
+        // ── Clear ────────────────────────────────────────────────────
+        ctx.fillStyle = '#01090404';
         ctx.fillRect(0, 0, SCOPE_W, SCOPE_H);
-        // Grid
-        ctx.strokeStyle = 'rgba(0,110,60,0.35)';
+
+        // ── SPECTRUM AREA (top SPEC_H px) ────────────────────────────
+
+        // Background
+        ctx.fillStyle = '#010d05';
+        ctx.fillRect(0, 0, SCOPE_W, SPEC_H);
+
+        // dB grid lines (horizontal)
         ctx.lineWidth = 0.5;
-        for (let x = 0; x <= SCOPE_W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,SCOPE_H); ctx.stroke(); }
-        for (let y = 0; y <= SCOPE_H; y += 22) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(SCOPE_W,y); ctx.stroke(); }
-        ctx.strokeStyle = 'rgba(0,140,75,0.45)';
-        ctx.beginPath(); ctx.moveTo(0,mid); ctx.lineTo(SCOPE_W,mid); ctx.stroke();
-        // Glow layer
-        if (scopeSineAmp > 5) {
-            ctx.strokeStyle = `rgba(0,123,67,${0.18 * (scopeSineAmp / SINE_AMP_TARGET)})`;
-            ctx.lineWidth = 10;
-            ctx.beginPath();
-            for (let x = 0; x < SCOPE_W; x++) { x===0 ? ctx.moveTo(x,scopeBuffer[x]) : ctx.lineTo(x,scopeBuffer[x]); }
-            ctx.stroke();
+        for (let i = 1; i <= 4; i++) {
+            const y = SPEC_H - (i / 4.5) * (SPEC_H - 14) - 4;
+            ctx.strokeStyle = i === 2 ? 'rgba(0,110,55,0.35)' : 'rgba(0,85,40,0.2)';
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(SCOPE_W, y); ctx.stroke();
         }
-        // Main trace
-        const alpha = 0.65 + 0.35 * (scopeSineAmp / SINE_AMP_TARGET);
-        ctx.strokeStyle = `rgba(0,160,85,${alpha})`;
-        ctx.lineWidth = 1.8;
-        ctx.shadowColor = 'rgba(0,123,67,0.9)';
-        ctx.shadowBlur = scopeSineAmp > 5 ? 7 : 2;
+
+        // Frequency grid lines (vertical) at 500,1000,1500,2000,2500 Hz
+        const freqTicks = [500, 1000, 1500, 2000, 2500];
+        freqTicks.forEach(f => {
+            const x = (f / FREQ_MAX) * SCOPE_W;
+            ctx.strokeStyle = 'rgba(0,90,45,0.22)';
+            ctx.lineWidth = 0.5;
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, SPEC_H); ctx.stroke();
+        });
+
+        // Filter passband (CW ±250Hz) — shaded rectangle
+        ctx.fillStyle = 'rgba(0,123,67,0.10)';
+        ctx.fillRect(FILT_X1, 0, FILT_X2 - FILT_X1, SPEC_H);
+        ctx.strokeStyle = 'rgba(0,160,80,0.38)';
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        for (let x = 0; x < SCOPE_W; x++) { x===0 ? ctx.moveTo(x,scopeBuffer[x]) : ctx.lineTo(x,scopeBuffer[x]); }
+        ctx.moveTo(FILT_X1, 0); ctx.lineTo(FILT_X1, SPEC_H);
+        ctx.moveTo(FILT_X2, 0); ctx.lineTo(FILT_X2, SPEC_H);
+        ctx.stroke();
+
+        // Spectrum fill (gradient below line, IC-7300 "fill+line" mode)
+        const specTop = SPEC_H - 10;
+        const fillGrad = ctx.createLinearGradient(0, 0, 0, SPEC_H);
+        const fa = 0.22 + toneStrength * 0.38;
+        fillGrad.addColorStop(0,   `rgba(20,230,110,${fa})`);
+        fillGrad.addColorStop(0.45,`rgba(0,150,65,${fa * 0.55})`);
+        fillGrad.addColorStop(1,   'rgba(0,40,18,0)');
+        ctx.fillStyle = fillGrad;
+        ctx.beginPath();
+        ctx.moveTo(0, SPEC_H);
+        for (let x = 0; x < SCOPE_W; x++) {
+            const y = SPEC_H - smoothSpectrum[x] * specTop;
+            x === 0 ? ctx.lineTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.lineTo(SCOPE_W - 1, SPEC_H);
+        ctx.closePath();
+        ctx.fill();
+
+        // Spectrum line
+        const la = 0.65 + toneStrength * 0.35;
+        ctx.strokeStyle = `rgba(0,195,85,${la})`;
+        ctx.lineWidth = 1.6;
+        ctx.shadowColor = `rgba(0,180,80,${toneStrength * 0.85})`;
+        ctx.shadowBlur = 2 + toneStrength * 10;
+        ctx.beginPath();
+        for (let x = 0; x < SCOPE_W; x++) {
+            const y = SPEC_H - smoothSpectrum[x] * specTop;
+            x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
         ctx.stroke();
         ctx.shadowBlur = 0;
-        // Phosphor dot
-        if (scopeSineAmp > 3) {
-            const lastY = scopeBuffer[SCOPE_W - 1];
-            ctx.fillStyle = `rgba(0,210,110,${0.85 * (scopeSineAmp / SINE_AMP_TARGET)})`;
-            ctx.beginPath(); ctx.arc(SCOPE_W - 1, lastY, 2.5, 0, Math.PI * 2); ctx.fill();
+
+        // CW spike peak marker (bright dot + dashed vertical)
+        if (toneStrength > 0.2) {
+            const peakY = SPEC_H - smoothSpectrum[CW_X] * specTop;
+            // Dashed vertical from peak to bottom
+            ctx.strokeStyle = `rgba(0,210,95,${toneStrength * 0.3})`;
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 4]);
+            ctx.beginPath(); ctx.moveTo(CW_X, peakY + 2); ctx.lineTo(CW_X, SPEC_H); ctx.stroke();
+            ctx.setLineDash([]);
+            // Bright dot at peak
+            ctx.fillStyle = `rgba(140,255,170,${toneStrength * 0.95})`;
+            ctx.beginPath(); ctx.arc(CW_X, peakY, 2.8, 0, Math.PI * 2); ctx.fill();
+            // Outer glow ring
+            ctx.strokeStyle = `rgba(0,230,100,${toneStrength * 0.5})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.arc(CW_X, peakY, 5, 0, Math.PI * 2); ctx.stroke();
         }
+
+        // Frequency labels at bottom of spectrum area
+        ctx.font = '7px Consolas, monospace';
+        ctx.textAlign = 'center';
+        freqTicks.forEach(f => {
+            const x = (f / FREQ_MAX) * SCOPE_W;
+            ctx.fillStyle = 'rgba(0,150,65,0.5)';
+            ctx.fillText(f >= 1000 ? `${f/1000}k` : f, x, SPEC_H - 2);
+        });
+        // 750 Hz label + triangle marker
+        const cwAlpha = 0.5 + toneStrength * 0.5;
+        ctx.fillStyle = `rgba(0,220,100,${cwAlpha})`;
+        ctx.fillText('750', CW_X, SPEC_H - 2);
+        ctx.beginPath();
+        ctx.moveTo(CW_X - 4, SPEC_H + 1);
+        ctx.lineTo(CW_X + 4, SPEC_H + 1);
+        ctx.lineTo(CW_X, SPEC_H - 5);
+        ctx.closePath();
+        ctx.fill();
+
+        // dB labels on right edge
+        ctx.textAlign = 'right';
+        ctx.fillStyle = 'rgba(0,130,60,0.45)';
+        ['S9+', 'S9', 'S7', 'S5'].forEach((lbl, i) => {
+            const y = SPEC_H - ((3 - i) / 4.5) * (SPEC_H - 14) - 4;
+            ctx.fillText(lbl, SCOPE_W - 2, y - 2);
+        });
+
+        // ── Divider ───────────────────────────────────────────────────
+        ctx.strokeStyle = 'rgba(0,110,55,0.6)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(0, SPEC_H); ctx.lineTo(SCOPE_W, SPEC_H); ctx.stroke();
+
+        // ── WATERFALL AREA (bottom FALL_H px) ────────────────────────
+        // Build pixel data from waterfallRows
+        const d = fallImgData.data;
+        for (let row = 0; row < Math.min(waterfallRows.length, FALL_H); row++) {
+            const rowData = waterfallRows[row];
+            const base = row * SCOPE_W * 4;
+            for (let x = 0; x < SCOPE_W; x++) {
+                const [r, g, b] = wfColor(rowData[x]);
+                const i = base + x * 4;
+                d[i] = r; d[i+1] = g; d[i+2] = b; d[i+3] = 255;
+            }
+        }
+        ctx.putImageData(fallImgData, 0, SPEC_H);
+
+        // Filter passband overlay on waterfall
+        ctx.fillStyle = 'rgba(0,123,67,0.07)';
+        ctx.fillRect(FILT_X1, SPEC_H, FILT_X2 - FILT_X1, FALL_H);
+        ctx.strokeStyle = 'rgba(0,150,75,0.22)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(FILT_X1, SPEC_H); ctx.lineTo(FILT_X1, SPEC_H + FALL_H);
+        ctx.moveTo(FILT_X2, SPEC_H); ctx.lineTo(FILT_X2, SPEC_H + FALL_H);
+        ctx.stroke();
+
+        // "WFALL" label on waterfall
+        ctx.fillStyle = 'rgba(0,140,60,0.35)';
+        ctx.font = '7px Consolas, monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText('WFALL', 4, SPEC_H + 10);
     }
     draw();
 }
