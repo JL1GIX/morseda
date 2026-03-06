@@ -533,12 +533,13 @@ let beginnerMode = false;
 let scopeRunning = false;
 const SCOPE_W = 600, SCOPE_H = 160;
 const SPEC_H = 92, FALL_H = 68; // spectrum top, waterfall bottom
-// Frequency axis: 0–3000 Hz, CW tone at 750 Hz
-const FREQ_MIN = 0, FREQ_MAX = 3000, CW_FREQ = 750;
-const CW_X = Math.round((CW_FREQ - FREQ_MIN) / (FREQ_MAX - FREQ_MIN) * SCOPE_W); // 150px
-// CW filter passband ±250 Hz
-const FILT_X1 = Math.round((CW_FREQ - 250 - FREQ_MIN) / (FREQ_MAX - FREQ_MIN) * SCOPE_W);
-const FILT_X2 = Math.round((CW_FREQ + 250 - FREQ_MIN) / (FREQ_MAX - FREQ_MIN) * SCOPE_W);
+// Frequency axis: CW tone always at center, ±1500 Hz span
+const CW_X = SCOPE_W / 2; // 300px — always center
+const SPAN_HZ = 3000;     // total span displayed (±1500 Hz around CW)
+const PX_PER_HZ = SCOPE_W / SPAN_HZ; // 0.2 px/Hz
+// CW filter passband ±250 Hz → ±50 px
+const FILT_X1 = CW_X - 250 * PX_PER_HZ;
+const FILT_X2 = CW_X + 250 * PX_PER_HZ;
 let waterfallRows = [];        // each entry = Float32Array(SCOPE_W), 0–1
 let smoothSpectrum = new Float32Array(SCOPE_W).fill(0);
 let toneStrength = 0;          // 0–1, smoothed tone presence
@@ -808,12 +809,12 @@ function startScopeAnimation() {
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(SCOPE_W, y); ctx.stroke();
         }
 
-        // Frequency grid lines (vertical) at 500,1000,1500,2000,2500 Hz
-        const freqTicks = [500, 1000, 1500, 2000, 2500];
-        freqTicks.forEach(f => {
-            const x = (f / FREQ_MAX) * SCOPE_W;
-            ctx.strokeStyle = 'rgba(0,90,45,0.22)';
-            ctx.lineWidth = 0.5;
+        // Frequency grid lines (vertical) — relative offsets from center
+        const freqOffsets = [-1000, -500, 0, 500, 1000]; // Hz relative to CW center
+        freqOffsets.forEach(f => {
+            const x = CW_X + f * PX_PER_HZ;
+            ctx.strokeStyle = f === 0 ? 'rgba(0,140,65,0.35)' : 'rgba(0,90,45,0.22)';
+            ctx.lineWidth = f === 0 ? 0.8 : 0.5;
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, SPEC_H); ctx.stroke();
         });
 
@@ -877,18 +878,18 @@ function startScopeAnimation() {
             ctx.beginPath(); ctx.arc(CW_X, peakY, 5, 0, Math.PI * 2); ctx.stroke();
         }
 
-        // Frequency labels at bottom of spectrum area
+        // Frequency labels at bottom of spectrum area (relative to CW center)
         ctx.font = '7px Consolas, monospace';
         ctx.textAlign = 'center';
-        freqTicks.forEach(f => {
-            const x = (f / FREQ_MAX) * SCOPE_W;
-            ctx.fillStyle = 'rgba(0,150,65,0.5)';
-            ctx.fillText(f >= 1000 ? `${f/1000}k` : f, x, SPEC_H - 2);
+        freqOffsets.forEach(f => {
+            const x = CW_X + f * PX_PER_HZ;
+            const lbl = f === 0 ? '750Hz' : (f > 0 ? `+${f >= 1000 ? f/1000+'k' : f}` : `${f <= -1000 ? f/1000+'k' : f}`);
+            ctx.fillStyle = f === 0 ? `rgba(0,220,100,${0.5 + toneStrength * 0.5})` : 'rgba(0,150,65,0.45)';
+            ctx.fillText(lbl, x, SPEC_H - 2);
         });
-        // 750 Hz label + triangle marker
+        // Center frequency marker
         const cwAlpha = 0.5 + toneStrength * 0.5;
         ctx.fillStyle = `rgba(0,220,100,${cwAlpha})`;
-        ctx.fillText('750', CW_X, SPEC_H - 2);
         ctx.beginPath();
         ctx.moveTo(CW_X - 4, SPEC_H + 1);
         ctx.lineTo(CW_X + 4, SPEC_H + 1);
