@@ -296,7 +296,7 @@
             background-position: right 10px center;
         }
         select:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(0,123,67,0.3); }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         /* Start screen */
         #start-screen p {
             color: var(--primary);
@@ -713,7 +713,7 @@ let beginnerMode = false;
 let gameMode = 'RX'; // 'RX' | 'TX'
 let txWord = [], txCharIndex = 0, txMorseInput = '';
 let txCharTimer = null;
-const TX_CHAR_GAP = 400;    // ms after last element ends → auto-decode
+let TX_CHAR_GAP = 400;      // ms after last element ends → auto-decode (スマホは700ms)
 const TX_DOT_TIME = 0.06;   // sec — fixed keyer element speed (20 WPM)
 // Iambic keyer state
 let dotHeld = false, dashHeld = false;
@@ -1176,8 +1176,9 @@ function startTxGame() {
     dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
     document.getElementById('rx-area').classList.add('hidden');
     document.getElementById('tx-area').classList.remove('hidden');
-    // パドルボタンはタッチ端末のみ表示
+    // パドルボタンはタッチ端末のみ表示。判定ギャップも緩和
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    TX_CHAR_GAP = isTouch ? 700 : 400;
     if (isTouch) document.getElementById('tx-paddle-area').classList.remove('hidden');
     document.getElementById('status-msg').innerText = 'TRANSMIT...';
     document.addEventListener('keydown', onTxKeyDown);
