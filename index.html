@@ -15,9 +15,7 @@
             --success: #00cc66;
             --scope-bg: #050f08;
         }
-
         * { box-sizing: border-box; }
-
         body {
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             background: var(--bg);
@@ -34,7 +32,6 @@
                 radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
                 radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
         }
-
         /* Scanline overlay */
         body::after {
             content: '';
@@ -50,7 +47,6 @@
             pointer-events: none;
             z-index: 9999;
         }
-
         #game-container {
             background: var(--panel);
             border: 1px solid var(--border);
@@ -66,7 +62,6 @@
             text-align: center;
             position: relative;
         }
-
         /* Decorative corner pieces */
         #game-container::before {
             content: '◈';
@@ -84,7 +79,6 @@
             color: var(--primary-dim);
             opacity: 0.4;
         }
-
         /* Header */
         .header-bar {
             display: flex;
@@ -105,7 +99,6 @@
             height: 1px;
             background: linear-gradient(to left, transparent, var(--primary-dim));
         }
-
         h1 {
             margin: 0;
             letter-spacing: 6px;
@@ -113,7 +106,6 @@
             color: var(--primary);
             text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5), 0 0 80px rgba(0,123,67,0.2);
         }
-
         .subtitle {
             font-size: 0.6rem;
             color: var(--primary-dim);
@@ -121,7 +113,6 @@
             margin-bottom: 16px;
             opacity: 0.65;
         }
-
         /* Stats bar */
         .stats {
             display: flex;
@@ -135,7 +126,6 @@
         .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .stat-label { color: var(--primary-dim); font-size: 0.6rem; letter-spacing: 2px; opacity: 0.9; }
         .stat-value { color: var(--primary); font-size: 1.05rem; font-weight: bold; text-shadow: 0 0 10px rgba(0,123,67,0.9), 0 0 20px rgba(0,123,67,0.4); }
-
         /* Oscilloscope */
         #scope-container {
             position: relative;
@@ -180,7 +170,6 @@
             width: 100%;
             height: 90px;
         }
-
         /* ── 初心者モード: 文字ごとのモールス表示 ────────────────── */
         #beginner-display {
             min-height: 3rem;
@@ -220,7 +209,6 @@
             from { opacity: 0; transform: scaleX(0.2); }
             to   { opacity: 1; transform: scaleX(1); }
         }
-
         /* Input display */
         #input-display {
             font-size: 2rem;
@@ -254,7 +242,6 @@
             border-bottom: 2px solid var(--success);
             border-right: 2px solid var(--success);
         }
-
         .flash-error { animation: error-flash 0.4s ease-in-out; }
         @keyframes error-flash {
             0%, 100% { border-top-color: var(--primary); border-color: var(--primary-dim); }
@@ -265,10 +252,8 @@
             0%, 100% { border-top-color: var(--primary); border-color: var(--primary-dim); }
             50% { border-color: var(--success); border-top-color: var(--success); box-shadow: 0 0 30px var(--success), inset 0 0 20px rgba(0,255,133,0.08); }
         }
-
         .cursor { display: inline-block; width: 2px; height: 32px; background: var(--primary); animation: blink 1s infinite; margin-left: 5px; box-shadow: 0 0 12px var(--primary), 0 0 25px rgba(0,123,67,0.5); }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
         /* Buttons */
         button {
             background: transparent;
@@ -293,9 +278,7 @@
         }
         .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.45; }
         .quit-btn:hover { opacity: 1; }
-
         #mobile-input { position: absolute; opacity: 0; pointer-events: none; left: -9999px; }
-
         /* Select */
         select {
             background: rgba(0,0,0,0.85);
@@ -313,9 +296,7 @@
             background-position: right 10px center;
         }
         select:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(0,123,67,0.3); }
-
         .hidden { display: none; }
-
         /* Start screen */
         #start-screen p {
             color: var(--primary);
@@ -327,7 +308,6 @@
             text-align: left;
             margin: 15px 0;
         }
-
         .settings-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -386,7 +366,6 @@
             letter-spacing: 0.5px;
             line-height: 1.5;
         }
-
         /* Signal indicators */
         .signal-indicators {
             display: flex;
@@ -408,18 +387,14 @@
             from { opacity: 0.3; box-shadow: none; }
             to   { opacity: 1; box-shadow: 0 0 8px var(--primary); }
         }
-
         /* Status msg */
         #status-msg { font-size: 0.72rem; opacity: 0.9; margin-top: 10px; letter-spacing: 2px; }
-
         /* Result screen */
         #result-screen h2 { letter-spacing: 6px; font-size: 1.4rem; text-shadow: 0 0 20px rgba(0,123,67,1.0), 0 0 50px rgba(0,123,67,0.4); }
         #final-result-text { font-size: 2rem; color: var(--success); text-shadow: 0 0 20px rgba(0,180,90,0.9), 0 0 50px rgba(0,180,90,0.4); }
-
         /* ── Mobile ─────────────────────────────────────────────────── */
         @media (max-width: 700px) {
             body { justify-content: flex-start; padding: 8px 0; overflow-y: auto; }
-
             #game-container {
                 padding: 12px;
                 border-radius: 0;
@@ -428,36 +403,27 @@
                 width: 100%;
                 max-width: 100%;
             }
-
             h1 { font-size: 1.3rem; letter-spacing: 4px; }
-
             /* 入力ボックスを最初から大きく確保 */
             #input-display {
                 font-size: 1.8rem;
                 min-height: 6rem;
                 padding: 16px 12px;
             }
-
             #scope-canvas { height: 70px; }
-
             /* 初心者モードのドット・ダッシュも少し小さく */
             .msym-dot  { width: 12px; height: 12px; }
             .msym-dash { width: 30px; height: 12px; }
         }
     </style>
-
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3503091804175227"
      crossorigin="anonymous"></script>
-    
 </head>
 <body>
-
 <div id="game-container">
-    <div class="header-bar"><h1>モールス打</h1></div>
+    <div class="header-bar"><h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1></div>
     <div class="subtitle">▸ AMATEUR RADIO CONTEST TRAINER ◂</div>
-
     <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text">
-
     <!-- ═══ START SCREEN ═══ -->
     <div id="start-screen">
         <p>コールサインとRSTを交互に受信せよ。<br>Enterで判定。正確にコピーせよ。</p>
@@ -487,7 +453,6 @@
         </div>
         <button onclick="unlockAndPrepare()">▶ ミッション開始</button>
     </div>
-
     <!-- ═══ GAME SCREEN ═══ -->
     <div id="game-screen" class="hidden">
         <div class="signal-indicators">
@@ -497,7 +462,6 @@
             <div class="sig-dot active" id="sig3"></div>
             <div class="sig-dot active blink-active" id="sig4"></div>
         </div>
-
         <div class="stats">
             <div class="stat-item">
                 <span class="stat-label">▸ TIME</span>
@@ -512,24 +476,20 @@
                 <span class="stat-value" id="wpm-display">20</span>
             </div>
         </div>
-
         <!-- Oscilloscope -->
         <div id="scope-container">
             <span id="scope-label">SCOPE ─ 750Hz CW</span>
             <span id="scope-freq">▌</span>
             <canvas id="scope-canvas" width="600" height="90"></canvas>
         </div>
-
         <!-- 初心者モード: 現在送出中の文字のモールス表示 -->
         <div id="beginner-display" class="hidden"></div>
-
         <div id="input-display" onclick="focusMobile()">
             <span id="typed-text"></span><span class="cursor"></span>
         </div>
         <div id="status-msg">READY...</div>
         <button class="quit-btn" onclick="quitGame()">■ QUIT (中断)</button>
     </div>
-
     <!-- ═══ RESULT SCREEN ═══ -->
     <div id="result-screen" class="hidden">
         <h2>MISSION END</h2>
@@ -537,7 +497,6 @@
         <button onclick="location.reload()">▶ 再挑戦</button>
     </div>
 </div>
-
 <!-- フッター -->
 <footer style="
     margin-top: 20px;
@@ -553,7 +512,6 @@
     <a href="privacy.html" style="color:#007b43; text-decoration:none;">プライバシーポリシー</a>
     <a href="contact.html" style="color:#007b43; text-decoration:none;">お問い合わせ</a>
 </footer>
-
 <script>
 // ── Morse code ────────────────────────────────────────────────────────────────
 const MORSE_CODE = {
@@ -564,7 +522,6 @@ const MORSE_CODE = {
     '6':'-....','7':'--...','8':'---..','9':'----.',
     '/':'-..-.', // ポータブル
 };
-
 // ── State ─────────────────────────────────────────────────────────────────────
 let audioCtx = null, masterGain = null;
 let timeLeft, initialSeconds, score = 0, currentWord = '', isPlaying = false;
@@ -572,7 +529,6 @@ let timerId, audioLoopId, activeOscillators = [];
 let isWaitingNext = false, nextType = 'CALLSIGN';
 let DOT_TIME = 0.06; // 20wpm default
 let beginnerMode = false;
-
 // Oscilloscope
 let scopeRunning = false;
 const SCOPE_W = 600, SCOPE_H = 90;
@@ -580,21 +536,16 @@ let scopeBuffer = new Array(SCOPE_W).fill(SCOPE_H / 2);
 let scopePhase = 0;
 let scopeSineAmp = 0, scopeNoiseAmp = 1.5;
 const SINE_AMP_TARGET = 24;
-
 // Tone schedule for oscilloscope sync: [{onTime, offTime}] ms
 let toneSchedule = [];
-
 // Character schedule for beginner mode: [{morse, startMs, endMs}]
 let charSchedule = [];
-
 const mobileInput = document.getElementById('mobile-input');
 const displayFrame = document.getElementById('input-display');
 const typedDisplay = document.getElementById('typed-text');
 const beginnerDisplay = document.getElementById('beginner-display');
-
 // ── WPM ───────────────────────────────────────────────────────────────────────
 function wpmToDotTime(wpm) { return 1.2 / wpm; }
-
 // ── Callsign / RST ────────────────────────────────────────────────────────────
 function generateCallsign() {
     const rAZ = () => String.fromCharCode(65 + Math.floor(Math.random() * 26));
@@ -606,18 +557,13 @@ function generateRST() {
     for (let i = 2; i <= 48; i++) areas.push(i.toString().padStart(2,'0'));
     return '599' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
 }
-
 // ── Audio unlock + prepare ────────────────────────────────────────────────────
-// iOS Safari では AudioContext の生成・resume・ノード再生をすべてユーザー操作の
-// 同期コールスタック内で行う必要がある。
 function unlockAndPrepare() {
     const wpmVal = parseInt(document.getElementById('wpm-select').value);
     DOT_TIME = wpmToDotTime(wpmVal);
     document.getElementById('wpm-display').innerText = wpmVal;
     beginnerMode = document.getElementById('beginner-mode-check').checked;
     if (beginnerMode) beginnerDisplay.classList.remove('hidden');
-
-    // ① ユーザー操作の同期コールスタック内で AudioContext を生成（iOS必須）
     if (!audioCtx) {
         const AC = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AC();
@@ -625,36 +571,25 @@ function unlockAndPrepare() {
         masterGain.gain.setValueAtTime(1, 0);
         masterGain.connect(audioCtx.destination);
     }
-
-    // ② suspended なら同期的に resume（iOS では必ずここで呼ぶ）
     const doResume = (audioCtx.state === 'suspended')
         ? audioCtx.resume()
         : Promise.resolve();
-
-    // ③ 無音バッファを masterGain 経由で再生してロック解除（iOS必須）
     const unlockBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
     const unlockSrc = audioCtx.createBufferSource();
     unlockSrc.buffer = unlockBuf;
     unlockSrc.connect(masterGain);
     unlockSrc.start(0);
-
-    // ④ 電話割り込みなどで suspended になったとき自動 resume
     audioCtx.onstatechange = () => {
         if (audioCtx.state === 'suspended') audioCtx.resume();
     };
-
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
     mobileInput.focus();
-
     initScope();
     startScopeAnimation();
-
-    // ⑤ resume 完了後にゲーム開始
     doResume.then(() => { setTimeout(startGame, 300); })
             .catch(() => { setTimeout(startGame, 300); });
 }
-
 function startGame() {
     initialSeconds = parseInt(document.getElementById('time-select').value);
     timeLeft = initialSeconds;
@@ -664,7 +599,6 @@ function startGame() {
     nextWord();
     timerId = setInterval(tick, 1000);
 }
-
 // ── Audio ──────────────────────────────────────────────────────────────────────
 function killCurrentAudio() {
     if (audioLoopId) clearTimeout(audioLoopId);
@@ -673,7 +607,6 @@ function killCurrentAudio() {
     toneSchedule = [];
     charSchedule = [];
 }
-
 function tick() {
     if (!isPlaying) return;
     timeLeft--;
@@ -681,7 +614,6 @@ function tick() {
     document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     if (timeLeft <= 0) endGame();
 }
-
 function nextWord() {
     mobileInput.value = '';
     typedDisplay.innerText = '';
@@ -689,26 +621,21 @@ function nextWord() {
     nextType = (nextType === 'CALLSIGN') ? 'RST' : 'CALLSIGN';
     playMorseLoop();
 }
-
 function playMorseLoop() {
     if (!isPlaying || isWaitingNext) return;
     const duration = playMorse(currentWord);
     audioLoopId = setTimeout(playMorseLoop, duration * 1000 + 1000);
 }
-
 function playMorse(text) {
     killCurrentAudio();
     const startTime = audioCtx.currentTime + 0.1;
     const startMs   = Date.now() + 100;
     let offset = 0;
     const charEntries = [];
-
     text.split('').forEach(char => {
         const code = MORSE_CODE[char];
         if (!code) return;
-
         const charStartOffset = offset;
-
         code.split('').forEach(symbol => {
             const dur = (symbol === '.') ? DOT_TIME : DOT_TIME * 3;
             const osc  = audioCtx.createOscillator();
@@ -721,18 +648,14 @@ function playMorse(text) {
             gain.gain.linearRampToValueAtTime(0, startTime + offset + dur + 0.006);
             osc.connect(gain); gain.connect(masterGain);
             osc.start(startTime + offset);
-            osc.stop(startTime + offset + dur + 0.05); // iOS: 余裕を持たせる
+            osc.stop(startTime + offset + dur + 0.05);
             activeOscillators.push(osc);
-
             toneSchedule.push({ onTime: startMs + offset * 1000, offTime: startMs + (offset + dur) * 1000 });
             offset += dur + DOT_TIME;
         });
-
         charEntries.push({ morse: code, startOffset: charStartOffset });
         offset += DOT_TIME * 2;
     });
-
-    // 各文字の表示区間: 自分のstartから次のcharのstartまで（最後は単語末尾まで）
     charEntries.forEach((entry, i) => {
         entry.startMs = startMs + entry.startOffset * 1000;
         entry.endMs   = i < charEntries.length - 1
@@ -740,18 +663,14 @@ function playMorse(text) {
             : startMs + (offset + 0.5) * 1000;
     });
     charSchedule = charEntries;
-
     return offset + 0.1;
 }
-
 // ── Input ──────────────────────────────────────────────────────────────────────
 function focusMobile() { if (isPlaying) mobileInput.focus(); }
-
 mobileInput.addEventListener('input', () => {
     if (!isPlaying || isWaitingNext) return;
     typedDisplay.innerText = mobileInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
 });
-
 mobileInput.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return;
     const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -776,32 +695,23 @@ mobileInput.addEventListener('keydown', (e) => {
         displayFrame.classList.add('flash-error');
     }
 });
-
 // ── Beginner mode display ─────────────────────────────────────────────────────
 let lastDisplayedMorse = null;
-
 function updateBeginnerDisplay() {
     if (!beginnerMode) return;
     const now = Date.now();
-
-    // 現在送出中の文字を探す
     const current = charSchedule.find(s => now >= s.startMs && now < s.endMs);
     const morse = current ? current.morse : null;
-
-    if (morse === lastDisplayedMorse) return; // 変化なしなら再描画しない
+    if (morse === lastDisplayedMorse) return;
     lastDisplayedMorse = morse;
-
     if (!morse) {
         beginnerDisplay.innerHTML = '';
         return;
     }
-
-    // dot/dashのシェイプを生成
     beginnerDisplay.innerHTML = morse.split('').map(sym =>
         `<span class="${sym === '.' ? 'msym-dot' : 'msym-dash'}"></span>`
     ).join('');
 }
-
 // ── Oscilloscope ──────────────────────────────────────────────────────────────
 function initScope() {
     scopeBuffer = new Array(SCOPE_W).fill(SCOPE_H / 2);
@@ -809,27 +719,20 @@ function initScope() {
     scopeRunning = false;
     lastDisplayedMorse = null;
 }
-
 function isToneOn() {
     const now = Date.now();
     return toneSchedule.some(s => now >= s.onTime && now <= s.offTime);
 }
-
 function startScopeAnimation() {
     scopeRunning = true;
     const canvas = document.getElementById('scope-canvas');
     const ctx = canvas.getContext('2d');
     const mid = SCOPE_H / 2;
-
     function draw() {
         if (!scopeRunning) return;
         requestAnimationFrame(draw);
-
-        // 初心者モード更新
         updateBeginnerDisplay();
-
         const toneActive = isPlaying && isToneOn();
-
         if (toneActive) {
             scopeSineAmp = Math.min(SINE_AMP_TARGET, scopeSineAmp + 3.5);
             scopeNoiseAmp = Math.max(0.4, scopeNoiseAmp - 0.5);
@@ -838,7 +741,6 @@ function startScopeAnimation() {
             scopeNoiseAmp = Math.min(1.8, scopeNoiseAmp + 0.25);
         }
         scopePhase += 0.18;
-
         scopeBuffer.shift();
         let newY;
         if (scopeSineAmp > 0.5) {
@@ -847,10 +749,8 @@ function startScopeAnimation() {
             newY = mid + (Math.random() - 0.5) * scopeNoiseAmp * 2.5;
         }
         scopeBuffer.push(newY);
-
         ctx.fillStyle = '#020f06';
         ctx.fillRect(0, 0, SCOPE_W, SCOPE_H);
-
         // Grid
         ctx.strokeStyle = 'rgba(0,110,60,0.35)';
         ctx.lineWidth = 0.5;
@@ -858,7 +758,6 @@ function startScopeAnimation() {
         for (let y = 0; y <= SCOPE_H; y += 22) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(SCOPE_W,y); ctx.stroke(); }
         ctx.strokeStyle = 'rgba(0,140,75,0.45)';
         ctx.beginPath(); ctx.moveTo(0,mid); ctx.lineTo(SCOPE_W,mid); ctx.stroke();
-
         // Glow layer
         if (scopeSineAmp > 5) {
             ctx.strokeStyle = `rgba(0,123,67,${0.18 * (scopeSineAmp / SINE_AMP_TARGET)})`;
@@ -867,7 +766,6 @@ function startScopeAnimation() {
             for (let x = 0; x < SCOPE_W; x++) { x===0 ? ctx.moveTo(x,scopeBuffer[x]) : ctx.lineTo(x,scopeBuffer[x]); }
             ctx.stroke();
         }
-
         // Main trace
         const alpha = 0.65 + 0.35 * (scopeSineAmp / SINE_AMP_TARGET);
         ctx.strokeStyle = `rgba(0,160,85,${alpha})`;
@@ -878,7 +776,6 @@ function startScopeAnimation() {
         for (let x = 0; x < SCOPE_W; x++) { x===0 ? ctx.moveTo(x,scopeBuffer[x]) : ctx.lineTo(x,scopeBuffer[x]); }
         ctx.stroke();
         ctx.shadowBlur = 0;
-
         // Phosphor dot
         if (scopeSineAmp > 3) {
             const lastY = scopeBuffer[SCOPE_W - 1];
@@ -886,17 +783,14 @@ function startScopeAnimation() {
             ctx.beginPath(); ctx.arc(SCOPE_W - 1, lastY, 2.5, 0, Math.PI * 2); ctx.fill();
         }
     }
-
     draw();
 }
-
 // ── End / Quit ────────────────────────────────────────────────────────────────
 function quitGame() {
     isPlaying = false; scopeRunning = false;
     clearInterval(timerId); killCurrentAudio();
     location.reload();
 }
-
 function endGame() {
     isPlaying = false; scopeRunning = false;
     clearInterval(timerId); killCurrentAudio();
@@ -909,4 +803,3 @@ function endGame() {
 </script>
 </body>
 </html>
-
