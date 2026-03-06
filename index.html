@@ -392,6 +392,51 @@
         /* Result screen */
         #result-screen h2 { letter-spacing: 6px; font-size: 1.4rem; text-shadow: 0 0 20px rgba(0,123,67,1.0), 0 0 50px rgba(0,123,67,0.4); }
         #final-result-text { font-size: 2rem; color: var(--success); text-shadow: 0 0 20px rgba(0,180,90,0.9), 0 0 50px rgba(0,180,90,0.4); }
+        /* TX word display */
+        #tx-word-display {
+            font-size: 1.8rem;
+            letter-spacing: 6px;
+            min-height: 4.5rem;
+            border: 1px solid var(--primary-dim);
+            border-top: 2px solid var(--primary);
+            padding: 12px;
+            background: rgba(0, 15, 8, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            position: relative;
+        }
+        #tx-word-display::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px;
+            width: 10px; height: 10px;
+            border-top: 2px solid var(--success);
+            border-left: 2px solid var(--success);
+        }
+        #tx-word-display::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; right: -1px;
+            width: 10px; height: 10px;
+            border-bottom: 2px solid var(--success);
+            border-right: 2px solid var(--success);
+        }
+        #tx-morse-input {
+            min-height: 2.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(0, 123, 67, 0.22);
+            border-radius: 2px;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
         /* ── Mobile ─────────────────────────────────────────────────── */
         @media (max-width: 700px) {
             body { justify-content: flex-start; padding: 8px 0; overflow-y: auto; }
@@ -426,32 +471,49 @@
     <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text">
     <!-- ═══ START SCREEN ═══ -->
     <div id="start-screen">
-        <p>コールサインとRSTを交互に受信せよ。<br>Enterで判定。正確にコピーせよ。</p>
-        <div class="settings-grid">
-            <div class="setting-item">
-                <span class="setting-label">⏱ 制限時間</span>
-                <select id="time-select">
-                    <option value="60">1分間</option>
-                    <option value="120">2分間</option>
-                    <option value="180">3分間</option>
-                    <option value="240">4分間</option>
-                    <option value="300">5分間</option>
-                </select>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">📡 モールス速度</span>
-                <select id="wpm-select">
-                    <option value="10">10 WPM</option>
-                    <option value="20" selected>20 WPM</option>
-                    <option value="30">30 WPM</option>
-                </select>
-            </div>
-            <div class="setting-item checkbox-item">
-                <input type="checkbox" id="beginner-mode-check">
-                <label for="beginner-mode-check">初心者モード（送出中の文字のモールスをリアルタイム表示）</label>
+        <!-- Step 1: Mode select -->
+        <div id="mode-select">
+            <p style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:15px 0;">
+                モードを選択してください。<br>
+                <span style="opacity:0.7;font-size:0.75rem;">▸ 受信モード：モールスを聴いてコピー<br>▸ 送信モード：モールスを打って送信</span>
+            </p>
+            <div style="display:flex;gap:12px;justify-content:center;margin:18px 0;flex-wrap:wrap;">
+                <button onclick="selectMode('RX')" style="font-size:0.9rem;padding:12px 28px;letter-spacing:1px;">📻 受信モード</button>
+                <button onclick="selectMode('TX')" style="font-size:0.9rem;padding:12px 28px;letter-spacing:1px;">📡 送信モード</button>
             </div>
         </div>
-        <button onclick="unlockAndPrepare()">▶ ミッション開始</button>
+        <!-- Step 2: Settings (hidden until mode selected) -->
+        <div id="mode-settings" class="hidden">
+            <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:15px 0;"></p>
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <span class="setting-label">⏱ 制限時間</span>
+                    <select id="time-select">
+                        <option value="60">1分間</option>
+                        <option value="120">2分間</option>
+                        <option value="180">3分間</option>
+                        <option value="240">4分間</option>
+                        <option value="300">5分間</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">📡 モールス速度</span>
+                    <select id="wpm-select">
+                        <option value="10">10 WPM</option>
+                        <option value="20" selected>20 WPM</option>
+                        <option value="30">30 WPM</option>
+                    </select>
+                </div>
+                <div class="setting-item checkbox-item">
+                    <input type="checkbox" id="beginner-mode-check">
+                    <label for="beginner-mode-check">初心者モード（現在の文字のモールスを表示）</label>
+                </div>
+            </div>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
+                <button onclick="unlockAndPrepare()">▶ ミッション開始</button>
+                <button onclick="backToModeSelect()" style="font-size:0.72rem;padding:6px 16px;opacity:0.5;margin-top:10px;">◀ 戻る</button>
+            </div>
+        </div>
     </div>
     <!-- ═══ GAME SCREEN ═══ -->
     <div id="game-screen" class="hidden">
@@ -482,10 +544,20 @@
             <span id="scope-freq">SPAN 3kHz</span>
             <canvas id="scope-canvas" width="600" height="160"></canvas>
         </div>
-        <!-- 初心者モード: 現在送出中の文字のモールス表示 -->
+        <!-- 初心者モード: 現在の文字のモールス表示 -->
         <div id="beginner-display" class="hidden"></div>
-        <div id="input-display" onclick="focusMobile()">
-            <span id="typed-text"></span><span class="cursor"></span>
+        <!-- RX area -->
+        <div id="rx-area">
+            <div id="input-display" onclick="focusMobile()">
+                <span id="typed-text"></span><span class="cursor"></span>
+            </div>
+        </div>
+        <!-- TX area -->
+        <div id="tx-area" class="hidden">
+            <div id="tx-word-display">
+                <span id="tx-target-text"></span>
+            </div>
+            <div id="tx-morse-input"><span id="tx-input-render"></span></div>
         </div>
         <div id="status-msg">READY...</div>
         <button class="quit-btn" onclick="quitGame()">■ QUIT (中断)</button>
@@ -529,6 +601,11 @@ let timerId, audioLoopId, activeOscillators = [];
 let isWaitingNext = false, nextType = 'CALLSIGN';
 let DOT_TIME = 0.06; // 20wpm default
 let beginnerMode = false;
+// TX mode state
+let gameMode = 'RX'; // 'RX' | 'TX'
+let txWord = [], txCharIndex = 0, txMorseInput = '';
+let txCharTimer = null;
+const TX_CHAR_GAP = 650; // ms pause before auto-decode
 // IC-7300 Style Spectrum Scope
 let scopeRunning = false;
 const SCOPE_W = 600, SCOPE_H = 160;
@@ -591,7 +668,7 @@ function unlockAndPrepare() {
     };
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
-    mobileInput.focus();
+    if (gameMode === 'RX') mobileInput.focus();
     initScope();
     startScopeAnimation();
     doResume.then(() => { setTimeout(startGame, 300); })
@@ -600,11 +677,16 @@ function unlockAndPrepare() {
 function startGame() {
     initialSeconds = parseInt(document.getElementById('time-select').value);
     timeLeft = initialSeconds;
-    score = 0; isPlaying = true; isWaitingNext = false; nextType = 'CALLSIGN';
+    score = 0; isPlaying = true;
     masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
-    document.getElementById('status-msg').innerText = '受信中...';
-    nextWord();
     timerId = setInterval(tick, 1000);
+    if (gameMode === 'TX') {
+        startTxGame();
+    } else {
+        isWaitingNext = false; nextType = 'CALLSIGN';
+        document.getElementById('status-msg').innerText = '受信中...';
+        nextWord();
+    }
 }
 // ── Audio ──────────────────────────────────────────────────────────────────────
 function killCurrentAudio() {
@@ -705,7 +787,7 @@ mobileInput.addEventListener('keydown', (e) => {
 // ── Beginner mode display ─────────────────────────────────────────────────────
 let lastDisplayedMorse = null;
 function updateBeginnerDisplay() {
-    if (!beginnerMode) return;
+    if (!beginnerMode || gameMode !== 'RX') return;
     const now = Date.now();
     const current = charSchedule.find(s => now >= s.startMs && now < s.endMs);
     const morse = current ? current.morse : null;
@@ -942,15 +1024,170 @@ function startScopeAnimation() {
     }
     draw();
 }
+// ── TX Mode ───────────────────────────────────────────────────────────────────
+// Reverse lookup: morse string → char
+const MORSE_REVERSE = {};
+Object.entries(MORSE_CODE).forEach(([ch, code]) => { MORSE_REVERSE[code] = ch; });
+
+function selectMode(mode) {
+    gameMode = mode;
+    document.getElementById('mode-select').classList.add('hidden');
+    document.getElementById('mode-settings').classList.remove('hidden');
+    const desc = document.getElementById('mode-description');
+    if (mode === 'RX') {
+        desc.innerHTML = 'コールサインとRSTを交互に受信せよ。<br>Enterで判定。正確にコピーせよ。';
+        document.querySelector('label[for="beginner-mode-check"]').innerText =
+            '初心者モード（送出中の文字のモールスをリアルタイム表示）';
+    } else {
+        desc.innerHTML = 'コールサインとRSTが表示される。<br>スペース＝短点（・）、Jキー＝長点（－）で打鍵せよ。<br>1文字ずつ自動判定。正確に送信せよ。';
+        document.querySelector('label[for="beginner-mode-check"]').innerText =
+            '初心者モード（現在の文字のモールスを表示）';
+    }
+}
+
+function backToModeSelect() {
+    document.getElementById('mode-settings').classList.add('hidden');
+    document.getElementById('mode-select').classList.remove('hidden');
+}
+
+function startTxGame() {
+    txCharIndex = 0; txMorseInput = ''; txCharTimer = null;
+    document.getElementById('rx-area').classList.add('hidden');
+    document.getElementById('tx-area').classList.remove('hidden');
+    document.getElementById('status-msg').innerText = 'TRANSMIT...';
+    document.addEventListener('keydown', onTxKey);
+    nextTxWord();
+}
+
+function nextTxWord() {
+    const type = (score % 2 === 0) ? 'CALLSIGN' : 'RST';
+    const raw = (type === 'CALLSIGN') ? generateCallsign() : generateRST();
+    txWord = raw.split('');
+    txCharIndex = 0; txMorseInput = '';
+    updateTxDisplay();
+    if (beginnerMode) updateTxBeginnerDisplay();
+    document.getElementById('status-msg').innerText = 'TRANSMIT...';
+}
+
+function updateTxDisplay() {
+    const target = document.getElementById('tx-target-text');
+    target.innerHTML = txWord.map((ch, i) => {
+        if (i < txCharIndex) {
+            return `<span style="color:var(--success);opacity:0.55;">${ch}</span>`;
+        } else if (i === txCharIndex) {
+            return `<span style="color:#fff;text-shadow:0 0 15px var(--primary);">${ch}</span>`;
+        } else {
+            return `<span style="opacity:0.3;">${ch}</span>`;
+        }
+    }).join('');
+}
+
+function updateTxBeginnerDisplay() {
+    if (!beginnerMode) return;
+    const ch = txWord[txCharIndex];
+    if (!ch) { beginnerDisplay.innerHTML = ''; return; }
+    const code = MORSE_CODE[ch];
+    if (!code) { beginnerDisplay.innerHTML = ''; return; }
+    beginnerDisplay.innerHTML = code.split('').map(sym =>
+        `<span class="${sym === '.' ? 'msym-dot' : 'msym-dash'}"></span>`
+    ).join('');
+}
+
+function renderTxInput() {
+    document.getElementById('tx-input-render').innerText = txMorseInput || '·';
+}
+
+function addTxSymbol(sym) {
+    // Clear pending decode timer
+    if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
+    txMorseInput += sym;
+    renderTxInput();
+    playSidetone(sym === '-');
+    // Set new decode timer
+    txCharTimer = setTimeout(decodeTxChar, TX_CHAR_GAP);
+}
+
+function playSidetone(isDash) {
+    if (!audioCtx) return;
+    const dur = isDash ? Math.max(0.25, DOT_TIME * 3) : Math.max(0.10, DOT_TIME);
+    const t = audioCtx.currentTime;
+    const ms = Date.now();
+    const osc = audioCtx.createOscillator();
+    const gn  = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 750;
+    gn.gain.setValueAtTime(0, t);
+    gn.gain.linearRampToValueAtTime(0.4, t + 0.006);
+    gn.gain.setValueAtTime(0.4, t + dur - 0.003);
+    gn.gain.linearRampToValueAtTime(0, t + dur + 0.006);
+    osc.connect(gn); gn.connect(masterGain);
+    osc.start(t); osc.stop(t + dur + 0.01);
+    toneSchedule.push({ onTime: ms, offTime: ms + dur * 1000 });
+}
+
+function decodeTxChar() {
+    txCharTimer = null;
+    const decoded = MORSE_REVERSE[txMorseInput] || null;
+    const expected = txWord[txCharIndex];
+    const txArea = document.getElementById('tx-area');
+
+    if (decoded === expected) {
+        // Correct
+        txCharIndex++;
+        txMorseInput = '';
+        document.getElementById('tx-input-render').innerText = '';
+        txArea.classList.remove('flash-error');
+        txArea.classList.add('flash-correct');
+        setTimeout(() => txArea.classList.remove('flash-correct'), 400);
+        document.getElementById('status-msg').innerText = `✓ ${expected}`;
+
+        if (txCharIndex >= txWord.length) {
+            // Word complete
+            score++;
+            document.getElementById('score').innerText = score;
+            document.getElementById('status-msg').innerText = '✓ WORD OK';
+            setTimeout(() => {
+                if (!isPlaying) return;
+                nextTxWord();
+            }, 600);
+        } else {
+            updateTxDisplay();
+            if (beginnerMode) updateTxBeginnerDisplay();
+        }
+    } else {
+        // Wrong — retry same character
+        txMorseInput = '';
+        document.getElementById('tx-input-render').innerText = '';
+        txArea.classList.remove('flash-correct');
+        txArea.classList.add('flash-error');
+        setTimeout(() => txArea.classList.remove('flash-error'), 400);
+        document.getElementById('status-msg').innerText = `✗ RETRY: ${expected}`;
+    }
+}
+
+function onTxKey(e) {
+    if (!isPlaying || gameMode !== 'TX') return;
+    if (e.repeat) return;
+    if (e.code === 'Space') { e.preventDefault(); addTxSymbol('.'); }
+    else if (e.code === 'KeyJ') { e.preventDefault(); addTxSymbol('-'); }
+}
+
+function cleanupTx() {
+    document.removeEventListener('keydown', onTxKey);
+    if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
+}
+
 // ── End / Quit ────────────────────────────────────────────────────────────────
 function quitGame() {
     isPlaying = false; scopeRunning = false;
     clearInterval(timerId); killCurrentAudio();
+    if (gameMode === 'TX') cleanupTx();
     location.reload();
 }
 function endGame() {
     isPlaying = false; scopeRunning = false;
     clearInterval(timerId); killCurrentAudio();
+    if (gameMode === 'TX') cleanupTx();
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
         `${score} ${score === 1 ? 'word' : 'words'} / ${minutes} min`;
