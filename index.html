@@ -183,6 +183,11 @@
             border: 1px solid rgba(0,123,67,0.25);
             border-radius: 2px;
         }
+        /* TX初心者モード時は符号が大きいので間隔を広げる */
+        #beginner-display.tx-beginner {
+            min-height: 3.8rem;
+            gap: 14px;
+        }
         /* dot shape */
         .msym-dot {
             display: inline-block;
@@ -202,6 +207,27 @@
             border-radius: 7px;
             background: var(--primary);
             box-shadow: 0 0 10px var(--primary), 0 0 22px rgba(0,123,67,0.5);
+            flex-shrink: 0;
+            animation: msym-in 0.07s ease-out;
+        }
+        /* TX用 大きいサイズ */
+        .msym-dot-lg {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 12px var(--primary), 0 0 28px rgba(0,192,96,0.5);
+            flex-shrink: 0;
+            animation: msym-in 0.07s ease-out;
+        }
+        .msym-dash-lg {
+            display: inline-block;
+            width: 58px;
+            height: 22px;
+            border-radius: 11px;
+            background: var(--primary);
+            box-shadow: 0 0 12px var(--primary), 0 0 28px rgba(0,192,96,0.5);
             flex-shrink: 0;
             animation: msym-in 0.07s ease-out;
         }
@@ -509,13 +535,13 @@
             border-right: 2px solid var(--success);
         }
         #tx-morse-input {
-            min-height: 2.8rem;
+            min-height: 3.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 14px;
             margin-top: 8px;
-            padding: 6px 12px;
+            padding: 8px 12px;
             background: rgba(0, 0, 0, 0.45);
             border: 1px solid rgba(0, 192, 96, 0.25);
             border-radius: 2px;
@@ -1211,17 +1237,18 @@ function updateTxDisplay() {
 function updateTxBeginnerDisplay() {
     if (!beginnerMode) return;
     const ch = txWord[txCharIndex];
-    if (!ch) { beginnerDisplay.innerHTML = ''; return; }
+    if (!ch) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
     const code = MORSE_CODE[ch];
-    if (!code) { beginnerDisplay.innerHTML = ''; return; }
+    if (!code) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
+    beginnerDisplay.classList.add('tx-beginner');
     beginnerDisplay.innerHTML = code.split('').map(sym =>
-        `<span class="${sym === '.' ? 'msym-dot' : 'msym-dash'}"></span>`
+        `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
     ).join('');
 }
 
 function renderTxInput() {
     document.getElementById('tx-input-render').innerHTML = txMorseInput.split('').map(sym =>
-        `<span class="${sym === '.' ? 'msym-dot' : 'msym-dash'}"></span>`
+        `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
     ).join('');
 }
 
@@ -1352,6 +1379,7 @@ function cleanupTx() {
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
     const pa = document.getElementById('tx-paddle-area');
     if (pa) pa.classList.add('hidden');
+    beginnerDisplay.classList.remove('tx-beginner');
 }
 
 // ── SNS Share ─────────────────────────────────────────────────────────────────
