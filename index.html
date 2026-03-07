@@ -736,6 +736,7 @@ let beginnerMode = false;
 // TX mode state
 let gameMode = 'RX'; // 'RX' | 'TX'
 let txWord = [], txCharIndex = 0, txMorseInput = '';
+let nextTxType = 'CALLSIGN';
 let txCharTimer = null;
 let TX_CHAR_GAP = 400;      // ms after last element ends → auto-decode (スマホは700ms)
 const TX_DOT_TIME = 0.06;   // sec — fixed keyer element speed (20 WPM)
@@ -1198,6 +1199,7 @@ function backToModeSelect() {
 function startTxGame() {
     txCharIndex = 0; txMorseInput = ''; txCharTimer = null;
     dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
+    nextTxType = 'CALLSIGN';
     document.getElementById('rx-area').classList.add('hidden');
     document.getElementById('tx-area').classList.remove('hidden');
     // パドルボタンはタッチ端末のみ表示。判定ギャップも緩和
@@ -1211,8 +1213,8 @@ function startTxGame() {
 }
 
 function nextTxWord() {
-    const type = (score % 2 === 0) ? 'CALLSIGN' : 'RST';
-    const raw  = (type === 'CALLSIGN') ? generateCallsign() : generateRST();
+    const raw = (nextTxType === 'CALLSIGN') ? generateCallsign() : generateRST();
+    nextTxType = (nextTxType === 'CALLSIGN') ? 'RST' : 'CALLSIGN';
     txWord = raw.split('');
     txCharIndex = 0; txMorseInput = '';
     renderTxInput();
