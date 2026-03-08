@@ -592,6 +592,9 @@
                 <button onclick="selectMode('RX')" style="font-size:0.9rem;padding:12px 28px;letter-spacing:1px;">📻 受信モード</button>
                 <button onclick="selectMode('TX')" style="font-size:0.9rem;padding:12px 28px;letter-spacing:1px;">📡 送信モード</button>
             </div>
+            <div style="text-align:center; margin-top:4px;">
+                <a href="ranking.html" style="color:var(--primary-dim); text-decoration:none; font-size:0.7rem; letter-spacing:2px; opacity:0.65; border:1px solid var(--border); padding:5px 16px; border-radius:2px; display:inline-block; transition:opacity 0.15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'">🏆 ランキングを見る</a>
+            </div>
         </div>
         <!-- Step 2: Settings (hidden until mode selected) -->
         <div id="mode-settings" class="hidden">
@@ -698,6 +701,19 @@
                 </button>
             </div>
         </div>
+        <!-- Score registration -->
+        <div id="score-reg-area" style="margin-top:18px; border-top:1px solid var(--border); padding-top:14px;">
+            <div class="share-label">▸ REGISTER YOUR SCORE ◂</div>
+            <div id="score-reg-form" style="margin-top:10px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="nickname-input" placeholder="ニックネーム（10文字まで）" maxlength="10"
+                    autocomplete="off" autocapitalize="off" spellcheck="false"
+                    style="background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:2px;
+                           color:var(--primary); font-family:inherit; font-size:0.82rem;
+                           padding:8px 12px; width:210px; letter-spacing:1px; outline:none;">
+                <button onclick="submitScore()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">📊 登録</button>
+            </div>
+            <div id="score-reg-result" class="hidden" style="margin-top:14px; font-size:0.85rem; line-height:2; color:var(--primary);"></div>
+        </div>
         <button onclick="location.reload()" style="margin-top:16px;">▶ 再挑戦</button>
     </div>
 </div>
@@ -713,6 +729,7 @@
     letter-spacing: 1px;
     opacity: 0.55;
 ">
+    <a href="ranking.html" style="color:#007b43; text-decoration:none;">ランキング</a>
     <a href="privacy.html" style="color:#007b43; text-decoration:none;">プライバシーポリシー</a>
     <a href="contact.html" style="color:#007b43; text-decoration:none;">お問い合わせ</a>
 </footer>
@@ -1413,8 +1430,55 @@ function endGame() {
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
         `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min`;
+    // Reset score registration UI
+    document.getElementById('score-reg-form').style.display = '';
+    document.getElementById('score-reg-result').classList.add('hidden');
+    document.getElementById('nickname-input').value = '';
+    const btn = document.getElementById('submit-score-btn');
+    btn.disabled = false;
+    btn.textContent = '📊 登録';
+    // Hide registration if score is 0
+    document.getElementById('score-reg-area').style.display = score > 0 ? '' : 'none';
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
+}
+async function submitScore() {
+    const nickname = document.getElementById('nickname-input').value.trim();
+    if (!nickname) {
+        document.getElementById('nickname-input').focus();
+        return;
+    }
+    const minutes = Math.round(initialSeconds / 60);
+    const btn = document.getElementById('submit-score-btn');
+    btn.disabled = true;
+    btn.textContent = '送信中...';
+    try {
+        await fetch('https://api.jl1gix.com/api/scores', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nickname,
+                score,
+                mode: gameMode,
+                is_beginner: beginnerMode ? 1 : 0,
+                minutes
+            })
+        });
+        const rankRes = await fetch(`https://api.jl1gix.com/api/scores/rank?score=${score}&mode=${gameMode}`);
+        const rankData = await rankRes.json();
+        document.getElementById('score-reg-form').style.display = 'none';
+        const resultDiv = document.getElementById('score-reg-result');
+        resultDiv.classList.remove('hidden');
+        const pct = rankData.percentile !== undefined ? rankData.percentile : '－';
+        resultDiv.innerHTML =
+            `<span style="color:var(--success);">✓ 登録完了！</span><br>` +
+            `上位 <b>${pct}%</b><br><br>` +
+            `<a href="ranking.html" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:6px 18px; font-size:0.78rem; letter-spacing:1px; border-radius:2px;">🏆 ランキングを見る</a>`;
+    } catch (e) {
+        btn.disabled = false;
+        btn.textContent = '📊 登録';
+        alert('登録に失敗しました。もう一度お試しください。');
+    }
 }
 </script>
 </body>
