@@ -777,7 +777,7 @@ function generateCallsign() {
 function generateRST() {
     const areas = ['101','102','103','104','105','106','107','108','109','110','111','112','113','114'];
     for (let i = 2; i <= 48; i++) areas.push(i.toString().padStart(2,'0'));
-    return '599' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
+    return '5NN' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
 }
 // ── Audio unlock + prepare ────────────────────────────────────────────────────
 function unlockAndPrepare() {
