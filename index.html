@@ -1444,10 +1444,7 @@ function endGame() {
 }
 async function submitScore() {
     const nickname = document.getElementById('nickname-input').value.trim();
-    if (!nickname) {
-        document.getElementById('nickname-input').focus();
-        return;
-    }
+    const finalNickname = nickname || 'noname';
     const minutes = Math.round(initialSeconds / 60);
     const btn = document.getElementById('submit-score-btn');
     btn.disabled = true;
@@ -1457,7 +1454,7 @@ async function submitScore() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                nickname,
+                nickname: finalNickname,
                 score,
                 mode: gameMode,
                 is_beginner: beginnerMode ? 1 : 0,
