@@ -372,7 +372,7 @@ async function loadRanking(mode, minutes, page) {
 
             const d = new Date(row.created_at);
             const date = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
-            const beginnerBadge = row.is_beginner ? '<span class="beginner-badge">初</span>' : '';
+            const beginnerBadge = row.is_beginner ? ' 🔰' : '';
 
             html += `<tr>
                 <td class="rank-num">${rankDisplay}</td>
