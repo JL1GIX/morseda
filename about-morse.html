@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>モールス符号について - モールス打</title>
+    <style>
+        :root {
+            --primary: #00c060;
+            --primary-dim: #00a050;
+            --bg: #080f0b;
+            --panel: #0e1f16;
+            --border: #1e5c38;
+            --error: #e74c3c;
+            --success: #00ee77;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 10px 40px;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .container {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--primary);
+            padding: 24px;
+            border-radius: 4px;
+            box-shadow:
+                0 0 50px rgba(0,100,55,0.35),
+                0 0 100px rgba(0,80,40,0.12),
+                inset 0 1px 0 rgba(0,123,67,0.18);
+            width: 95%;
+            max-width: 680px;
+            position: relative;
+        }
+        .container::before {
+            content: '◈';
+            position: absolute;
+            top: 8px; left: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        .container::after {
+            content: '◈';
+            position: absolute;
+            top: 8px; right: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 4px;
+        }
+        .header-bar::before {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary-dim));
+        }
+        .header-bar::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to left, transparent, var(--primary-dim));
+        }
+        h1 {
+            margin: 0;
+            letter-spacing: 6px;
+            font-size: 1.4rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5);
+        }
+        .subtitle {
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            letter-spacing: 4px;
+            margin-bottom: 28px;
+            opacity: 0.9;
+            text-align: center;
+        }
+        h2 {
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+            padding-left: 12px;
+            margin: 28px 0 14px;
+            text-shadow: 0 0 10px rgba(0,192,96,0.4);
+        }
+        h2:first-of-type { margin-top: 0; }
+        p {
+            font-size: 0.82rem;
+            line-height: 1.9;
+            color: rgba(0,192,96,0.85);
+            margin: 0 0 14px;
+            letter-spacing: 0.5px;
+        }
+        .highlight-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 14px 16px;
+            margin: 12px 0;
+            font-size: 0.82rem;
+            line-height: 1.9;
+            color: rgba(0,192,96,0.85);
+        }
+        .morse-example {
+            display: inline-block;
+            background: rgba(0,192,96,0.08);
+            border: 1px solid rgba(0,192,96,0.2);
+            padding: 2px 10px;
+            border-radius: 2px;
+            color: var(--success);
+            letter-spacing: 4px;
+            font-size: 1rem;
+            margin: 0 4px;
+        }
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 24px 0;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 24px;
+            color: var(--primary-dim);
+            text-decoration: none;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            opacity: 0.55;
+            transition: opacity 0.15s;
+        }
+        .back-btn:hover { opacity: 1; color: var(--primary); }
+        footer {
+            margin-top: 20px;
+            padding: 12px 0 4px;
+            border-top: 1px solid #1e5c38;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            opacity: 0.55;
+            width: 95%;
+            max-width: 680px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-bar">
+        <h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
+    <div class="subtitle">▸ モールス符号について ◂</div>
+
+    <h2>▸ モールス符号とは</h2>
+    <p>モールス符号（Morse code）は、短点（・）と長点（－）の組み合わせで文字や数字を表す通信方式です。1837年にアメリカの発明家サミュエル・モールスによって考案され、電信通信の標準的な手段として世界中に普及しました。短点を「トン」、長点を「ツー」と呼び、そのリズムの組み合わせで全ての文字を表現します。</p>
+    <p>例えば、SOS（遭難信号）は <span class="morse-example">・・・　－－－　・・・</span> と表され、世界共通の緊急信号として今も使われています。</p>
+
+    <h2>▸ アマチュア無線とモールス通信</h2>
+    <p>アマチュア無線（ハム）の世界では、モールス符号による通信をCW（Continuous Wave）と呼びます。音声通話と異なり、電波が弱い状況や雑音の多い環境でも信号を伝えやすいという特性があり、遠距離通信（DX）やコンテスト交信で現在も広く使われています。</p>
+    <p>かつてはアマチュア無線の上位免許を取得するためにモールス試験が必須でしたが、現在は試験から外れています。それでもCW運用への人気は根強く、世界中の局が日々モールスで交信しています。</p>
+
+    <hr class="section-divider">
+
+    <h2>▸ アマチュア無線コンテストとCW</h2>
+    <p>アマチュア無線のコンテストでは、制限時間内にできるだけ多くの局と交信してポイントを競います。CW部門のコンテストでは、スピードと正確さが求められます。一般的なコンテスト交信の流れは以下の通りです。</p>
+
+    <div class="highlight-box">
+        <strong style="color:var(--success);">コンテスト交信の典型的な流れ：</strong><br><br>
+        1. CQ CQ　（呼び出し）<br>
+        2. 相手局コールサイン　（例：JA1ABC）<br>
+        3. RST レポート　（例：5NN）<br>
+        4. コンテストナンバー　（例：101H）<br><br>
+        <span style="opacity:0.7; font-size:0.78rem;">※ モールス打はこの交信パターンをシミュレートして練習できます</span>
+    </div>
+
+    <h2>▸ RSTレポートとは</h2>
+    <p>RST（Readability・Signal Strength・Tone）レポートは、受信した信号の品質を数値で伝える規格です。CWコンテストでは「5NN」（了解度5・信号強度9・トーン9）が定型として広く使われており、モールス打でも「5NN」を使用しています。コンテストでは実際の信号品質に関わらずこの定型を送るのが一般的です。</p>
+
+    <h2>▸ コールサインの読み方</h2>
+    <p>日本のアマチュア無線局のコールサインは「JA1ABC」のような形式をしています。最初の文字（プリフィックス）がエリアと種別を示し、数字がエリア番号、末尾のアルファベット（サフィックス）が個別の識別子です。モールス打では日本のコールサイン（JA〜JZ、7J〜7N系）をランダムに生成して練習できます。</p>
+
+    <h2>▸ モールス習得のメリット</h2>
+    <p>モールス符号を習得することには、単なる通信手段を超えた価値があります。電波伝搬の悪いコンディション時でも交信できる実用的なスキルであることに加え、世界中のアマチュア無線家と共通の言語でつながれる喜びがあります。また、規則的なリズムを学ぶ過程は集中力や記憶力のトレーニングにもなると言われています。</p>
+    <p>現代では軍事・商業用途での使用はほとんどなくなりましたが、アマチュア無線コミュニティではCWは今も「無線の原点」として親しまれており、多くの局が積極的にCW運用を楽しんでいます。</p>
+
+    <div style="text-align:center;">
+        <a href="https://jl1gix.com" class="back-btn">◀ トップに戻る</a>
+    </div>
+</div>
+
+<footer>
+    <a href="howto.html" style="color:#007b43; text-decoration:none;">使い方</a>
+    <a href="ranking.html" style="color:#007b43; text-decoration:none;">ランキング</a>
+    <a href="about.html" style="color:#007b43; text-decoration:none;">サイトについて</a>
+    <a href="privacy.html" style="color:#007b43; text-decoration:none;">プライバシーポリシー</a>
+    <a href="contact.html" style="color:#007b43; text-decoration:none;">お問い合わせ</a>
+</footer>
+</body>
+</html>
