@@ -428,7 +428,7 @@
             font-size: 0.58rem;
             letter-spacing: 3px;
             color: var(--primary-dim);
-            opacity: 0.7;
+            opacity: 1.0;
             margin-bottom: 12px;
         }
         .share-buttons {
@@ -1464,7 +1464,7 @@ async function submitScore() {
                 minutes
             })
         });
-        const rankRes = await fetch(`https://api.jl1gix.com/api/scores/rank?score=${score}&mode=${gameMode}`);
+        const rankRes = await fetch(`https://api.jl1gix.com/api/scores/rank?score=${score}&mode=${gameMode}&minutes=${Math.round(initialSeconds/60)}`);
         const rankData = await rankRes.json();
         document.getElementById('score-reg-form').style.display = 'none';
         const resultDiv = document.getElementById('score-reg-result');

@@ -300,6 +300,12 @@
         <button class="mode-tab" id="tab-tx" onclick="switchMode('TX')">📡 送信モード</button>
     </div>
 
+    <div class="mode-tabs" style="gap:6px; margin-top:-8px;">
+        <button class="mode-tab active" id="tab-1" onclick="switchMinutes(1)" style="font-size:0.75rem; padding:6px 0;">1分</button>
+        <button class="mode-tab" id="tab-3" onclick="switchMinutes(3)" style="font-size:0.75rem; padding:6px 0;">3分</button>
+        <button class="mode-tab" id="tab-5" onclick="switchMinutes(5)" style="font-size:0.75rem; padding:6px 0;">5分</button>
+    </div>
+
     <div id="ranking-body">
         <div class="status-msg">LOADING...</div>
     </div>
@@ -323,14 +329,15 @@
 <script>
 const API = 'https://api.jl1gix.com';
 let currentMode = 'RX';
+let currentMinutes = 1;
 let currentPage = 1;
 let totalPages = 1;
 
-async function loadRanking(mode, page) {
+async function loadRanking(mode, minutes, page) {
     const body = document.getElementById('ranking-body');
     body.innerHTML = '<div class="status-msg">LOADING...</div>';
     try {
-        const res = await fetch(`${API}/api/scores?mode=${mode}&page=${page}`);
+        const res = await fetch(`${API}/api/scores?mode=${mode}&minutes=${minutes}&page=${page}`);
         if (!res.ok) throw new Error('server error');
         const data = await res.json();
         const rows = data.rows || [];
@@ -352,7 +359,6 @@ async function loadRanking(mode, page) {
                 <th>RANK</th>
                 <th>NICKNAME</th>
                 <th>SCORE</th>
-                <th>TIME</th>
                 <th>DATE</th>
             </tr></thead><tbody>`;
 
@@ -364,14 +370,14 @@ async function loadRanking(mode, page) {
             else if (rank === 3) rankDisplay = '<span class="rank-3">🥉</span>';
             else rankDisplay = rank;
 
-            const date = new Date(row.created_at).toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit' });
+            const d = new Date(row.created_at);
+            const date = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
             const beginnerBadge = row.is_beginner ? '<span class="beginner-badge">初</span>' : '';
 
             html += `<tr>
                 <td class="rank-num">${rankDisplay}</td>
                 <td class="nickname">${escHtml(row.nickname)}${beginnerBadge}</td>
                 <td class="score-val">${row.score}<span class="score-unit">chars</span></td>
-                <td class="time-val">${row.minutes}min</td>
                 <td class="date-val">${date}</td>
             </tr>`;
         });
@@ -396,18 +402,27 @@ function switchMode(mode) {
     currentPage = 1;
     document.getElementById('tab-rx').classList.toggle('active', mode === 'RX');
     document.getElementById('tab-tx').classList.toggle('active', mode === 'TX');
-    loadRanking(mode, 1);
+    loadRanking(currentMode, currentMinutes, 1);
+}
+
+function switchMinutes(min) {
+    currentMinutes = min;
+    currentPage = 1;
+    [1, 3, 5].forEach(m => {
+        document.getElementById(`tab-${m}`).classList.toggle('active', m === min);
+    });
+    loadRanking(currentMode, currentMinutes, 1);
 }
 
 function changePage(delta) {
     const newPage = currentPage + delta;
     if (newPage < 1 || newPage > totalPages) return;
     currentPage = newPage;
-    loadRanking(currentMode, currentPage);
+    loadRanking(currentMode, currentMinutes, currentPage);
 }
 
 // Initial load
-loadRanking('RX', 1);
+loadRanking('RX', 1, 1);
 </script>
 </body>
 </html>
