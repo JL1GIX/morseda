@@ -703,16 +703,15 @@
         </div>
         <!-- Score registration -->
         <div id="score-reg-area" style="margin-top:18px; border-top:1px solid var(--border); padding-top:14px;">
-            <div class="share-label">▸ REGISTER YOUR SCORE ◂</div>
-            <div id="score-reg-form" style="margin-top:10px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; align-items:center;">
-                <input type="text" id="nickname-input" placeholder="ニックネーム（10文字まで）" maxlength="10"
+            <div id="score-reg-result" style="margin-bottom:12px; font-size:0.85rem; line-height:2; color:var(--primary);"></div>
+            <div id="score-reg-form" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="nickname-input" placeholder="ニックネーム（任意・10文字まで）" maxlength="10"
                     autocomplete="off" autocapitalize="off" spellcheck="false"
                     style="background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:2px;
                            color:var(--primary); font-family:inherit; font-size:0.82rem;
-                           padding:8px 12px; width:210px; letter-spacing:1px; outline:none;">
-                <button onclick="submitScore()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">📊 登録</button>
+                           padding:8px 12px; width:230px; letter-spacing:1px; outline:none;">
+                <button onclick="setNickname()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">✏️ 名前を設定</button>
             </div>
-            <div id="score-reg-result" class="hidden" style="margin-top:14px; font-size:0.85rem; line-height:2; color:var(--primary);"></div>
         </div>
         <button onclick="location.reload()" style="margin-top:16px;">▶ 再挑戦</button>
     </div>
@@ -1430,51 +1429,63 @@ function endGame() {
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
         `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min`;
-    // Reset score registration UI
-    document.getElementById('score-reg-form').style.display = '';
-    document.getElementById('score-reg-result').classList.add('hidden');
     document.getElementById('nickname-input').value = '';
     const btn = document.getElementById('submit-score-btn');
     btn.disabled = false;
-    btn.textContent = '📊 登録';
-    // Hide registration if score is 0
+    btn.textContent = '✏️ 名前を設定';
     document.getElementById('score-reg-area').style.display = score > 0 ? '' : 'none';
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
+    if (score > 0) autoRegister();
 }
-async function submitScore() {
-    const nickname = document.getElementById('nickname-input').value.trim();
-    const finalNickname = nickname || 'noname';
+let _registeredId = null;
+async function autoRegister() {
+    _registeredId = null;
     const minutes = Math.round(initialSeconds / 60);
-    const btn = document.getElementById('submit-score-btn');
-    btn.disabled = true;
-    btn.textContent = '送信中...';
     try {
-        await fetch('https://api.jl1gix.com/api/scores', {
+        const res = await fetch('https://api.jl1gix.com/api/scores', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                nickname: finalNickname,
+                nickname: 'noname',
                 score,
                 mode: gameMode,
                 is_beginner: beginnerMode ? 1 : 0,
                 minutes
             })
         });
-        const rankRes = await fetch(`https://api.jl1gix.com/api/scores/rank?score=${score}&mode=${gameMode}&minutes=${Math.round(initialSeconds/60)}`);
+        const data = await res.json();
+        _registeredId = data.id;
+        const rankRes = await fetch(`https://api.jl1gix.com/api/scores/rank?score=${score}&mode=${gameMode}&minutes=${minutes}`);
         const rankData = await rankRes.json();
-        document.getElementById('score-reg-form').style.display = 'none';
-        const resultDiv = document.getElementById('score-reg-result');
-        resultDiv.classList.remove('hidden');
         const pct = rankData.percentile !== undefined ? rankData.percentile : '－';
-        resultDiv.innerHTML =
-            `<span style="color:var(--success);">✓ 登録完了！</span><br>` +
-            `上位 <b>${pct}%</b><br><br>` +
-            `<a href="ranking.html" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:6px 18px; font-size:0.78rem; letter-spacing:1px; border-radius:2px;">🏆 ランキングを見る</a>`;
+        document.getElementById('score-reg-result').innerHTML =
+            `<span style="color:var(--success);">✓ 登録完了！</span>　上位 <b>${pct}%</b>　` +
+            `<a href="ranking.html" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:4px 14px; font-size:0.75rem; letter-spacing:1px; border-radius:2px;">🏆 ランキング</a>`;
+    } catch (e) {
+        document.getElementById('score-reg-result').innerHTML =
+            `<span style="color:var(--error); font-size:0.75rem;">登録に失敗しました</span>`;
+    }
+}
+async function setNickname() {
+    const nickname = document.getElementById('nickname-input').value.trim();
+    if (!nickname) return;
+    if (!_registeredId) return;
+    const btn = document.getElementById('submit-score-btn');
+    btn.disabled = true;
+    btn.textContent = '設定中...';
+    try {
+        await fetch(`https://api.jl1gix.com/api/scores/${_registeredId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nickname })
+        });
+        btn.textContent = '✓ 設定済み';
+        document.getElementById('nickname-input').disabled = true;
     } catch (e) {
         btn.disabled = false;
-        btn.textContent = '📊 登録';
-        alert('登録に失敗しました。もう一度お試しください。');
+        btn.textContent = '✏️ 名前を設定';
+        alert('設定に失敗しました。もう一度お試しください。');
     }
 }
 </script>
