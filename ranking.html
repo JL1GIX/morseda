@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ランキング - モールス打</title>
+    <style>
+        :root {
+            --primary: #00c060;
+            --primary-dim: #00a050;
+            --bg: #080f0b;
+            --panel: #0e1f16;
+            --border: #1e5c38;
+            --error: #e74c3c;
+            --success: #00ee77;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 10px 40px;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .container {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--primary);
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow:
+                0 0 50px rgba(0,100,55,0.35),
+                0 0 100px rgba(0,80,40,0.12),
+                inset 0 1px 0 rgba(0,123,67,0.18);
+            width: 95%;
+            max-width: 640px;
+            position: relative;
+        }
+        .container::before {
+            content: '◈';
+            position: absolute;
+            top: 8px; left: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        .container::after {
+            content: '◈';
+            position: absolute;
+            top: 8px; right: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 4px;
+        }
+        .header-bar::before {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary-dim));
+        }
+        .header-bar::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to left, transparent, var(--primary-dim));
+        }
+        h1 {
+            margin: 0;
+            letter-spacing: 6px;
+            font-size: 1.4rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5), 0 0 80px rgba(0,123,67,0.2);
+        }
+        .subtitle {
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            text-align: center;
+        }
+        /* Mode tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .mode-tab {
+            flex: 1;
+            padding: 9px 0;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--primary-dim);
+            font-family: inherit;
+            font-size: 0.82rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.15s;
+        }
+        .mode-tab.active {
+            background: rgba(0,192,96,0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+            text-shadow: 0 0 8px rgba(0,192,96,0.6);
+        }
+        .mode-tab:hover:not(.active) {
+            border-color: var(--primary-dim);
+            color: var(--primary);
+        }
+        /* Table */
+        .ranking-wrap {
+            overflow-x: auto;
+        }
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+        .ranking-table thead tr {
+            border-bottom: 1px solid var(--primary-dim);
+        }
+        .ranking-table th {
+            color: var(--primary-dim);
+            font-size: 0.62rem;
+            letter-spacing: 2px;
+            padding: 6px 8px;
+            text-align: left;
+            white-space: nowrap;
+        }
+        .ranking-table td {
+            padding: 9px 8px;
+            border-bottom: 1px solid rgba(30,92,56,0.35);
+            letter-spacing: 1px;
+            vertical-align: middle;
+        }
+        .ranking-table tr:last-child td { border-bottom: none; }
+        .ranking-table tr:hover td {
+            background: rgba(0,192,96,0.04);
+        }
+        .rank-num {
+            color: var(--primary-dim);
+            font-size: 0.78rem;
+            white-space: nowrap;
+        }
+        .rank-1 { color: #ffd700; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
+        .rank-2 { color: #c0c0c0; text-shadow: 0 0 6px rgba(192,192,192,0.5); }
+        .rank-3 { color: #cd7f32; text-shadow: 0 0 6px rgba(205,127,50,0.5); }
+        .nickname {
+            color: var(--primary);
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .score-val {
+            color: var(--success);
+            text-shadow: 0 0 8px rgba(0,238,119,0.4);
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+        .score-unit {
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            margin-left: 2px;
+        }
+        .time-val {
+            color: var(--primary-dim);
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+        .date-val {
+            color: var(--primary-dim);
+            font-size: 0.7rem;
+            opacity: 0.65;
+            white-space: nowrap;
+        }
+        .beginner-badge {
+            display: inline-block;
+            font-size: 0.58rem;
+            background: rgba(0,192,96,0.12);
+            border: 1px solid rgba(0,192,96,0.25);
+            color: var(--primary-dim);
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-left: 5px;
+            vertical-align: middle;
+            letter-spacing: 0;
+        }
+        /* Status messages */
+        .status-msg {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--primary-dim);
+            font-size: 0.82rem;
+            letter-spacing: 2px;
+        }
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+        .page-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--primary-dim);
+            font-family: inherit;
+            font-size: 0.72rem;
+            padding: 6px 16px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.15s;
+        }
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .page-btn:disabled {
+            opacity: 0.25;
+            cursor: default;
+        }
+        .page-info {
+            color: var(--primary-dim);
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+        }
+        /* Back button */
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            color: var(--primary-dim);
+            text-decoration: none;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            opacity: 0.55;
+            transition: opacity 0.15s;
+        }
+        .back-btn:hover { opacity: 1; color: var(--primary); }
+        /* Footer */
+        footer {
+            margin-top: 20px;
+            padding: 12px 0 4px;
+            border-top: 1px solid #1e5c38;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            opacity: 0.55;
+            width: 95%;
+            max-width: 640px;
+        }
+        @media (max-width: 500px) {
+            .date-val, .ranking-table th:last-child, .ranking-table td:last-child {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-bar">
+        <h1><a href="index.html" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
+    <div class="subtitle">▸ RANKING ◂</div>
+
+    <div class="mode-tabs">
+        <button class="mode-tab active" id="tab-rx" onclick="switchMode('RX')">📻 受信モード</button>
+        <button class="mode-tab" id="tab-tx" onclick="switchMode('TX')">📡 送信モード</button>
+    </div>
+
+    <div id="ranking-body">
+        <div class="status-msg">LOADING...</div>
+    </div>
+
+    <div class="pagination">
+        <button class="page-btn" id="prev-btn" onclick="changePage(-1)" disabled>◀ PREV</button>
+        <span class="page-info" id="page-info">PAGE 1</span>
+        <button class="page-btn" id="next-btn" onclick="changePage(1)" disabled>NEXT ▶</button>
+    </div>
+
+    <div style="text-align:center;">
+        <a href="index.html" class="back-btn">◀ トップに戻る</a>
+    </div>
+</div>
+
+<footer>
+    <a href="privacy.html" style="color:#007b43; text-decoration:none;">プライバシーポリシー</a>
+    <a href="contact.html" style="color:#007b43; text-decoration:none;">お問い合わせ</a>
+</footer>
+
+<script>
+const API = 'https://api.jl1gix.com';
+let currentMode = 'RX';
+let currentPage = 1;
+let totalPages = 1;
+
+async function loadRanking(mode, page) {
+    const body = document.getElementById('ranking-body');
+    body.innerHTML = '<div class="status-msg">LOADING...</div>';
+    try {
+        const res = await fetch(`${API}/api/scores?mode=${mode}&page=${page}`);
+        if (!res.ok) throw new Error('server error');
+        const data = await res.json();
+        const rows = data.rows || [];
+        const total = data.total || 0;
+        totalPages = Math.max(1, Math.ceil(total / 100));
+
+        document.getElementById('page-info').textContent = `PAGE ${page} / ${totalPages}`;
+        document.getElementById('prev-btn').disabled = page <= 1;
+        document.getElementById('next-btn').disabled = page >= totalPages;
+
+        if (rows.length === 0) {
+            body.innerHTML = '<div class="status-msg">まだスコアがありません</div>';
+            return;
+        }
+
+        const offset = (page - 1) * 100;
+        let html = `<div class="ranking-wrap"><table class="ranking-table">
+            <thead><tr>
+                <th>RANK</th>
+                <th>NICKNAME</th>
+                <th>SCORE</th>
+                <th>TIME</th>
+                <th>DATE</th>
+            </tr></thead><tbody>`;
+
+        rows.forEach((row, i) => {
+            const rank = offset + i + 1;
+            let rankDisplay;
+            if (rank === 1) rankDisplay = '<span class="rank-1">🥇</span>';
+            else if (rank === 2) rankDisplay = '<span class="rank-2">🥈</span>';
+            else if (rank === 3) rankDisplay = '<span class="rank-3">🥉</span>';
+            else rankDisplay = rank;
+
+            const date = new Date(row.created_at).toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit' });
+            const beginnerBadge = row.is_beginner ? '<span class="beginner-badge">初</span>' : '';
+
+            html += `<tr>
+                <td class="rank-num">${rankDisplay}</td>
+                <td class="nickname">${escHtml(row.nickname)}${beginnerBadge}</td>
+                <td class="score-val">${row.score}<span class="score-unit">chars</span></td>
+                <td class="time-val">${row.minutes}min</td>
+                <td class="date-val">${date}</td>
+            </tr>`;
+        });
+
+        html += '</tbody></table></div>';
+        body.innerHTML = html;
+    } catch (e) {
+        body.innerHTML = '<div class="status-msg" style="color:var(--error);">読み込みに失敗しました<br><br><span style="font-size:0.7rem;opacity:0.6;">しばらくしてから再読み込みしてください</span></div>';
+    }
+}
+
+function escHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function switchMode(mode) {
+    currentMode = mode;
+    currentPage = 1;
+    document.getElementById('tab-rx').classList.toggle('active', mode === 'RX');
+    document.getElementById('tab-tx').classList.toggle('active', mode === 'TX');
+    loadRanking(mode, 1);
+}
+
+function changePage(delta) {
+    const newPage = currentPage + delta;
+    if (newPage < 1 || newPage > totalPages) return;
+    currentPage = newPage;
+    loadRanking(currentMode, currentPage);
+}
+
+// Initial load
+loadRanking('RX', 1);
+</script>
+</body>
+</html>
