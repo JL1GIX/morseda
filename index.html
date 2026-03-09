@@ -69,6 +69,7 @@
             max-width: 640px;
             text-align: center;
             position: relative;
+            z-index: 2;
         }
         /* Decorative corner pieces */
         #game-container::before {
@@ -632,6 +633,7 @@
                 <div class="setting-item checkbox-item">
                     <input type="checkbox" id="beginner-mode-check">
                     <label for="beginner-mode-check">初心者モード（現在の文字のモールスを表示）</label>
+                    <span style="font-size:1.1rem;line-height:1;" title="初心者向けモード">🔰</span>
                 </div>
             </div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
@@ -1488,6 +1490,199 @@ async function autoRegister() {
             `<span style="color:var(--error); font-size:0.75rem;">登録に失敗しました</span>`;
     }
 }
+
+// ── ホーム画面：波アニメーション & JL1GIXモールス表示 ────────────────────────
+(function() {
+    /* ---- キャンバス & モールス表示エレメント作成 ---- */
+    const bgCanvas = document.createElement('canvas');
+    bgCanvas.id = 'home-bg-canvas';
+    bgCanvas.style.cssText = `
+        position:fixed;top:0;left:0;width:100%;height:100%;
+        pointer-events:none;z-index:0;
+        opacity:0;transition:opacity 0.8s;
+    `;
+    document.body.insertBefore(bgCanvas, document.body.firstChild);
+
+    const morseDiv = document.createElement('div');
+    morseDiv.id = 'home-morse-bar';
+    morseDiv.style.cssText = `
+        position:fixed;bottom:28px;left:0;right:0;
+        text-align:center;letter-spacing:6px;
+        font-family:'Consolas','Monaco','Courier New',monospace;
+        font-size:1.05rem;color:rgba(0,208,106,0.25);
+        pointer-events:none;z-index:1;
+        opacity:0;transition:opacity 0.8s;
+        user-select:none;
+    `;
+    document.body.appendChild(morseDiv);
+
+    let homeActive = false;
+    let animFrame;
+
+    /* ---- 表示ON/OFFの切り替え ---- */
+    function setHomeVisible(v) {
+        homeActive = v;
+        bgCanvas.style.opacity = v ? '1' : '0';
+        morseDiv.style.opacity = v ? '1' : '0';
+        if (v) { resizeCanvas(); startHomeAnim(); }
+        else    { cancelAnimationFrame(animFrame); stopMorseLoop(); }
+    }
+
+    /* ---- Canvasリサイズ ---- */
+    function resizeCanvas() {
+        bgCanvas.width  = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', () => { if (homeActive) resizeCanvas(); });
+
+    /* ---- 波アニメーション ---- */
+    let waveT = 0;
+    function startHomeAnim() {
+        cancelAnimationFrame(animFrame);
+        function draw() {
+            if (!homeActive) return;
+            animFrame = requestAnimationFrame(draw);
+            const ctx = bgCanvas.getContext('2d');
+            const W = bgCanvas.width, H = bgCanvas.height;
+            ctx.clearRect(0, 0, W, H);
+            waveT += 0.012;
+
+            const waves = [
+                { amp:28, freq:0.0035, phase:0,      speed:0.8, y:0.38, alpha:0.07 },
+                { amp:18, freq:0.006,  phase:1.2,    speed:1.1, y:0.50, alpha:0.05 },
+                { amp:36, freq:0.0025, phase:2.5,    speed:0.6, y:0.62, alpha:0.06 },
+                { amp:12, freq:0.009,  phase:0.7,    speed:1.5, y:0.45, alpha:0.04 },
+            ];
+            waves.forEach(w => {
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(0,208,106,${w.alpha})`;
+                ctx.lineWidth = 1.5;
+                for (let x = 0; x <= W; x += 2) {
+                    const y = H * w.y + Math.sin(x * w.freq + waveT * w.speed + w.phase) * w.amp;
+                    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            });
+        }
+        draw();
+    }
+
+    /* ---- JL1GIX モールス送出（20 WPM）---- */
+    const MORSE_MAP = {
+        'J':'.---','L':'.-..','1':'.----','G':'--.','I':'..','X':'-..-',' ':' '
+    };
+    const HOME_CALL = 'JL1GIX';
+    const HOME_WPM  = 20;
+    const DIT_MS    = 1200 / HOME_WPM;   // 60ms
+
+    // フルシーケンスを [{sym, ms}] に展開
+    function buildMorseSeq(text) {
+        const seq = [];
+        text.split('').forEach((ch, ci) => {
+            const code = MORSE_MAP[ch.toUpperCase()] || '';
+            code.split('').forEach((s, si) => {
+                seq.push({ type: s === '.' ? 'dit' : 'dah', ms: s === '.' ? DIT_MS : DIT_MS * 3 });
+                if (si < code.length - 1) seq.push({ type:'gap', ms: DIT_MS });      // 符号間
+            });
+            if (ci < text.length - 1) seq.push({ type:'chgap', ms: DIT_MS * 3 });    // 文字間
+        });
+        seq.push({ type:'wgap', ms: DIT_MS * 7 });  // 繰り返し前の語間
+        return seq;
+    }
+
+    const MORSE_SEQ = buildMorseSeq(HOME_CALL);
+    let seqIdx = 0, morseTimer = null;
+    // 画面表示用：符号をドット/ダッシュで1文字ずつ組み立て
+    let displayBuf = '';
+    let charBuf    = '';
+
+    function updateDisplay() {
+        morseDiv.textContent = displayBuf;
+    }
+
+    function stepMorse() {
+        if (!homeActive) return;
+        const item = MORSE_SEQ[seqIdx];
+        seqIdx = (seqIdx + 1) % MORSE_SEQ.length;
+
+        if (item.type === 'dit') {
+            charBuf += '・';
+        } else if (item.type === 'dah') {
+            charBuf += '―';
+        } else if (item.type === 'gap') {
+            // 符号間: 何もしない（表示は次符号が来てから）
+        } else if (item.type === 'chgap') {
+            // 文字間: charBufを表示バッファに追加
+            if (charBuf) { displayBuf += (displayBuf ? ' ' : '') + charBuf; charBuf = ''; }
+            // 長くなりすぎたら先頭を削る（直近4文字分）
+            const parts = displayBuf.split(' ');
+            if (parts.length > 8) displayBuf = parts.slice(-8).join(' ');
+            updateDisplay();
+        } else if (item.type === 'wgap') {
+            if (charBuf) { displayBuf += (displayBuf ? ' ' : '') + charBuf; charBuf = ''; }
+            displayBuf = '';
+            updateDisplay();
+        }
+
+        morseTimer = setTimeout(stepMorse, item.ms);
+    }
+
+    function stopMorseLoop() {
+        clearTimeout(morseTimer);
+        displayBuf = ''; charBuf = '';
+        morseDiv.textContent = '';
+        seqIdx = 0;
+    }
+
+    /* ---- ページの状態変化を監視してON/OFF ---- */
+    // MutationObserverでmode-selectのhiddenクラスを監視
+    const modeSelectEl = document.getElementById('mode-select');
+    const obs = new MutationObserver(() => {
+        const visible = !modeSelectEl.classList.contains('hidden');
+        if (visible !== homeActive) setHomeVisible(visible);
+    });
+    obs.observe(modeSelectEl, { attributes: true, attributeFilter: ['class'] });
+
+    // 初期表示（mode-selectは最初から見えている）
+    window.addEventListener('DOMContentLoaded', () => setHomeVisible(true));
+    // DOMContentLoadedが既に発火済みの場合
+    if (document.readyState !== 'loading') setHomeVisible(true);
+
+    // morseTimerを最初に起動
+    function launchMorse() {
+        stopMorseLoop();
+        if (homeActive) stepMorse();
+    }
+
+    const _origSetHomeVisible = setHomeVisible;
+    // setHomeVisible内でmorseを起動するよう再定義
+    (function redefine() {
+        // startHomeAnimの後にlaunchMorse追加
+        const origStart = startHomeAnim;
+        window._startHomeAnim = origStart;
+    })();
+
+    // 上書き: setHomeVisible で morse も起動
+    bgCanvas._setVisible = function(v) {
+        homeActive = v;
+        bgCanvas.style.opacity = v ? '1' : '0';
+        morseDiv.style.opacity = v ? '1' : '0';
+        if (v) { resizeCanvas(); startHomeAnim(); launchMorse(); }
+        else   { cancelAnimationFrame(animFrame); stopMorseLoop(); }
+    };
+
+    // MutationObserverを上書き版で再登録
+    obs.disconnect();
+    const obs2 = new MutationObserver(() => {
+        const visible = !modeSelectEl.classList.contains('hidden');
+        if (visible !== homeActive) bgCanvas._setVisible(visible);
+    });
+    obs2.observe(modeSelectEl, { attributes: true, attributeFilter: ['class'] });
+
+    if (document.readyState !== 'loading') bgCanvas._setVisible(true);
+    else window.addEventListener('DOMContentLoaded', () => bgCanvas._setVisible(true));
+})();
+
 async function setNickname() {
     const nickname = document.getElementById('nickname-input').value.trim();
     if (!nickname) return;

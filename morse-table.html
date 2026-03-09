@@ -236,8 +236,8 @@
     <div class="subtitle">▸ MORSE CODE TABLE ◂</div>
 
     <div class="legend">
-        <div class="legend-item"><div class="dot-demo"></div>・ ＝ ディット（短点）</div>
-        <div class="legend-item"><div class="dash-demo"></div>― ＝ ダー（長点）</div>
+        <div class="legend-item"><div class="dot-demo"></div>・ ＝ トン（短点）</div>
+        <div class="legend-item"><div class="dash-demo"></div>― ＝ ツー（長点）</div>
     </div>
 
     <h2>▸ アルファベット</h2>
@@ -278,14 +278,11 @@ const NUMS = {
     '6':'-....','7':'--...','8':'---..','9':'----.'
 };
 const SYMS = {
-    '/':'-..-.','.'  :'.-.-.-',','  :'--..--','?'  :'..--..',
-    '!'  :'-.-.--','-'  :'-....-','('  :'-.--.',')'  :'-.--.-',
-    '='  :'-...-','+'  :'.-.-.','@'  :'.--.-.','&'  :'.-...'
+    '/':'-..-.','?':'..--..','!':'-.-.--',':':'---...','.':'.-.-.-','@':'.--.-.'
 };
 const SYM_NAMES = {
-    '/':'スラッシュ（ポータブル）','.':'ピリオド',',':'カンマ','?':'クエスチョン',
-    '!':'エクスクラメーション','-':'ハイフン','(':'括弧（開く）',')':'括弧（閉じる）',
-    '=':'イコール','+':'プラス','@':'アットマーク','&':'アンパサンド'
+    '/':'スラッシュ（ポータブル）','?':'クエスチョン','!':'エクスクラメーション',
+    ':':'コロン','.':'ピリオド','@':'アットマーク'
 };
 
 function codeToDisplay(code) {
@@ -298,12 +295,11 @@ function renderGrid(containerId, data, nameMap) {
         const cell = document.createElement('div');
         cell.className = 'morse-cell';
         const display = codeToDisplay(code);
-        const name = nameMap ? `<div class="morse-sym">${nameMap[ch] || ''}</div>` : '';
+        const label = nameMap ? (nameMap[ch] || '') : code;
         cell.innerHTML = `
             <div class="morse-char">${ch}</div>
             <div class="morse-code">${display}</div>
-            <div class="morse-sym">${code}</div>
-            ${name}
+            <div class="morse-sym">${label}</div>
         `;
         grid.appendChild(cell);
     });
