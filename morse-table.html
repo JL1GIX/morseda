@@ -295,11 +295,11 @@ function renderGrid(containerId, data, nameMap) {
         const cell = document.createElement('div');
         cell.className = 'morse-cell';
         const display = codeToDisplay(code);
-        const label = nameMap ? (nameMap[ch] || '') : code;
+        const nameLabel = nameMap ? `<div class="morse-sym">${nameMap[ch] || ''}</div>` : '';
         cell.innerHTML = `
             <div class="morse-char">${ch}</div>
             <div class="morse-code">${display}</div>
-            <div class="morse-sym">${label}</div>
+            ${nameLabel}
         `;
         grid.appendChild(cell);
     });
