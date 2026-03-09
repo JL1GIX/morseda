@@ -588,7 +588,7 @@
 <div id="game-container">
     <div class="header-bar"><h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1></div>
     <div class="subtitle">▸ AMATEUR RADIO CONTEST TRAINER ◂</div>
-    <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text">
+    <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text" enterkeyhint="send">
     <!-- ═══ START SCREEN ═══ -->
     <div id="start-screen">
         <!-- Step 1: Mode select -->
@@ -691,6 +691,11 @@
             <div id="input-display" onclick="focusMobile()">
                 <span id="typed-text"></span><span class="cursor"></span>
             </div>
+            <button id="rx-submit-btn"
+                onclick="submitRxInput()"
+                style="font-size:0.78rem;padding:7px 28px;margin-top:8px;letter-spacing:2px;opacity:0.85;">
+                ▶ ENTER
+            </button>
         </div>
         <!-- TX area -->
         <div id="tx-area" class="hidden">
@@ -937,13 +942,10 @@ function playMorse(text) {
     return offset + 0.1;
 }
 // ── Input ──────────────────────────────────────────────────────────────────────
-function focusMobile() { if (isPlaying) mobileInput.focus(); }
-mobileInput.addEventListener('input', () => {
-    if (!isPlaying || isWaitingNext) return;
-    typedDisplay.innerText = mobileInput.value.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
-});
-mobileInput.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter') return;
+function focusMobile() { if (isPlaying && gameMode === 'RX') mobileInput.focus(); }
+
+function submitRxInput() {
+    if (!isPlaying || isWaitingNext || gameMode !== 'RX') return;
     const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
     displayFrame.classList.remove('flash-correct', 'flash-error');
     void displayFrame.offsetWidth;
@@ -961,9 +963,31 @@ mobileInput.addEventListener('keydown', (e) => {
             isWaitingNext = false;
             document.getElementById('status-msg').innerText = '受信中...';
             nextWord();
+            // モバイルで自動リフォーカス
+            setTimeout(() => focusMobile(), 80);
         }, 500);
     } else {
         displayFrame.classList.add('flash-error');
+        // 不正解でもリフォーカスを維持
+        setTimeout(() => focusMobile(), 50);
+    }
+}
+
+mobileInput.addEventListener('input', () => {
+    if (!isPlaying || isWaitingNext) return;
+    const raw = mobileInput.value;
+    // iOS等で改行文字が入る場合（Return キー代替）
+    if (raw.includes('\n') || raw.includes('\r')) {
+        mobileInput.value = raw.replace(/[\n\r]/g, '');
+        submitRxInput();
+        return;
+    }
+    typedDisplay.innerText = raw.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
+});
+mobileInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        submitRxInput();
     }
 });
 // ── Beginner mode display ─────────────────────────────────────────────────────
@@ -1460,9 +1484,13 @@ function endGame() {
     if (score > 0) autoRegister();
 }
 let _registeredId = null;
-async function autoRegister() {
+async function autoRegister(retryCount = 0) {
     _registeredId = null;
     const minutes = Math.round(initialSeconds / 60);
+    const regResult = document.getElementById('score-reg-result');
+    if (retryCount === 0) {
+        regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中...</span>`;
+    }
     try {
         const res = await fetch('https://api.jl1gix.com/api/scores', {
             method: 'POST',
@@ -1475,17 +1503,25 @@ async function autoRegister() {
                 minutes
             })
         });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         _registeredId = data.id;
         const rankRes = await fetch(`https://api.jl1gix.com/api/scores/rank?score=${score}&mode=${gameMode}&minutes=${minutes}`);
         const rankData = await rankRes.json();
         const pct = rankData.percentile !== undefined ? rankData.percentile : '－';
-        document.getElementById('score-reg-result').innerHTML =
+        regResult.innerHTML =
             `<span style="color:var(--success);">✓ 登録完了！</span>　上位 <b>${pct}%</b>　` +
             `<a href="ranking.html" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:4px 14px; font-size:0.75rem; letter-spacing:1px; border-radius:2px;">🏆 ランキング</a>`;
     } catch (e) {
-        document.getElementById('score-reg-result').innerHTML =
-            `<span style="color:var(--error); font-size:0.75rem;">登録に失敗しました</span>`;
+        if (retryCount < 2) {
+            // 1秒・2秒後にリトライ
+            setTimeout(() => autoRegister(retryCount + 1), (retryCount + 1) * 1000);
+            regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中... (再試行 ${retryCount + 1}/2)</span>`;
+        } else {
+            regResult.innerHTML =
+                `<span style="color:var(--error); font-size:0.75rem;">登録に失敗しました　</span>` +
+                `<button onclick="autoRegister(0)" style="font-size:0.7rem;padding:4px 12px;margin:0;margin-top:4px;">再試行</button>`;
+        }
     }
 }
 
