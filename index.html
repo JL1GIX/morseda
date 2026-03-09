@@ -940,11 +940,11 @@ function playMorse(text) {
 function focusMobile() { if (isPlaying) mobileInput.focus(); }
 mobileInput.addEventListener('input', () => {
     if (!isPlaying || isWaitingNext) return;
-    typedDisplay.innerText = mobileInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    typedDisplay.innerText = mobileInput.value.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
 });
 mobileInput.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return;
-    const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
     displayFrame.classList.remove('flash-correct', 'flash-error');
     void displayFrame.offsetWidth;
     if (finalInput === currentWord && currentWord !== '') {
