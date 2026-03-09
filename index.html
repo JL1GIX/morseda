@@ -14,8 +14,8 @@
     <meta name="twitter:description" content="アマチュア無線コンテストのCW交信を想定したモールス符号練習ツール。受信・送信の両モードに対応。スコアをランキングに登録して他のユーザーと競おう。">
     <style>
         :root {
-            --primary: #00c060;
-            --primary-dim: #00a050;
+            --primary: #00d06a;
+            --primary-dim: #00b85a;
             --bg: #080f0b;
             --panel: #0e1f16;
             --border: #1e5c38;
@@ -49,8 +49,8 @@
                 0deg,
                 transparent,
                 transparent 2px,
-                rgba(0,0,0,0.12) 2px,
-                rgba(0,0,0,0.12) 4px
+                rgba(0,0,0,0.07) 2px,
+                rgba(0,0,0,0.07) 4px
             );
             pointer-events: none;
             z-index: 9999;
@@ -115,11 +115,11 @@
             text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5), 0 0 80px rgba(0,123,67,0.2);
         }
         .subtitle {
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             color: var(--primary-dim);
             letter-spacing: 4px;
             margin-bottom: 16px;
-            opacity: 0.9;
+            opacity: 1.0;
         }
         /* Stats bar */
         .stats {
@@ -132,7 +132,7 @@
             border-radius: 2px;
         }
         .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .stat-label { color: var(--primary-dim); font-size: 0.6rem; letter-spacing: 2px; opacity: 1.0; }
+        .stat-label { color: var(--primary-dim); font-size: 0.68rem; letter-spacing: 2px; opacity: 1.0; }
         .stat-value { color: var(--primary); font-size: 1.05rem; font-weight: bold; text-shadow: 0 0 10px rgba(0,123,67,0.9), 0 0 20px rgba(0,123,67,0.4); }
         /* Oscilloscope */
         #scope-container {
@@ -146,9 +146,9 @@
         #scope-label {
             position: absolute;
             top: 5px; left: 8px;
-            font-size: 0.5rem;
+            font-size: 0.58rem;
             color: var(--primary-dim);
-            opacity: 0.85;
+            opacity: 1.0;
             letter-spacing: 2px;
             z-index: 2;
             pointer-events: none;
@@ -156,9 +156,9 @@
         #scope-freq {
             position: absolute;
             top: 5px; right: 8px;
-            font-size: 0.5rem;
+            font-size: 0.58rem;
             color: var(--primary-dim);
-            opacity: 0.85;
+            opacity: 1.0;
             letter-spacing: 1px;
             z-index: 2;
             pointer-events: none;
@@ -310,7 +310,7 @@
             box-shadow: 0 0 15px rgba(0,123,67,0.35);
             color: #fff;
         }
-        .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.7; }
+        .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.85; }
         .quit-btn:hover { opacity: 1; }
         #mobile-input { position: absolute; opacity: 0; pointer-events: none; left: -9999px; }
         /* Select */
@@ -356,7 +356,7 @@
             text-align: left;
         }
         .setting-label {
-            font-size: 0.6rem;
+            font-size: 0.68rem;
             color: var(--primary);
             letter-spacing: 2px;
             margin-bottom: 8px;
@@ -408,7 +408,7 @@
             margin-bottom: 8px;
             align-items: center;
         }
-        .sig-label { font-size: 0.5rem; color: var(--primary-dim); opacity: 0.85; letter-spacing: 1px; margin-right: 4px; }
+        .sig-label { font-size: 0.58rem; color: var(--primary-dim); opacity: 1.0; letter-spacing: 1px; margin-right: 4px; }
         .sig-dot {
             width: 7px; height: 7px;
             border-radius: 50%;
@@ -422,7 +422,7 @@
             to   { opacity: 1; box-shadow: 0 0 8px var(--primary); }
         }
         /* Status msg */
-        #status-msg { font-size: 0.72rem; opacity: 1.0; margin-top: 10px; letter-spacing: 2px; }
+        #status-msg { font-size: 0.82rem; opacity: 1.0; margin-top: 10px; letter-spacing: 2px; }
         /* Result screen */
         #result-screen h2 { letter-spacing: 6px; font-size: 1.4rem; text-shadow: 0 0 20px rgba(0,123,67,1.0), 0 0 50px rgba(0,123,67,0.4); }
         #final-result-text { font-size: clamp(1.1rem, 5.5vw, 2rem); color: var(--success); text-shadow: 0 0 20px rgba(0,180,90,0.9), 0 0 50px rgba(0,180,90,0.4); white-space: nowrap; }
@@ -433,7 +433,7 @@
             border-top: 1px solid var(--border);
         }
         .share-label {
-            font-size: 0.58rem;
+            font-size: 0.65rem;
             letter-spacing: 3px;
             color: var(--primary-dim);
             opacity: 1.0;
@@ -507,9 +507,9 @@
         }
         .tx-paddle-label {
             display: block;
-            font-size: 0.62rem;
+            font-size: 0.68rem;
             letter-spacing: 3px;
-            opacity: 0.7;
+            opacity: 0.9;
         }
         /* TX word display */
         #tx-word-display {
