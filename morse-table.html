@@ -3,23 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>サイトについて - モールス打</title>
-    <meta name="description" content="モールス打の管理者・JL1GIXのプロフィールとサイト制作経緯。ウェブで気軽にCW練習がしたくて自作したモールス符号練習ツールです。">
-    <meta property="og:title" content="サイトについて - モールス打">
-    <meta property="og:description" content="モールス打の管理者・JL1GIXのプロフィールとサイト制作経緯を紹介します。">
-    <meta property="og:url" content="https://jl1gix.com/about.html">
+    <title>モールス符号表 - モールス打</title>
+    <meta name="description" content="アルファベット・数字・記号のモールス符号一覧表。アマチュア無線のCW練習に役立つ符号表です。">
+    <meta property="og:title" content="モールス符号表 - モールス打">
+    <meta property="og:description" content="アルファベット・数字・記号のモールス符号一覧表。">
+    <meta property="og:url" content="https://jl1gix.com/morse-table.html">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="サイトについて - モールス打">
-    <meta name="twitter:description" content="モールス打の管理者・JL1GIXのプロフィールとサイト制作経緯を紹介します。">
     <style>
         :root {
-            --primary: #00c060;
-            --primary-dim: #00a050;
+            --primary: #00d06a;
+            --primary-dim: #00b85a;
             --bg: #080f0b;
             --panel: #0e1f16;
             --border: #1e5c38;
-            --error: #e74c3c;
             --success: #00ee77;
         }
         * { box-sizing: border-box; }
@@ -43,7 +40,7 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background: repeating-linear-gradient(
                 0deg, transparent, transparent 2px,
-                rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px
+                rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
             );
             pointer-events: none;
             z-index: 9999;
@@ -105,61 +102,104 @@
             text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5);
         }
         .subtitle {
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             color: var(--primary-dim);
             letter-spacing: 4px;
             margin-bottom: 28px;
-            opacity: 0.9;
+            opacity: 1.0;
             text-align: center;
         }
         h2 {
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             letter-spacing: 3px;
             color: var(--primary);
             border-left: 3px solid var(--primary);
             padding-left: 12px;
             margin: 28px 0 14px;
-            text-shadow: 0 0 10px rgba(0,192,96,0.4);
         }
         h2:first-of-type { margin-top: 0; }
-        p {
-            font-size: 0.84rem;
-            line-height: 2.0;
-            color: rgba(0,210,105,0.95);
-            margin: 0 0 14px;
-            letter-spacing: 0.5px;
+
+        /* ── 符号グリッド ── */
+        .morse-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 6px;
+            margin-bottom: 8px;
         }
-        .profile-box {
+        .morse-cell {
             background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border);
-            border-radius: 2px;
-            padding: 18px 20px;
-            margin: 14px 0;
+            border: 1px solid rgba(30,92,56,0.6);
+            border-radius: 3px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s, border-color 0.15s;
+            cursor: default;
         }
-        .profile-callsign {
-            font-size: 1.6rem;
-            letter-spacing: 6px;
+        .morse-cell:hover {
+            background: rgba(0,123,67,0.12);
+            border-color: var(--primary-dim);
+        }
+        .morse-char {
+            font-size: 1.4rem;
+            font-weight: bold;
             color: var(--success);
-            text-shadow: 0 0 15px rgba(0,238,119,0.6);
-            margin-bottom: 12px;
+            text-shadow: 0 0 10px rgba(0,238,119,0.5);
+            line-height: 1;
         }
-        .profile-item {
-            font-size: 0.8rem;
-            color: rgba(0,192,96,0.8);
-            line-height: 2;
-            letter-spacing: 1px;
+        .morse-code {
+            font-size: 1.1rem;
+            color: var(--primary);
+            letter-spacing: 3px;
+            line-height: 1;
         }
-        .profile-label {
-            color: var(--primary-dim);
+        .morse-sym {
             font-size: 0.65rem;
-            letter-spacing: 2px;
-            margin-right: 10px;
+            color: var(--primary-dim);
+            letter-spacing: 1px;
+            opacity: 0.8;
         }
-        .section-divider {
-            border: none;
-            border-top: 1px solid var(--border);
-            margin: 24px 0;
+
+        /* ── 記号セクション ── */
+        .morse-grid-sm {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 6px;
         }
+
+        /* ── 凡例 ── */
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 0 0 20px;
+            font-size: 0.72rem;
+            color: var(--primary-dim);
+            letter-spacing: 1px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dot-demo {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 6px var(--primary);
+            flex-shrink: 0;
+        }
+        .dash-demo {
+            width: 28px; height: 10px;
+            border-radius: 5px;
+            background: var(--primary);
+            box-shadow: 0 0 6px var(--primary);
+            flex-shrink: 0;
+        }
+
         .back-btn {
             display: inline-block;
             margin-top: 24px;
@@ -171,19 +211,20 @@
             transition: opacity 0.15s;
         }
         .back-btn:hover { opacity: 1; color: var(--primary); }
+
         footer {
             margin-top: 20px;
             padding: 12px 0 4px;
             border-top: 1px solid #1e5c38;
             display: flex;
             justify-content: center;
-            gap: 24px;
+            flex-wrap: wrap;
+            gap: 10px 20px;
             font-size: 0.65rem;
             letter-spacing: 1px;
             opacity: 0.55;
             width: 95%;
             max-width: 680px;
-            flex-wrap: wrap;
         }
     </style>
 </head>
@@ -192,31 +233,21 @@
     <div class="header-bar">
         <h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1>
     </div>
-    <div class="subtitle">▸ サイトについて ◂</div>
+    <div class="subtitle">▸ MORSE CODE TABLE ◂</div>
 
-    <h2>▸ 管理者プロフィール</h2>
-    <div class="profile-box">
-        <div class="profile-callsign">JL1GIX</div>
-        <div class="profile-item">
-            <span class="profile-label">免許</span>第三級アマチュア無線技士<br>
-            <span class="profile-label">SNS</span><a href="https://x.com/jl1gix" style="color:var(--primary); text-decoration:none;">X (Twitter) @jl1gix</a>
-        </div>
+    <div class="legend">
+        <div class="legend-item"><div class="dot-demo"></div>・ ＝ ディット（短点）</div>
+        <div class="legend-item"><div class="dash-demo"></div>― ＝ ダー（長点）</div>
     </div>
 
-    <h2>▸ このサイトを作った経緯</h2>
-    <p>ウェブブラウザで気軽にモールス符号の練習がしたいと思ったのがきっかけです。でも、いざ探してみると「これだ」と思えるものがなかなか見つからなくて。ならば自分で作ってしまおう、というのがモールス打の始まりです。</p>
-    <p>最初はシンプルな受信練習ツールでしたが、使いながら「スマホでも使いたい」「送信の練習もしたい」「ランキングで他の人と比べたい」といった要望を自分自身に感じるたびに機能を追加してきました。今も少しずつアップデートしています。</p>
+    <h2>▸ アルファベット</h2>
+    <div class="morse-grid" id="alpha-grid"></div>
 
-    <hr class="section-divider">
+    <h2>▸ 数字</h2>
+    <div class="morse-grid" id="num-grid"></div>
 
-    <h2>▸ 開発のこだわり</h2>
-    <p>モールス打を作るうえで最も意識したのは「初心者でも迷わず使える」ことです。CWの練習を始めたばかりの方が、難しい設定をせずにすぐに練習を始められるよう、UIをシンプルに保つことにこだわりました。</p>
-    <p>初心者モードでは、現在流れている文字のモールス符号をリアルタイムで画面に表示します。「聴こえたけどこれ何の符号？」という瞬間に確認できるので、符号を覚えながら並行して練習できます。コールサインやRSTレポートを実際のコンテスト形式で生成しているため、本番さながらの練習ができるのも特徴です。</p>
-    <p>また、スマートフォンでも快適に使えるようタッチ操作に最適化されています。通勤時間や隙間時間にも気軽にモールスの練習ができます。</p>
-
-    <h2>▸ 今後について</h2>
-    <p>自分自身がCWを学んでいる途中なので、練習していて「こんな機能があれば」と思ったことをどんどん追加していく予定です。同じようにコンテストCWを練習したい方の役に立てれば嬉しいです。</p>
-    <p>ご意見・ご要望は<a href="contact.html" style="color:var(--primary); text-decoration:none;">お問い合わせ</a>からお気軽にどうぞ。</p>
+    <h2>▸ 記号</h2>
+    <div class="morse-grid-sm" id="sym-grid"></div>
 
     <div style="text-align:center;">
         <a href="https://jl1gix.com" class="back-btn">◀ トップに戻る</a>
@@ -235,5 +266,52 @@
         <a href="contact.html" style="color:#007b43; text-decoration:none;">お問い合わせ</a>
     </div>
 </footer>
+
+<script>
+const ALPHA = {
+    'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---',
+    'K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-',
+    'U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..'
+};
+const NUMS = {
+    '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....',
+    '6':'-....','7':'--...','8':'---..','9':'----.'
+};
+const SYMS = {
+    '/':'-..-.','.'  :'.-.-.-',','  :'--..--','?'  :'..--..',
+    '!'  :'-.-.--','-'  :'-....-','('  :'-.--.',')'  :'-.--.-',
+    '='  :'-...-','+'  :'.-.-.','@'  :'.--.-.','&'  :'.-...'
+};
+const SYM_NAMES = {
+    '/':'スラッシュ（ポータブル）','.':'ピリオド',',':'カンマ','?':'クエスチョン',
+    '!':'エクスクラメーション','-':'ハイフン','(':'括弧（開く）',')':'括弧（閉じる）',
+    '=':'イコール','+':'プラス','@':'アットマーク','&':'アンパサンド'
+};
+
+function codeToDisplay(code) {
+    return code.split('').map(s => s === '.' ? '・' : '―').join('');
+}
+
+function renderGrid(containerId, data, nameMap) {
+    const grid = document.getElementById(containerId);
+    Object.entries(data).forEach(([ch, code]) => {
+        const cell = document.createElement('div');
+        cell.className = 'morse-cell';
+        const display = codeToDisplay(code);
+        const name = nameMap ? `<div class="morse-sym">${nameMap[ch] || ''}</div>` : '';
+        cell.innerHTML = `
+            <div class="morse-char">${ch}</div>
+            <div class="morse-code">${display}</div>
+            <div class="morse-sym">${code}</div>
+            ${name}
+        `;
+        grid.appendChild(cell);
+    });
+}
+
+renderGrid('alpha-grid', ALPHA, null);
+renderGrid('num-grid', NUMS, null);
+renderGrid('sym-grid', SYMS, SYM_NAMES);
+</script>
 </body>
 </html>
