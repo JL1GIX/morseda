@@ -1540,6 +1540,16 @@ async function autoRegister() {
     modeSelEl.style.zIndex = '0';
     modeSelEl.insertBefore(sc, modeSelEl.firstChild);
 
+    /* ---- 他局信号（JL1GIX中央 + 周辺4局）---- */
+    // offset: Hz, amp: 最大振幅, period: ON/OFFサイクルms, duty: ONデューティ比
+    const PHANTOM = [
+        { offset: -880, amp: 0.52, period: 3100, duty: 0.42 },
+        { offset: -450, amp: 0.38, period: 2200, duty: 0.35 },
+        { offset:  430, amp: 0.46, period: 2750, duty: 0.38 },
+        { offset:  860, amp: 0.34, period: 1900, duty: 0.30 },
+    ];
+    const phantomStr = new Float32Array(PHANTOM.length).fill(0);
+
     /* ---- 状態変数 ---- */
     let hActive = false, animId, cycStart;
     let wfRows = [], smoothSpec = new Float32Array(SW).fill(0);
@@ -1551,20 +1561,31 @@ async function autoRegister() {
         return CY_EV.some(e => t >= e.on && t <= e.off);
     }
 
-    function genSpec(active) {
+    function isPhantomOn(idx) {
+        const p = PHANTOM[idx];
+        const t = (Date.now() + idx * 1373) % p.period;
+        return t < p.period * p.duty;
+    }
+
+    function addPeak(s, cx, amp) {
+        const sig2 = 2 * 3.5 * 3.5;
+        const peak = amp + Math.random() * 0.06;
+        for (let x = Math.max(0, ~~cx - 28); x < Math.min(SW, ~~cx + 28); x++) {
+            const d = x - cx;
+            s[x] = Math.max(s[x], peak * Math.exp(-(d * d) / sig2));
+        }
+    }
+
+    function genSpec(mainActive) {
         const s = new Float32Array(SW);
         for (let x = 0; x < SW; x++) {
             s[x] = 0.04 + Math.random() * 0.055;
             if (Math.random() < 0.004) s[x] += Math.random() * 0.12;
         }
-        if (active) {
-            const peak = 0.78 + Math.random() * 0.09;
-            const sig2 = 2 * 3.5 * 3.5;
-            for (let x = Math.max(0, CW_X - 28); x < Math.min(SW, CW_X + 28); x++) {
-                const d = x - CW_X;
-                s[x] = Math.max(s[x], peak * Math.exp(-(d * d) / sig2));
-            }
-        }
+        if (mainActive) addPeak(s, CW_X, 0.78);
+        PHANTOM.forEach((p, i) => {
+            if (phantomStr[i] > 0.05) addPeak(s, CW_X + p.offset * PX_HZ, p.amp * phantomStr[i]);
+        });
         return s;
     }
 
@@ -1582,6 +1603,9 @@ async function autoRegister() {
         const ctx = sc.getContext('2d');
 
         tStr = isToneOn() ? Math.min(1, tStr + 0.14) : Math.max(0, tStr - 0.09);
+        PHANTOM.forEach((p, i) => {
+            phantomStr[i] = isPhantomOn(i) ? Math.min(1, phantomStr[i] + 0.10) : Math.max(0, phantomStr[i] - 0.07);
+        });
 
         const inst = genSpec(tStr > 0.25);
         for (let x = 0; x < SW; x++) smoothSpec[x] = smoothSpec[x] * 0.60 + inst[x] * 0.40;
