@@ -1427,9 +1427,7 @@ function cleanupTx() {
 function getShareText() {
     const minutes = Math.round(initialSeconds / 60);
     const modeLabel = gameMode === 'TX' ? '送信' : '受信';
-    const wpm = gameMode === 'RX' ? document.getElementById('wpm-display').innerText : '';
-    const wpmStr = gameMode === 'RX' ? ` / ${wpm} WPM` : '';
-    return `【モールス打】${modeLabel}モード${wpmStr}\n${minutes}分間で${score}文字！\n#モールス打 #アマチュア無線 #CW #モールス信号\nhttps://jl1gix.com`;
+    return `【モールス打】${modeLabel}モード\n${minutes}分間で${score}文字！\n#モールス打 #アマチュア無線 #CW #モールス信号\nhttps://jl1gix.com`;
 }
 
 function shareX() {
