@@ -1481,48 +1481,64 @@ function endGame() {
     document.getElementById('score-reg-area').style.display = score > 0 ? '' : 'none';
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
-    if (score > 0) autoRegister();
+    if (score > 0) {
+        autoRegister();
+        setTimeout(() => {
+            const reg = document.getElementById('score-reg-area');
+            if (reg) reg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 300);
+    }
 }
 let _registeredId = null;
 async function autoRegister(retryCount = 0) {
-    _registeredId = null;
+    if (retryCount === 0) _registeredId = null;
     const minutes = Math.round(initialSeconds / 60);
     const regResult = document.getElementById('score-reg-result');
     if (retryCount === 0) {
         regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中...</span>`;
     }
-    try {
-        const res = await fetch('https://api.jl1gix.com/api/scores', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                nickname: 'noname',
-                score,
-                mode: gameMode,
-                is_beginner: beginnerMode ? 1 : 0,
-                minutes
-            })
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        _registeredId = data.id;
-        const rankRes = await fetch(`https://api.jl1gix.com/api/scores/rank?score=${score}&mode=${gameMode}&minutes=${minutes}`);
-        const rankData = await rankRes.json();
-        const pct = rankData.percentile !== undefined ? rankData.percentile : '－';
-        regResult.innerHTML =
-            `<span style="color:var(--success);">✓ 登録完了！</span>　上位 <b>${pct}%</b>　` +
-            `<a href="ranking.html" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:4px 14px; font-size:0.75rem; letter-spacing:1px; border-radius:2px;">🏆 ランキング</a>`;
-    } catch (e) {
-        if (retryCount < 2) {
-            // 1秒・2秒後にリトライ
-            setTimeout(() => autoRegister(retryCount + 1), (retryCount + 1) * 1000);
-            regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中... (再試行 ${retryCount + 1}/2)</span>`;
-        } else {
-            regResult.innerHTML =
-                `<span style="color:var(--error); font-size:0.75rem;">登録に失敗しました　</span>` +
-                `<button onclick="autoRegister(0)" style="font-size:0.7rem;padding:4px 12px;margin:0;margin-top:4px;">再試行</button>`;
+
+    // ── Step 1: POST（まだ登録されていない場合のみ）──
+    if (!_registeredId) {
+        try {
+            const res = await fetch('https://api.jl1gix.com/api/scores', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nickname: 'noname',
+                    score,
+                    mode: gameMode,
+                    is_beginner: beginnerMode ? 1 : 0,
+                    minutes
+                })
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            _registeredId = data.id;
+        } catch (e) {
+            if (retryCount < 2) {
+                regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中... (再試行 ${retryCount + 1}/2)</span>`;
+                setTimeout(() => autoRegister(retryCount + 1), (retryCount + 1) * 1000);
+            } else {
+                regResult.innerHTML =
+                    `<span style="color:var(--error); font-size:0.75rem;">登録に失敗しました　</span>` +
+                    `<button onclick="autoRegister(0)" style="font-size:0.7rem;padding:4px 12px;margin:0;margin-top:4px;">再試行</button>`;
+            }
+            return;
         }
     }
+
+    // ── Step 2: ランク取得（失敗しても登録成功として扱う）──
+    let pct = '－';
+    try {
+        const rankRes = await fetch(`https://api.jl1gix.com/api/scores/rank?score=${score}&mode=${gameMode}&minutes=${minutes}`);
+        const rankData = await rankRes.json();
+        if (rankData.percentile !== undefined) pct = rankData.percentile;
+    } catch (e) { /* ランク取得失敗は無視 */ }
+
+    regResult.innerHTML =
+        `<span style="color:var(--success);">✓ 登録完了！</span>　上位 <b>${pct}%</b>　` +
+        `<a href="ranking.html" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:4px 14px; font-size:0.75rem; letter-spacing:1px; border-radius:2px;">🏆 ランキング</a>`;
 }
 
 // ── ホーム画面：スペクトラムスコープ（JL1GIX 20WPM）────────────────────────────
