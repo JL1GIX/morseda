@@ -811,7 +811,14 @@ function wpmToDotTime(wpm) { return 1.2 / wpm; }
 function generateCallsign() {
     const rAZ = () => String.fromCharCode(65 + Math.floor(Math.random() * 26));
     const r09 = () => Math.floor(Math.random() * 10).toString();
-    const call = (Math.random() < 0.5 ? 'J' : '7') + rAZ() + r09() + rAZ() + rAZ() + rAZ();
+    const rRange = (a, z) => String.fromCharCode(a.charCodeAt(0) + Math.floor(Math.random() * (z.charCodeAt(0) - a.charCodeAt(0) + 1)));
+    // プレフィックス選択: J（50%）、7（25%）、8（25%）
+    const pfx = Math.random() < 0.5 ? 'J' : (Math.random() < 0.5 ? '7' : '8');
+    let second;
+    if (pfx === 'J') second = rRange('A', 'S');       // JA〜JS
+    else if (pfx === '7') second = rRange('J', 'N');   // 7J〜7N
+    else second = (Math.random() < 0.5 ? 'J' : 'N');  // 8J or 8N
+    const call = pfx + second + r09() + rAZ() + rAZ() + rAZ();
     // 30%の確率でポータブル表記（/0〜/9）を付加
     if (Math.random() < 0.3) {
         return call + '/' + r09();
