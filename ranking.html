@@ -386,8 +386,9 @@ async function loadRanking(mode, minutes, page) {
             else if (rank === 3) rankDisplay = '<span class="rank-3">🥉</span>';
             else rankDisplay = rank;
 
-            const d = new Date(row.created_at);
-            const date = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+            // JST (UTC+9) で日付表示
+            const d = new Date(new Date(row.created_at).getTime() + 9 * 60 * 60 * 1000);
+            const date = `${d.getUTCFullYear()}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${String(d.getUTCDate()).padStart(2,'0')}`;
             const beginnerBadge = row.is_beginner ? ' 🔰' : '';
 
             html += `<tr>
