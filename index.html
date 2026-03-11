@@ -611,7 +611,13 @@
             </div>
         </div>
         <!-- Step 2: Settings (hidden until mode selected) -->
-        <div id="mode-settings" class="hidden">
+        <div id="mode-settings" class="hidden" style="position:relative;">
+            <!-- 音声チェック：右上に配置（受信モード時のみ表示） -->
+            <div id="audio-check-item" style="display:none;position:absolute;top:0;right:0;align-items:center;gap:5px;font-size:0.72rem;color:var(--primary-dim);letter-spacing:1px;cursor:pointer;">
+                <input type="checkbox" id="audio-check" onchange="toggleSosCheck(this.checked)" style="margin:0;">
+                <span style="font-size:0.95rem;line-height:1;">🔊</span>
+                <label for="audio-check" style="cursor:pointer;white-space:nowrap;">音声チェック</label>
+            </div>
             <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:15px 0;"></p>
             <div class="settings-grid">
                 <div class="setting-item">
@@ -629,11 +635,6 @@
                         <option value="20" selected>20 WPM</option>
                         <option value="30">30 WPM</option>
                     </select>
-                </div>
-                <div class="setting-item checkbox-item" id="audio-check-item" style="display:none;">
-                    <input type="checkbox" id="audio-check" onchange="toggleSosCheck(this.checked)">
-                    <span style="font-size:1.1rem;line-height:1;flex-shrink:0;" title="音声チェック">🔊</span>
-                    <label for="audio-check">音声のチェック（SOS を鳴らす）</label>
                 </div>
                 <div class="setting-item checkbox-item">
                     <input type="checkbox" id="beginner-mode-check">
@@ -1312,7 +1313,7 @@ function selectMode(mode) {
         document.querySelector('label[for="beginner-mode-check"]').innerText =
             '初心者モード（送出中の文字のモールスをリアルタイム表示）';
         wpmItem.style.display = '';
-        audioCheckItem.style.display = '';
+        audioCheckItem.style.display = 'flex';
     } else {
         desc.innerHTML = 'コールサインとRSTが表示される。<br>スペース長押し＝連続短点（・・・）、Jキー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。';
         document.querySelector('label[for="beginner-mode-check"]').innerText =
