@@ -630,6 +630,11 @@
                         <option value="30">30 WPM</option>
                     </select>
                 </div>
+                <div class="setting-item checkbox-item" id="audio-check-item" style="display:none;">
+                    <input type="checkbox" id="audio-check" onchange="toggleSosCheck(this.checked)">
+                    <span style="font-size:1.1rem;line-height:1;flex-shrink:0;" title="音声チェック">🔊</span>
+                    <label for="audio-check">音声のチェック（SOS を鳴らす）</label>
+                </div>
                 <div class="setting-item checkbox-item">
                     <input type="checkbox" id="beginner-mode-check">
                     <span style="font-size:1.1rem;line-height:1;flex-shrink:0;" title="初心者向けモード">🔰</span>
@@ -832,6 +837,8 @@ function generateRST() {
 }
 // ── Audio unlock + prepare ────────────────────────────────────────────────────
 function unlockAndPrepare() {
+    stopSosCheck();
+    document.getElementById('audio-check').checked = false;
     if (gameMode === 'RX') {
         const wpmVal = parseInt(document.getElementById('wpm-select').value);
         DOT_TIME = wpmToDotTime(wpmVal);
@@ -882,6 +889,57 @@ function startGame() {
         nextWord();
     }
 }
+// ── 音声チェック（SOS ループ）─────────────────────────────────────────────────
+let _sosCtx = null, _sosTimer = null;
+function toggleSosCheck(on) {
+    if (on) startSosCheck(); else stopSosCheck();
+}
+function startSosCheck() {
+    stopSosCheck();
+    const AC = window.AudioContext || window.webkitAudioContext;
+    _sosCtx = new AC();
+    _sosLoop();
+}
+function stopSosCheck() {
+    if (_sosTimer) { clearTimeout(_sosTimer); _sosTimer = null; }
+    if (_sosCtx)   { try { _sosCtx.close(); } catch(e){} _sosCtx = null; }
+}
+function _sosLoop() {
+    if (!_sosCtx) return;
+    const dotT  = 1.2 / 20;        // 0.06s at 20 WPM
+    const dashT = dotT * 3;         // 0.18s
+    const elGap = dotT;             // 要素間隔
+    const ltGap = dotT * 3;         // 文字間隔
+    const wdGap = dotT * 7;         // 語間隔
+    const freq  = 750;
+    // SOS = ... --- ...
+    const letters = ['...', '---', '...'];
+    let t = _sosCtx.currentTime + 0.05;
+    let offset = 0;
+    letters.forEach((code, li) => {
+        code.split('').forEach((sym, si) => {
+            const dur = sym === '.' ? dotT : dashT;
+            const osc = _sosCtx.createOscillator();
+            const gn  = _sosCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            gn.gain.setValueAtTime(0, t + offset);
+            gn.gain.linearRampToValueAtTime(0.5, t + offset + 0.006);
+            gn.gain.setValueAtTime(0.5, t + offset + dur - 0.006);
+            gn.gain.linearRampToValueAtTime(0, t + offset + dur + 0.006);
+            osc.connect(gn); gn.connect(_sosCtx.destination);
+            osc.start(t + offset);
+            osc.stop(t + offset + dur + 0.05);
+            offset += dur + elGap;
+        });
+        // 文字後の追加ギャップ（elGap はすでに加算済み）
+        if (li < letters.length - 1) offset += (ltGap - elGap);
+    });
+    // 語末は word gap（elGap 分は加算済みなので残りを追加）
+    offset += (wdGap - elGap);
+    _sosTimer = setTimeout(_sosLoop, offset * 1000);
+}
+
 // ── Audio ──────────────────────────────────────────────────────────────────────
 function killCurrentAudio() {
     if (audioLoopId) clearTimeout(audioLoopId);
@@ -1248,20 +1306,25 @@ function selectMode(mode) {
     document.getElementById('mode-settings').classList.remove('hidden');
     const desc    = document.getElementById('mode-description');
     const wpmItem = document.getElementById('wpm-setting-item');
+    const audioCheckItem = document.getElementById('audio-check-item');
     if (mode === 'RX') {
         desc.innerHTML = 'コールサインとRSTを交互に受信せよ。<br>Enterで判定。正確にコピーせよ。';
         document.querySelector('label[for="beginner-mode-check"]').innerText =
             '初心者モード（送出中の文字のモールスをリアルタイム表示）';
         wpmItem.style.display = '';
+        audioCheckItem.style.display = '';
     } else {
         desc.innerHTML = 'コールサインとRSTが表示される。<br>スペース長押し＝連続短点（・・・）、Jキー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。';
         document.querySelector('label[for="beginner-mode-check"]').innerText =
             '初心者モード（現在打つ文字のモールスを表示）';
         wpmItem.style.display = 'none';
+        audioCheckItem.style.display = 'none';
     }
 }
 
 function backToModeSelect() {
+    stopSosCheck();
+    document.getElementById('audio-check').checked = false;
     document.getElementById('mode-settings').classList.add('hidden');
     document.getElementById('mode-select').classList.remove('hidden');
 }
