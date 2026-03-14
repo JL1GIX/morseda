@@ -678,16 +678,16 @@
             </div>
             <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:15px 0;"></p>
             <div class="settings-grid">
-                <div class="setting-item">
-                    <span class="setting-label">⏱ 制限時間</span>
-                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="setting-item" style="flex:1;">
+                        <span class="setting-label">⏱ 制限時間</span>
                         <select id="time-select">
                             <option value="60">1分間</option>
                             <option value="180">3分間</option>
                             <option value="300">5分間</option>
                         </select>
-                        <button id="free-mode-btn" onclick="startFreeMode()" style="display:none;font-size:0.65rem;padding:6px 10px;letter-spacing:1px;white-space:nowrap;margin:0;">📝 フリー入力</button>
                     </div>
+                    <button id="free-mode-btn" onclick="startFreeMode()" style="display:none;font-size:0.65rem;padding:6px 10px;letter-spacing:1px;white-space:nowrap;margin:0;align-self:center;">📝 フリー入力</button>
                 </div>
                 <div class="setting-item" id="wpm-setting-item">
                     <span class="setting-label">📡 モールス速度</span>
