@@ -585,59 +585,139 @@
             width: 100%;
             max-width: 560px;
             margin: 0 auto;
-            padding: 10px 0;
+            padding: 6px 0 10px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
+        }
+        #free-header {
+            text-align: center;
+            letter-spacing: 6px;
+            font-size: 0.7rem;
+            color: var(--primary-dim);
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        #free-header span {
+            color: var(--primary);
+            font-size: 1.0rem;
+            letter-spacing: 8px;
+        }
+        #free-input-block {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 10px 16px 12px;
+        }
+        #free-input-block .free-section-label {
+            font-size: 0.58rem;
+            color: var(--primary-dim);
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #free-input-block .free-section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
         }
         #free-morse-render {
-            min-height: 2.4rem;
+            min-height: 2.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
             flex-wrap: wrap;
-            background: rgba(0,0,0,0.35);
-            border: 1px solid var(--border);
-            border-radius: 2px;
-            padding: 10px 14px;
-            letter-spacing: 2px;
         }
-        #free-text-display {
-            min-height: 120px;
-            max-height: 220px;
-            overflow-y: auto;
+        #free-output-block {
             background: rgba(0,0,0,0.55);
             border: 1px solid var(--primary);
             border-radius: 2px;
-            padding: 14px 16px;
-            font-size: 1.35rem;
-            letter-spacing: 4px;
+            padding: 0;
+            overflow: hidden;
+        }
+        #free-output-block .free-section-label {
+            font-size: 0.58rem;
+            color: var(--primary-dim);
+            letter-spacing: 3px;
+            padding: 6px 14px 5px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0,50,20,0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #free-output-block .free-section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        #free-text-display {
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 12px 16px 10px;
+            font-size: 1.4rem;
+            letter-spacing: 5px;
             color: var(--primary);
             word-break: break-all;
             text-align: left;
-            line-height: 1.8;
+            line-height: 1.9;
             font-family: 'Courier New', monospace;
         }
-        .free-label {
-            font-size: 0.65rem;
-            color: var(--primary-dim);
-            letter-spacing: 3px;
-            text-align: center;
-        }
-        #free-btn-row {
+        #free-controls {
             display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
         }
+        #free-controls .free-quit-btn {
+            font-size: 0.72rem;
+            padding: 7px 22px;
+            letter-spacing: 2px;
+        }
+        #free-controls .free-reset-btn {
+            font-size: 0.68rem;
+            padding: 6px 16px;
+            letter-spacing: 2px;
+            opacity: 0.55;
+            background: transparent;
+            border-color: var(--border);
+            color: var(--primary-dim);
+        }
+        #free-controls .free-reset-btn:hover { opacity: 0.85; }
         #free-paddle-area {
             display: none;
             gap: 20px;
             justify-content: center;
-            margin-top: 4px;
+            margin-top: 2px;
         }
         #free-paddle-area.visible { display: flex; }
+        /* 設定画面のフリー入力リンク */
+        #free-mode-link {
+            display: none;
+            text-align: center;
+            margin-top: 6px;
+        }
+        #free-mode-link button {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--primary-dim);
+            font-size: 0.68rem;
+            padding: 5px 18px;
+            letter-spacing: 2px;
+            opacity: 0.7;
+            transition: opacity 0.2s, border-color 0.2s;
+        }
+        #free-mode-link button:hover {
+            opacity: 1;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3503091804175227"
      crossorigin="anonymous"></script>
@@ -678,16 +758,13 @@
             </div>
             <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:15px 0;"></p>
             <div class="settings-grid">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <div class="setting-item" style="flex:1;">
-                        <span class="setting-label">⏱ 制限時間</span>
-                        <select id="time-select">
-                            <option value="60">1分間</option>
-                            <option value="180">3分間</option>
-                            <option value="300">5分間</option>
-                        </select>
-                    </div>
-                    <button id="free-mode-btn" onclick="startFreeMode()" style="display:none;font-size:0.65rem;padding:6px 10px;letter-spacing:1px;white-space:nowrap;margin:0;align-self:center;">📝 フリー入力</button>
+                <div class="setting-item">
+                    <span class="setting-label">⏱ 制限時間</span>
+                    <select id="time-select">
+                        <option value="60">1分間</option>
+                        <option value="180">3分間</option>
+                        <option value="300">5分間</option>
+                    </select>
                 </div>
                 <div class="setting-item" id="wpm-setting-item">
                     <span class="setting-label">📡 モールス速度</span>
@@ -702,6 +779,9 @@
                     <span style="font-size:1.1rem;line-height:1;flex-shrink:0;" title="初心者向けモード">🔰</span>
                     <label for="beginner-mode-check">初心者モード（現在の文字のモールスを表示）</label>
                 </div>
+            </div>
+            <div id="free-mode-link">
+                <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
             </div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
                 <button onclick="unlockAndPrepare()">▶ ミッション開始</button>
@@ -776,18 +856,26 @@
     </div>
     <!-- ═══ FREE INPUT SCREEN ═══ -->
     <div id="free-screen" class="hidden">
-        <div class="free-label">▸ FREE INPUT MODE ◂</div>
-        <!-- 入力中のモールス符号表示 -->
-        <div class="free-label" style="margin-bottom:-8px;">INPUT</div>
-        <div id="free-morse-render"></div>
-        <!-- デコード済みテキスト -->
-        <div class="free-label" style="margin-bottom:-8px;">DECODED TEXT</div>
-        <div id="free-text-display"><span class="cursor"></span></div>
-        <!-- ボタン行 -->
-        <div id="free-btn-row">
-            <button onclick="resetFreeMode()" style="font-size:0.78rem;padding:8px 24px;letter-spacing:2px;opacity:0.75;">↺ RESET</button>
-            <button onclick="quitFreeMode()" style="font-size:0.78rem;padding:8px 24px;letter-spacing:2px;">■ QUIT</button>
+        <div id="free-header">▸ <span>FREE INPUT</span> ◂</div>
+
+        <!-- 入力中のモールス符号 -->
+        <div id="free-input-block">
+            <div class="free-section-label">INPUT</div>
+            <div id="free-morse-render"></div>
         </div>
+
+        <!-- デコード済みテキスト -->
+        <div id="free-output-block">
+            <div class="free-section-label">DECODED</div>
+            <div id="free-text-display"><span class="cursor"></span></div>
+        </div>
+
+        <!-- コントロール -->
+        <div id="free-controls">
+            <button class="free-reset-btn" onclick="resetFreeMode()">↺ RESET</button>
+            <button class="free-quit-btn" onclick="quitFreeMode()">■ QUIT</button>
+        </div>
+
         <!-- タッチ端末用パドルボタン -->
         <div id="free-paddle-area">
             <button class="tx-paddle-btn"
@@ -1397,21 +1485,21 @@ function selectMode(mode) {
     const desc    = document.getElementById('mode-description');
     const wpmItem = document.getElementById('wpm-setting-item');
     const audioCheckItem = document.getElementById('audio-check-item');
-    const freeModeBtn = document.getElementById('free-mode-btn');
+    const freeModeLink = document.getElementById('free-mode-link');
     if (mode === 'RX') {
         desc.innerHTML = 'コールサインとRSTを交互に受信せよ。<br>Enterで判定。正確にコピーせよ。';
         document.querySelector('label[for="beginner-mode-check"]').innerText =
             '初心者モード（送出中の文字のモールスをリアルタイム表示）';
         wpmItem.style.display = '';
         audioCheckItem.style.display = 'flex';
-        freeModeBtn.style.display = 'none';
+        freeModeLink.style.display = 'none';
     } else {
         desc.innerHTML = 'コールサインとRSTが表示される。<br>スペース長押し＝連続短点（・・・）、Jキー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。';
         document.querySelector('label[for="beginner-mode-check"]').innerText =
             '初心者モード（現在打つ文字のモールスを表示）';
         wpmItem.style.display = 'none';
         audioCheckItem.style.display = 'none';
-        freeModeBtn.style.display = '';
+        freeModeLink.style.display = 'block';
     }
 }
 
