@@ -580,6 +580,64 @@
             .msym-dot  { width: 12px; height: 12px; }
             .msym-dash { width: 30px; height: 12px; }
         }
+        /* ── Free Input Mode ── */
+        #free-screen {
+            width: 100%;
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        #free-morse-render {
+            min-height: 2.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 10px 14px;
+            letter-spacing: 2px;
+        }
+        #free-text-display {
+            min-height: 120px;
+            max-height: 220px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.55);
+            border: 1px solid var(--primary);
+            border-radius: 2px;
+            padding: 14px 16px;
+            font-size: 1.35rem;
+            letter-spacing: 4px;
+            color: var(--primary);
+            word-break: break-all;
+            text-align: left;
+            line-height: 1.8;
+            font-family: 'Courier New', monospace;
+        }
+        .free-label {
+            font-size: 0.65rem;
+            color: var(--primary-dim);
+            letter-spacing: 3px;
+            text-align: center;
+        }
+        #free-btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        #free-paddle-area {
+            display: none;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 4px;
+        }
+        #free-paddle-area.visible { display: flex; }
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3503091804175227"
      crossorigin="anonymous"></script>
@@ -622,11 +680,14 @@
             <div class="settings-grid">
                 <div class="setting-item">
                     <span class="setting-label">⏱ 制限時間</span>
-                    <select id="time-select">
-                        <option value="60">1分間</option>
-                        <option value="180">3分間</option>
-                        <option value="300">5分間</option>
-                    </select>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <select id="time-select">
+                            <option value="60">1分間</option>
+                            <option value="180">3分間</option>
+                            <option value="300">5分間</option>
+                        </select>
+                        <button id="free-mode-btn" onclick="startFreeMode()" style="display:none;font-size:0.65rem;padding:6px 10px;letter-spacing:1px;white-space:nowrap;margin:0;">📝 フリー入力</button>
+                    </div>
                 </div>
                 <div class="setting-item" id="wpm-setting-item">
                     <span class="setting-label">📡 モールス速度</span>
@@ -712,6 +773,34 @@
         </div>
         <div id="status-msg">READY...</div>
         <button class="quit-btn" onclick="quitGame()">■ QUIT (中断)</button>
+    </div>
+    <!-- ═══ FREE INPUT SCREEN ═══ -->
+    <div id="free-screen" class="hidden">
+        <div class="free-label">▸ FREE INPUT MODE ◂</div>
+        <!-- 入力中のモールス符号表示 -->
+        <div class="free-label" style="margin-bottom:-8px;">INPUT</div>
+        <div id="free-morse-render"></div>
+        <!-- デコード済みテキスト -->
+        <div class="free-label" style="margin-bottom:-8px;">DECODED TEXT</div>
+        <div id="free-text-display"><span class="cursor"></span></div>
+        <!-- ボタン行 -->
+        <div id="free-btn-row">
+            <button onclick="resetFreeMode()" style="font-size:0.78rem;padding:8px 24px;letter-spacing:2px;opacity:0.75;">↺ RESET</button>
+            <button onclick="quitFreeMode()" style="font-size:0.78rem;padding:8px 24px;letter-spacing:2px;">■ QUIT</button>
+        </div>
+        <!-- タッチ端末用パドルボタン -->
+        <div id="free-paddle-area">
+            <button class="tx-paddle-btn"
+                ontouchstart="event.preventDefault();tapSymbol(false);">
+                <span class="tx-paddle-sym">・</span>
+                <span class="tx-paddle-label">トン</span>
+            </button>
+            <button class="tx-paddle-btn"
+                ontouchstart="event.preventDefault();tapSymbol(true);">
+                <span class="tx-paddle-sym">ー</span>
+                <span class="tx-paddle-label">ツー</span>
+            </button>
+        </div>
     </div>
     <!-- ═══ RESULT SCREEN ═══ -->
     <div id="result-screen" class="hidden">
@@ -1308,18 +1397,21 @@ function selectMode(mode) {
     const desc    = document.getElementById('mode-description');
     const wpmItem = document.getElementById('wpm-setting-item');
     const audioCheckItem = document.getElementById('audio-check-item');
+    const freeModeBtn = document.getElementById('free-mode-btn');
     if (mode === 'RX') {
         desc.innerHTML = 'コールサインとRSTを交互に受信せよ。<br>Enterで判定。正確にコピーせよ。';
         document.querySelector('label[for="beginner-mode-check"]').innerText =
             '初心者モード（送出中の文字のモールスをリアルタイム表示）';
         wpmItem.style.display = '';
         audioCheckItem.style.display = 'flex';
+        freeModeBtn.style.display = 'none';
     } else {
         desc.innerHTML = 'コールサインとRSTが表示される。<br>スペース長押し＝連続短点（・・・）、Jキー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。';
         document.querySelector('label[for="beginner-mode-check"]').innerText =
             '初心者モード（現在打つ文字のモールスを表示）';
         wpmItem.style.display = 'none';
         audioCheckItem.style.display = 'none';
+        freeModeBtn.style.display = '';
     }
 }
 
@@ -1391,12 +1483,15 @@ function renderTxInput() {
 // ── Iambic keyer loop ─────────────────────────────────────────────────────────
 function keyerStep() {
     keyerPending = false;
-    if (!isPlaying || gameMode !== 'TX') return;
+    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
 
     if (!dotHeld && !dashHeld) {
         // Both paddles released → start character gap timer
         if (txMorseInput && !txCharTimer) {
-            txCharTimer = setTimeout(decodeTxChar, TX_CHAR_GAP);
+            txCharTimer = setTimeout(
+                gameMode === 'FREE' ? decodeFreeChar : decodeTxChar,
+                TX_CHAR_GAP
+            );
         }
         return; // stop loop; onTxKeyDown will restart it
     }
@@ -1416,7 +1511,7 @@ function keyerStep() {
     // Play element and accumulate input
     playSidetone(sym === '-');
     txMorseInput += sym;
-    renderTxInput();
+    if (gameMode === 'FREE') renderFreeInput(); else renderTxInput();
 
     // Schedule next step: element duration + inter-element gap (1 dot)
     const elemMs = (sym === '.' ? TX_DOT_TIME : TX_DOT_TIME * 3) * 1000;
@@ -1431,17 +1526,20 @@ function startKeyerLoop() {
 
 // ── Touch paddle buttons (タッチ端末・単押し専用) ─────────────────────────────
 function tapSymbol(isDash) {
-    if (!isPlaying || gameMode !== 'TX') return;
+    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
     const sym = isDash ? '-' : '.';
     playSidetone(isDash);
     txMorseInput += sym;
-    renderTxInput();
-    txCharTimer = setTimeout(decodeTxChar, TX_CHAR_GAP);
+    if (gameMode === 'FREE') renderFreeInput(); else renderTxInput();
+    txCharTimer = setTimeout(
+        gameMode === 'FREE' ? decodeFreeChar : decodeTxChar,
+        TX_CHAR_GAP
+    );
 }
 
 function onTxKeyDown(e) {
-    if (!isPlaying || gameMode !== 'TX') return;
+    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
     if (e.code === 'Space') {
         e.preventDefault();
         if (!dotHeld) { dotHeld = true; startKeyerLoop(); }
@@ -1516,6 +1614,94 @@ function cleanupTx() {
     const pa = document.getElementById('tx-paddle-area');
     if (pa) pa.classList.add('hidden');
     beginnerDisplay.classList.remove('tx-beginner');
+}
+
+// ── Free Input Mode ───────────────────────────────────────────────────────────
+let freeTextBuffer = '';
+
+function startFreeMode() {
+    // AudioContext を初期化（TX モードの unlockAndPrepare と同様）
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!audioCtx) {
+        audioCtx = new AC();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(1, 0);
+        masterGain.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const unlockBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+    const unlockSrc = audioCtx.createBufferSource();
+    unlockSrc.buffer = unlockBuf;
+    unlockSrc.connect(masterGain);
+    unlockSrc.start(0);
+
+    // 状態初期化
+    gameMode = 'FREE';
+    isPlaying = true;
+    freeTextBuffer = '';
+    txMorseInput = ''; txCharTimer = null;
+    dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
+
+    // タッチ端末判定
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    TX_CHAR_GAP = isTouch ? 700 : 400;
+
+    // 画面切替
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('free-screen').classList.remove('hidden');
+    if (isTouch) document.getElementById('free-paddle-area').classList.add('visible');
+
+    // 初期描画
+    renderFreeInput();
+    renderFreeText();
+
+    // キーボードリスナー登録
+    document.addEventListener('keydown', onTxKeyDown);
+    document.addEventListener('keyup',   onTxKeyUp);
+}
+
+function decodeFreeChar() {
+    txCharTimer = null;
+    const decoded = MORSE_REVERSE[txMorseInput] || '?';
+    txMorseInput = '';
+    lastSentSym = null;
+    renderFreeInput();
+    freeTextBuffer += decoded;
+    renderFreeText();
+}
+
+function renderFreeInput() {
+    document.getElementById('free-morse-render').innerHTML =
+        txMorseInput.split('').map(sym =>
+            `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
+        ).join('');
+}
+
+function renderFreeText() {
+    const el = document.getElementById('free-text-display');
+    el.textContent = freeTextBuffer;
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    el.appendChild(cursor);
+    el.scrollTop = el.scrollHeight;
+}
+
+function resetFreeMode() {
+    freeTextBuffer = '';
+    txMorseInput = '';
+    if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
+    dotHeld = false; dashHeld = false; keyerPending = false; lastSentSym = null;
+    renderFreeInput();
+    renderFreeText();
+}
+
+function quitFreeMode() {
+    isPlaying = false;
+    document.removeEventListener('keydown', onTxKeyDown);
+    document.removeEventListener('keyup',   onTxKeyUp);
+    if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
+    dotHeld = false; dashHeld = false; keyerPending = false;
+    location.reload();
 }
 
 // ── SNS Share ─────────────────────────────────────────────────────────────────
