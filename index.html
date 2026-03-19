@@ -962,7 +962,7 @@ let gameMode = 'RX'; // 'RX' | 'TX'
 let txWord = [], txCharIndex = 0, txMorseInput = '';
 let nextTxType = 'CALLSIGN';
 let txCharTimer = null;
-let TX_CHAR_GAP = 400;      // ms after last element ends → auto-decode (スマホは700ms)
+let TX_CHAR_GAP = 280;      // ms after last element ends → auto-decode (スマホは700ms)
 const TX_DOT_TIME = 0.06;   // sec — fixed keyer element speed (20 WPM)
 // Iambic keyer state
 let dotHeld = false, dashHeld = false;
@@ -1520,7 +1520,7 @@ function startTxGame() {
     document.getElementById('tx-area').classList.remove('hidden');
     // パドルボタンはタッチ端末のみ表示。判定ギャップも緩和
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    TX_CHAR_GAP = isTouch ? 700 : 400;
+    TX_CHAR_GAP = isTouch ? 700 : 280;
     if (isTouch) document.getElementById('tx-paddle-area').classList.remove('hidden');
     document.getElementById('status-msg').innerText = 'TRANSMIT...';
     document.addEventListener('keydown', onTxKeyDown);
@@ -1734,7 +1734,7 @@ function startFreeMode() {
 
     // タッチ端末判定
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    TX_CHAR_GAP = isTouch ? 700 : 400;
+    TX_CHAR_GAP = isTouch ? 700 : 280;
 
     // 画面切替
     document.getElementById('start-screen').classList.add('hidden');
