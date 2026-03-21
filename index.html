@@ -861,8 +861,13 @@
         <div id="free-header">▸ <span>FREE INPUT</span> ◂</div>
 
         <!-- 入力中のモールス符号 -->
-        <div id="free-input-block">
+        <div id="free-input-block" style="position:relative;">
             <div class="free-section-label">INPUT</div>
+            <label style="position:absolute;top:8px;right:10px;display:flex;align-items:center;gap:5px;font-size:0.68rem;color:var(--primary-dim);letter-spacing:1px;cursor:pointer;user-select:none;">
+                <input type="checkbox" id="free-beginner-check" style="margin:0;" onchange="renderFreeInput()">
+                <span style="font-size:0.9rem;line-height:1;">🔰</span>
+                <span>初心者モード</span>
+            </label>
             <div id="free-morse-render"></div>
         </div>
 
@@ -875,10 +880,6 @@
         <!-- コントロール -->
         <div id="free-controls">
             <button class="free-reset-btn" onclick="resetFreeMode()">↺ RESET</button>
-            <label style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--primary-dim);letter-spacing:1px;cursor:pointer;user-select:none;">
-                <input type="checkbox" id="free-beginner-check" style="margin:0;" onchange="renderFreeInput()">
-                <span style="font-size:1rem;line-height:1;">🔰</span>
-            </label>
             <button class="free-quit-btn" onclick="quitFreeMode()">■ QUIT</button>
         </div>
 
