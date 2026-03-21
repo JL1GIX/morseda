@@ -1565,6 +1565,11 @@ function updateTxBeginnerDisplay() {
 }
 
 function renderTxInput() {
+    // 非初心者モードでは符号を表示しない（音のみで判断）
+    if (!beginnerMode) {
+        document.getElementById('tx-input-render').innerHTML = '';
+        return;
+    }
     document.getElementById('tx-input-render').innerHTML = txMorseInput.split('').map(sym =>
         `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
     ).join('');
