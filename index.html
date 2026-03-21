@@ -875,6 +875,10 @@
         <!-- コントロール -->
         <div id="free-controls">
             <button class="free-reset-btn" onclick="resetFreeMode()">↺ RESET</button>
+            <label style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--primary-dim);letter-spacing:1px;cursor:pointer;user-select:none;">
+                <input type="checkbox" id="free-beginner-check" style="margin:0;" onchange="renderFreeInput()">
+                <span style="font-size:1rem;line-height:1;">🔰</span>
+            </label>
             <button class="free-quit-btn" onclick="quitFreeMode()">■ QUIT</button>
         </div>
 
@@ -1766,10 +1770,12 @@ function decodeFreeChar() {
 }
 
 function renderFreeInput() {
-    document.getElementById('free-morse-render').innerHTML =
-        txMorseInput.split('').map(sym =>
+    const showSymbols = document.getElementById('free-beginner-check').checked;
+    document.getElementById('free-morse-render').innerHTML = showSymbols
+        ? txMorseInput.split('').map(sym =>
             `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
-        ).join('');
+          ).join('')
+        : '';
 }
 
 function renderFreeText() {
