@@ -1569,11 +1569,13 @@ function updateTxBeginnerDisplay() {
 }
 
 function renderTxInput() {
-    // 非初心者モードでは符号を表示しない（音のみで判断）
+    const box = document.getElementById('tx-morse-input');
+    // 非初心者モードでは枠ごと非表示
     if (!beginnerMode) {
-        document.getElementById('tx-input-render').innerHTML = '';
+        box.style.display = 'none';
         return;
     }
+    box.style.display = '';
     document.getElementById('tx-input-render').innerHTML = txMorseInput.split('').map(sym =>
         `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
     ).join('');
