@@ -865,8 +865,7 @@
             <div class="free-section-label">INPUT</div>
             <label style="position:absolute;top:8px;right:10px;display:flex;align-items:center;gap:5px;font-size:0.68rem;color:var(--primary-dim);letter-spacing:1px;cursor:pointer;user-select:none;">
                 <input type="checkbox" id="free-beginner-check" style="margin:0;" onchange="renderFreeInput()">
-                <span style="font-size:0.9rem;line-height:1;">🔰</span>
-                <span>初心者モード</span>
+                <span>上級者モード</span>
             </label>
             <div id="free-morse-render"></div>
         </div>
@@ -1771,12 +1770,12 @@ function decodeFreeChar() {
 }
 
 function renderFreeInput() {
-    const showSymbols = document.getElementById('free-beginner-check').checked;
-    document.getElementById('free-morse-render').innerHTML = showSymbols
-        ? txMorseInput.split('').map(sym =>
+    const advancedMode = document.getElementById('free-beginner-check').checked;
+    document.getElementById('free-morse-render').innerHTML = advancedMode
+        ? ''
+        : txMorseInput.split('').map(sym =>
             `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
-          ).join('')
-        : '';
+          ).join('');
 }
 
 function renderFreeText() {
