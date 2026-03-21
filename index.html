@@ -1721,7 +1721,7 @@ function cleanupTx() {
 let freeTextBuffer = '';
 
 function startFreeMode() {
-    // AudioContext を初期化（TX モードの unlockAndPrepare と同様）
+    // AudioContext を初期化（TX モードの unlockAndPrepare と完全同様）
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!audioCtx) {
         audioCtx = new AC();
@@ -1729,12 +1729,27 @@ function startFreeMode() {
         masterGain.gain.setValueAtTime(1, 0);
         masterGain.connect(audioCtx.destination);
     }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const doResume = (audioCtx.state === 'suspended') ? audioCtx.resume() : Promise.resolve();
     const unlockBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
     const unlockSrc = audioCtx.createBufferSource();
     unlockSrc.buffer = unlockBuf;
     unlockSrc.connect(masterGain);
     unlockSrc.start(0);
+    audioCtx.onstatechange = () => { if (audioCtx.state === 'suspended') audioCtx.resume(); };
+
+    // 画面切替（タップ直後に行う）
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('free-screen').classList.remove('hidden');
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (isTouch) document.getElementById('free-paddle-area').classList.add('visible');
+
+    // resume完了後 300ms 待ってからキーヤー開始（unlockAndPrepare と同じ手順）
+    doResume.then(() => { setTimeout(launchFreeMode, 300); })
+            .catch(() => { setTimeout(launchFreeMode, 300); });
+}
+
+function launchFreeMode() {
+    masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
 
     // 状態初期化
     gameMode = 'FREE';
@@ -1746,11 +1761,6 @@ function startFreeMode() {
     // タッチ端末判定
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     TX_CHAR_GAP = isTouch ? 700 : 280;
-
-    // 画面切替
-    document.getElementById('start-screen').classList.add('hidden');
-    document.getElementById('free-screen').classList.remove('hidden');
-    if (isTouch) document.getElementById('free-paddle-area').classList.add('visible');
 
     // 初期描画
     renderFreeInput();
