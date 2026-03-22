@@ -863,10 +863,6 @@
         <!-- 入力中のモールス符号 -->
         <div id="free-input-block" style="position:relative;">
             <div class="free-section-label">INPUT</div>
-            <label style="position:absolute;top:8px;right:10px;display:flex;align-items:center;gap:5px;font-size:0.68rem;color:var(--primary-dim);letter-spacing:1px;cursor:pointer;user-select:none;">
-                <input type="checkbox" id="free-beginner-check" style="margin:0;" onchange="renderFreeInput()">
-                <span>上級者モード</span>
-            </label>
             <div id="free-morse-render"></div>
         </div>
 
@@ -1570,11 +1566,6 @@ function updateTxBeginnerDisplay() {
 
 function renderTxInput() {
     const box = document.getElementById('tx-morse-input');
-    // 非初心者モードでは枠ごと非表示
-    if (!beginnerMode) {
-        box.style.display = 'none';
-        return;
-    }
     box.style.display = '';
     document.getElementById('tx-input-render').innerHTML = txMorseInput.split('').map(sym =>
         `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
@@ -1782,12 +1773,9 @@ function decodeFreeChar() {
 }
 
 function renderFreeInput() {
-    const advancedMode = document.getElementById('free-beginner-check').checked;
-    document.getElementById('free-morse-render').innerHTML = advancedMode
-        ? ''
-        : txMorseInput.split('').map(sym =>
-            `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
-          ).join('');
+    document.getElementById('free-morse-render').innerHTML = txMorseInput.split('').map(sym =>
+        `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
+    ).join('');
 }
 
 function renderFreeText() {
