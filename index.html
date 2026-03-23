@@ -315,7 +315,22 @@
         }
         .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.85; }
         .quit-btn:hover { opacity: 1; }
-        #mobile-input { position: absolute; opacity: 0; pointer-events: none; left: -9999px; }
+        #mobile-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 2rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            text-shadow: 0 0 12px rgba(0,123,67,0.9), 0 0 25px rgba(0,123,67,0.4);
+            width: 100%;
+            text-align: center;
+            caret-color: var(--primary);
+            padding: 0;
+        }
+        #mobile-input::selection { background: rgba(0,123,67,0.35); color: var(--primary); }
         /* Select */
         select {
             background: rgba(0,0,0,0.85);
@@ -577,6 +592,7 @@
                 min-height: 6rem;
                 padding: 16px 12px;
             }
+            #mobile-input { font-size: 1.8rem; }
             #scope-canvas { height: 120px; }
             /* 初心者モードのドット・ダッシュも少し小さく */
             .msym-dot  { width: 12px; height: 12px; }
@@ -728,7 +744,6 @@
 <div id="game-container">
     <div class="header-bar"><h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1></div>
     <div class="subtitle">▸ AMATEUR RADIO CONTEST TRAINER ◂</div>
-    <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text" enterkeyhint="send">
     <!-- ═══ START SCREEN ═══ -->
     <div id="start-screen">
         <!-- Step 1: Mode select -->
@@ -837,8 +852,8 @@
         <div id="beginner-display" class="hidden"></div>
         <!-- RX area -->
         <div id="rx-area">
-            <div id="input-display" onclick="focusMobile()">
-                <span id="typed-text"></span><span class="cursor"></span>
+            <div id="input-display">
+                <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text" enterkeyhint="send">
             </div>
             <button id="rx-submit-btn"
                 onclick="submitRxInput()"
@@ -988,7 +1003,6 @@ let toneSchedule = [];
 let charSchedule = [];
 const mobileInput = document.getElementById('mobile-input');
 const displayFrame = document.getElementById('input-display');
-const typedDisplay = document.getElementById('typed-text');
 const beginnerDisplay = document.getElementById('beginner-display');
 // ── WPM ───────────────────────────────────────────────────────────────────────
 function wpmToDotTime(wpm) { return 1.2 / wpm; }
@@ -1137,8 +1151,7 @@ function tick() {
 }
 function nextWord() {
     mobileInput.value = '';
-    typedDisplay.innerText = '';
-    currentWord = (nextType === 'CALLSIGN') ? generateCallsign() : generateRST();
+    currentWord =(nextType === 'CALLSIGN') ? generateCallsign() : generateRST();
     nextType = (nextType === 'CALLSIGN') ? 'RST' : 'CALLSIGN';
     playMorseLoop();
 }
@@ -1195,7 +1208,7 @@ function submitRxInput() {
     displayFrame.classList.remove('flash-correct', 'flash-error');
     void displayFrame.offsetWidth;
     if (finalInput === currentWord && currentWord !== '') {
-        typedDisplay.innerText = ''; mobileInput.value = '';
+        mobileInput.value = '';
         score += currentWord.length;
         document.getElementById('score').innerText = score;
         isWaitingNext = true;
@@ -1227,7 +1240,15 @@ mobileInput.addEventListener('input', () => {
         submitRxInput();
         return;
     }
-    typedDisplay.innerText = raw.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
+    // 有効文字のみ残す（カーソル位置を保持）
+    const filtered = raw.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
+    if (filtered !== raw) {
+        const pos = mobileInput.selectionStart;
+        const removedBefore = raw.slice(0, pos).replace(/[A-Z0-9\/]/gi, '').length;
+        mobileInput.value = filtered;
+        const newPos = Math.max(0, pos - removedBefore);
+        mobileInput.setSelectionRange(newPos, newPos);
+    }
 });
 mobileInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
