@@ -597,7 +597,7 @@
             /* 初心者モードのドット・ダッシュも少し小さく */
             .msym-dot  { width: 12px; height: 12px; }
             .msym-dash { width: 30px; height: 12px; }
-            #key-customize-btn { display: none !important; }
+            #key-customize-wrap { display: none !important; }
         }
         /* ── Free Input Mode ── */
         #free-screen {
@@ -812,8 +812,7 @@
                 <label for="audio-check" style="cursor:pointer;white-space:nowrap;">音声チェック</label>
             </div>
             <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:15px 0;"></p>
-            <div style="display:flex;align-items:flex-start;gap:10px;">
-            <div class="settings-grid" style="flex:1;margin:18px 0 18px;">
+            <div class="settings-grid" style="margin:18px 0 18px;">
                 <div class="setting-item">
                     <span class="setting-label">⏱ 制限時間</span>
                     <select id="time-select">
@@ -836,7 +835,8 @@
                     <label for="beginner-mode-check">初心者モード（現在の文字のモールスを表示）</label>
                 </div>
             </div>
-            <button id="key-customize-btn" onclick="openKeyCustomize()" style="margin-top:18px;font-size:0.68rem;padding:6px 12px;opacity:0.7;letter-spacing:1px;white-space:nowrap;">⌨ キー設定</button>
+            <div id="key-customize-wrap" style="display:none;text-align:center;margin-bottom:6px;">
+                <button id="key-customize-btn" onclick="openKeyCustomize()" style="font-size:0.68rem;padding:6px 12px;opacity:0.7;letter-spacing:1px;white-space:nowrap;">⌨ キー設定</button>
             </div>
             <div id="free-mode-link">
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
@@ -1625,6 +1625,7 @@ function selectMode(mode) {
     const wpmItem = document.getElementById('wpm-setting-item');
     const audioCheckItem = document.getElementById('audio-check-item');
     const freeModeLink = document.getElementById('free-mode-link');
+    const keyCustWrap  = document.getElementById('key-customize-wrap');
     if (mode === 'RX') {
         desc.innerHTML = 'コールサインとRSTを交互に受信せよ。<br>Enterで判定。正確にコピーせよ。';
         document.querySelector('label[for="beginner-mode-check"]').innerText =
@@ -1632,6 +1633,7 @@ function selectMode(mode) {
         wpmItem.style.display = '';
         audioCheckItem.style.display = 'flex';
         freeModeLink.style.display = 'none';
+        keyCustWrap.style.display = 'none';
     } else {
         desc.innerHTML = `コールサインとRSTが表示される。<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
         document.querySelector('label[for="beginner-mode-check"]').innerText =
@@ -1639,6 +1641,7 @@ function selectMode(mode) {
         wpmItem.style.display = 'none';
         audioCheckItem.style.display = 'none';
         freeModeLink.style.display = 'block';
+        keyCustWrap.style.display = 'block';
     }
 }
 
