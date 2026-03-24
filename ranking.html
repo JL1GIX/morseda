@@ -438,8 +438,24 @@ function changePage(delta) {
     loadRanking(currentMode, currentMinutes, currentPage);
 }
 
-// Initial load
-loadRanking('RX', 1, 1);
+// Initial load — URLパラメータがあればそのタブを選択
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    const modeParam = params.get('mode');
+    const timeParam  = parseInt(params.get('time'));
+    if (modeParam === 'TX' || modeParam === 'RX') {
+        currentMode = modeParam;
+        document.getElementById('tab-rx').classList.toggle('active', modeParam === 'RX');
+        document.getElementById('tab-tx').classList.toggle('active', modeParam === 'TX');
+    }
+    if ([1, 3, 5].includes(timeParam)) {
+        currentMinutes = timeParam;
+        [1, 3, 5].forEach(m => {
+            document.getElementById(`tab-${m}`).classList.toggle('active', m === timeParam);
+        });
+    }
+    loadRanking(currentMode, currentMinutes, 1);
+})();
 </script>
 </body>
 </html>

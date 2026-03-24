@@ -996,6 +996,9 @@
             </div>
         </div>
         <button onclick="location.reload()" style="margin-top:16px;">▶ 再挑戦</button>
+        <div style="margin-top:10px;">
+            <a id="ranking-link" href="ranking.html" style="color:var(--primary-dim);font-size:0.72rem;letter-spacing:2px;opacity:0.7;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">🏆 ランキングを見る</a>
+        </div>
     </div>
 </div>
 <!-- フッター -->
@@ -1998,6 +2001,8 @@ function endGame() {
     btn.disabled = false;
     btn.textContent = '✏️ 名前を設定';
     document.getElementById('score-reg-area').style.display = score > 0 ? '' : 'none';
+    document.getElementById('ranking-link').href =
+        `ranking.html?mode=${gameMode === 'TX' ? 'TX' : 'RX'}&time=${minutes}`;
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
     if (score > 0) {
