@@ -812,7 +812,8 @@
                 <label for="audio-check" style="cursor:pointer;white-space:nowrap;">音声チェック</label>
             </div>
             <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:15px 0;"></p>
-            <div class="settings-grid">
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+            <div class="settings-grid" style="flex:1;margin:18px 0 18px;">
                 <div class="setting-item">
                     <span class="setting-label">⏱ 制限時間</span>
                     <select id="time-select">
@@ -820,7 +821,6 @@
                         <option value="180">3分間</option>
                         <option value="300">5分間</option>
                     </select>
-                    <button id="key-customize-btn" onclick="openKeyCustomize()" style="margin-left:8px;font-size:0.68rem;padding:4px 10px;opacity:0.7;letter-spacing:1px;">⌨ キー設定</button>
                 </div>
                 <div class="setting-item" id="wpm-setting-item">
                     <span class="setting-label">📡 モールス速度</span>
@@ -835,6 +835,8 @@
                     <span style="font-size:1.1rem;line-height:1;flex-shrink:0;" title="初心者向けモード">🔰</span>
                     <label for="beginner-mode-check">初心者モード（現在の文字のモールスを表示）</label>
                 </div>
+            </div>
+            <button id="key-customize-btn" onclick="openKeyCustomize()" style="margin-top:18px;font-size:0.68rem;padding:6px 12px;opacity:0.7;letter-spacing:1px;white-space:nowrap;">⌨ キー設定</button>
             </div>
             <div id="free-mode-link">
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
