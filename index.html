@@ -726,16 +726,35 @@
             background: transparent;
             border: 1px solid var(--border);
             color: var(--primary-dim);
-            font-size: 0.68rem;
-            padding: 5px 18px;
+            font-size: 0.75rem;
+            padding: 6px 22px;
             letter-spacing: 2px;
-            opacity: 0.7;
-            transition: opacity 0.2s, border-color 0.2s;
+            opacity: 0.75;
+            transition: opacity 0.2s, border-color 0.2s, color 0.2s;
         }
         #free-mode-link button:hover {
             opacity: 1;
             border-color: var(--primary);
             color: var(--primary);
+            box-shadow: none;
+        }
+        /* キー設定：最も控えめなサードアクション */
+        #key-customize-btn {
+            background: transparent;
+            border: 1px solid rgba(30,92,56,0.4);
+            color: rgba(0,184,90,0.45);
+            font-size: 0.58rem;
+            padding: 3px 10px;
+            letter-spacing: 1px;
+            opacity: 1;
+            margin-top: 0;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        #key-customize-btn:hover {
+            border-color: var(--border);
+            color: var(--primary-dim);
+            background: transparent;
+            box-shadow: none;
         }
         /* ── Key Customize Modal ── */
         #key-customize-modal {
@@ -835,8 +854,8 @@
                     <label for="beginner-mode-check">初心者モード（現在の文字のモールスを表示）</label>
                 </div>
             </div>
-            <div id="key-customize-wrap" style="display:none;text-align:center;margin-bottom:6px;">
-                <button id="key-customize-btn" onclick="openKeyCustomize()" style="font-size:0.68rem;padding:6px 12px;opacity:0.7;letter-spacing:1px;white-space:nowrap;">⌨ キー設定</button>
+            <div id="key-customize-wrap" style="display:none;text-align:center;margin-bottom:4px;">
+                <button id="key-customize-btn" onclick="openKeyCustomize()">⌨ キー設定</button>
             </div>
             <div id="free-mode-link">
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
