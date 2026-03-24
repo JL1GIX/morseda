@@ -1020,8 +1020,8 @@ const TX_DOT_TIME = 0.06;   // sec — fixed keyer element speed (20 WPM)
 // Iambic keyer state
 let dotHeld = false, dashHeld = false;
 // ── Key bindings (customizable) ───────────────────────────────────────────────
-let dotKey  = localStorage.getItem('dotKey')  || 'Space';
-let dashKey = localStorage.getItem('dashKey') || 'KeyJ';
+let dotKey  = 'Space';
+let dashKey = 'KeyJ';
 let _pendingDotKey = null, _pendingDashKey = null, _capturingFor = null;
 
 function getKeyLabel(code) {
@@ -1085,8 +1085,6 @@ function onKeyCapture(e) {
 function saveKeyCustomize() {
     dotKey  = _pendingDotKey;
     dashKey = _pendingDashKey;
-    localStorage.setItem('dotKey',  dotKey);
-    localStorage.setItem('dashKey', dashKey);
     updateTxModeDesc();
     closeKeyCustomize();
 }
