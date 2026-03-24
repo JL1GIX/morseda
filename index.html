@@ -736,6 +736,43 @@
             border-color: var(--primary);
             color: var(--primary);
         }
+        /* ── Key Customize Modal ── */
+        #key-customize-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.88);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+        #key-customize-modal.open { display: flex; }
+        .kc-box {
+            background: #000f08;
+            border: 1px solid var(--primary-dim);
+            border-top: 2px solid var(--primary);
+            padding: 26px 28px;
+            width: min(340px, 88vw);
+        }
+        .kc-title { font-size: 0.7rem; letter-spacing: 3px; color: var(--primary-dim); margin-bottom: 18px; text-align: center; }
+        .kc-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 0; }
+        .kc-label { font-size: 0.78rem; letter-spacing: 2px; color: var(--primary-dim); flex-shrink: 0; }
+        .kc-key-btn {
+            background: rgba(0,123,67,0.08);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            padding: 8px 0;
+            width: 155px;
+            cursor: pointer;
+            text-align: center;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .kc-key-btn:hover { border-color: var(--primary-dim); }
+        .kc-key-btn.listening { border-color: var(--primary); background: rgba(0,123,67,0.22); animation: blink 0.5s infinite; }
+        #kc-error { font-size: 0.7rem; letter-spacing: 1px; color: var(--error); min-height: 1.1em; text-align: center; margin: 10px 0 2px; }
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3503091804175227"
      crossorigin="anonymous"></script>
@@ -799,6 +836,7 @@
             </div>
             <div id="free-mode-link">
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
+                <button onclick="openKeyCustomize()" style="margin-left:8px;">⌨ キー設定</button>
             </div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
                 <button onclick="unlockAndPrepare()">▶ ミッション開始</button>
@@ -981,6 +1019,83 @@ let TX_CHAR_GAP = 280;      // ms after last element ends → auto-decode (ス�
 const TX_DOT_TIME = 0.06;   // sec — fixed keyer element speed (20 WPM)
 // Iambic keyer state
 let dotHeld = false, dashHeld = false;
+// ── Key bindings (customizable) ───────────────────────────────────────────────
+let dotKey  = localStorage.getItem('dotKey')  || 'Space';
+let dashKey = localStorage.getItem('dashKey') || 'KeyJ';
+let _pendingDotKey = null, _pendingDashKey = null, _capturingFor = null;
+
+function getKeyLabel(code) {
+    if (code === 'Space') return 'SPACE';
+    if (code.startsWith('Key'))   return code.slice(3);
+    if (code.startsWith('Digit')) return code.slice(5);
+    const arrowMap = {ArrowUp:'↑', ArrowDown:'↓', ArrowLeft:'←', ArrowRight:'→'};
+    if (arrowMap[code]) return arrowMap[code];
+    return code;
+}
+function openKeyCustomize() {
+    _pendingDotKey  = dotKey;
+    _pendingDashKey = dashKey;
+    _capturingFor   = null;
+    document.getElementById('kc-error').textContent = '';
+    updateKcBtns();
+    document.getElementById('key-customize-modal').classList.add('open');
+    document.addEventListener('keydown', onKeyCapture);
+}
+function closeKeyCustomize() {
+    _capturingFor = null;
+    document.getElementById('key-customize-modal').classList.remove('open');
+    document.removeEventListener('keydown', onKeyCapture);
+}
+function updateKcBtns() {
+    const db = document.getElementById('dot-key-btn');
+    const ab = document.getElementById('dash-key-btn');
+    db.textContent = _capturingFor === 'dot'  ? '… キー入力待ち …' : getKeyLabel(_pendingDotKey);
+    ab.textContent = _capturingFor === 'dash' ? '… キー入力待ち …' : getKeyLabel(_pendingDashKey);
+    db.classList.toggle('listening', _capturingFor === 'dot');
+    ab.classList.toggle('listening', _capturingFor === 'dash');
+}
+function startKeyCapture(which) {
+    _capturingFor = which;
+    document.getElementById('kc-error').textContent = '';
+    updateKcBtns();
+}
+function onKeyCapture(e) {
+    if (!_capturingFor) return;
+    e.preventDefault();
+    if (e.code === 'Escape') { closeKeyCustomize(); return; }
+    if (e.code === 'Enter')  { saveKeyCustomize();  return; }
+    const code = e.code;
+    if (_capturingFor === 'dot') {
+        if (code === _pendingDashKey) {
+            document.getElementById('kc-error').textContent = '長点と同じキーは設定できません';
+            _capturingFor = null; updateKcBtns(); return;
+        }
+        _pendingDotKey = code;
+    } else {
+        if (code === _pendingDotKey) {
+            document.getElementById('kc-error').textContent = '短点と同じキーは設定できません';
+            _capturingFor = null; updateKcBtns(); return;
+        }
+        _pendingDashKey = code;
+    }
+    _capturingFor = null;
+    document.getElementById('kc-error').textContent = '';
+    updateKcBtns();
+}
+function saveKeyCustomize() {
+    dotKey  = _pendingDotKey;
+    dashKey = _pendingDashKey;
+    localStorage.setItem('dotKey',  dotKey);
+    localStorage.setItem('dashKey', dashKey);
+    updateTxModeDesc();
+    closeKeyCustomize();
+}
+function updateTxModeDesc() {
+    if (document.getElementById('mode-settings').classList.contains('hidden')) return;
+    if (gameMode !== 'TX') return;
+    document.getElementById('mode-description').innerHTML =
+        `コールサインとRSTが表示される。<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
+}
 let lastSentSym = null;  // for iambic alternation ('.' or '-')
 let keyerPending = false; // true while keyer setTimeout is in flight
 // IC-7300 Style Spectrum Scope
@@ -1517,7 +1632,7 @@ function selectMode(mode) {
         audioCheckItem.style.display = 'flex';
         freeModeLink.style.display = 'none';
     } else {
-        desc.innerHTML = 'コールサインとRSTが表示される。<br>スペース長押し＝連続短点（・・・）、Jキー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。';
+        desc.innerHTML = `コールサインとRSTが表示される。<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
         document.querySelector('label[for="beginner-mode-check"]').innerText =
             '初心者モード（現在打つ文字のモールスを表示）';
         wpmItem.style.display = 'none';
@@ -1653,18 +1768,18 @@ function tapSymbol(isDash) {
 
 function onTxKeyDown(e) {
     if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
-    if (e.code === 'Space') {
+    if (e.code === dotKey) {
         e.preventDefault();
         if (!dotHeld) { dotHeld = true; startKeyerLoop(); }
-    } else if (e.code === 'KeyJ') {
+    } else if (e.code === dashKey) {
         e.preventDefault();
         if (!dashHeld) { dashHeld = true; startKeyerLoop(); }
     }
 }
 
 function onTxKeyUp(e) {
-    if (e.code === 'Space')  dotHeld  = false;
-    else if (e.code === 'KeyJ') dashHeld = false;
+    if (e.code === dotKey)       dotHeld  = false;
+    else if (e.code === dashKey) dashHeld = false;
 }
 
 function playSidetone(isDash) {
@@ -2190,5 +2305,24 @@ async function setNickname() {
     }
 }
 </script>
+<!-- ═══ KEY CUSTOMIZE MODAL ═══ -->
+<div id="key-customize-modal">
+    <div class="kc-box">
+        <div class="kc-title">⌨ キーカスタマイズ</div>
+        <div class="kc-row">
+            <span class="kc-label">▸ 短点（・）</span>
+            <button class="kc-key-btn" id="dot-key-btn" onclick="startKeyCapture('dot')"></button>
+        </div>
+        <div class="kc-row">
+            <span class="kc-label">▸ 長点（－）</span>
+            <button class="kc-key-btn" id="dash-key-btn" onclick="startKeyCapture('dash')"></button>
+        </div>
+        <div id="kc-error"></div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">
+            <button onclick="saveKeyCustomize()" style="font-size:0.75rem;padding:7px 22px;letter-spacing:2px;">✓ 保存</button>
+            <button onclick="closeKeyCustomize()" style="font-size:0.7rem;padding:6px 14px;opacity:0.5;">✕ キャンセル</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
