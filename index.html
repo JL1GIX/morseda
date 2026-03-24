@@ -830,7 +830,12 @@
                 <span style="font-size:0.95rem;line-height:1;">🔊</span>
                 <label for="audio-check" style="cursor:pointer;white-space:nowrap;">音声チェック</label>
             </div>
-            <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:15px 0;"></p>
+            <div style="display:flex;align-items:flex-start;gap:10px;margin:15px 0;">
+                <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:0;flex:1;"></p>
+                <div id="key-customize-wrap" style="display:none;flex-shrink:0;padding-top:3px;">
+                    <button id="key-customize-btn" onclick="openKeyCustomize()">⌨ キー設定</button>
+                </div>
+            </div>
             <div class="settings-grid" style="margin:18px 0 18px;">
                 <div class="setting-item">
                     <span class="setting-label">⏱ 制限時間</span>
@@ -853,9 +858,6 @@
                     <span style="font-size:1.1rem;line-height:1;flex-shrink:0;" title="初心者向けモード">🔰</span>
                     <label for="beginner-mode-check">初心者モード（現在の文字のモールスを表示）</label>
                 </div>
-            </div>
-            <div id="key-customize-wrap" style="display:none;text-align:center;margin-bottom:4px;">
-                <button id="key-customize-btn" onclick="openKeyCustomize()">⌨ キー設定</button>
             </div>
             <div id="free-mode-link">
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
