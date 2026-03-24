@@ -597,6 +597,7 @@
             /* 初心者モードのドット・ダッシュも少し小さく */
             .msym-dot  { width: 12px; height: 12px; }
             .msym-dash { width: 30px; height: 12px; }
+            #key-customize-btn { display: none !important; }
         }
         /* ── Free Input Mode ── */
         #free-screen {
@@ -836,7 +837,7 @@
             </div>
             <div id="free-mode-link">
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
-                <button onclick="openKeyCustomize()" style="margin-left:8px;">⌨ キー設定</button>
+                <button id="key-customize-btn" onclick="openKeyCustomize()" style="margin-left:8px;">⌨ キー設定</button>
             </div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
                 <button onclick="unlockAndPrepare()">▶ ミッション開始</button>
