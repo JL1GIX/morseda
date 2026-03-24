@@ -1020,7 +1020,6 @@ let TX_CHAR_GAP = 280;      // ms after last element ends → auto-decode (ス�
 const TX_DOT_TIME = 0.06;   // sec — fixed keyer element speed (20 WPM)
 // Iambic keyer state
 let dotHeld = false, dashHeld = false;
-let squeezed = false; // Mode B: 送出中に逆パドルが押されたか
 // ── Key bindings (customizable) ───────────────────────────────────────────────
 let dotKey  = 'Space';
 let dashKey = 'KeyJ';
@@ -1650,7 +1649,7 @@ function backToModeSelect() {
 
 function startTxGame() {
     txCharIndex = 0; txMorseInput = ''; txCharTimer = null;
-    dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false; squeezed = false;
+    dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
     nextTxType = 'CALLSIGN';
     document.getElementById('rx-area').classList.add('hidden');
     document.getElementById('tx-area').classList.remove('hidden');
@@ -1714,20 +1713,6 @@ function keyerStep() {
     if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
 
     if (!dotHeld && !dashHeld) {
-        // Mode B: スクイズ検出済みなら1要素だけ追加送出
-        if (squeezed) {
-            squeezed = false;
-            if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
-            const sym = (lastSentSym === '.') ? '-' : '.';
-            lastSentSym = sym;
-            playSidetone(sym === '-');
-            txMorseInput += sym;
-            if (gameMode === 'FREE') renderFreeInput(); else renderTxInput();
-            const elemMs = (sym === '.' ? TX_DOT_TIME : TX_DOT_TIME * 3) * 1000;
-            keyerPending = true;
-            setTimeout(keyerStep, elemMs + TX_DOT_TIME * 1000);
-            return;
-        }
         // Both paddles released → start character gap timer
         if (txMorseInput && !txCharTimer) {
             txCharTimer = setTimeout(
@@ -1735,7 +1720,7 @@ function keyerStep() {
                 TX_CHAR_GAP
             );
         }
-        return;
+        return; // stop loop; onTxKeyDown will restart it
     }
 
     // New element incoming → cancel any pending decode
@@ -1784,18 +1769,10 @@ function onTxKeyDown(e) {
     if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
     if (e.code === dotKey) {
         e.preventDefault();
-        if (!dotHeld) {
-            dotHeld = true;
-            if (keyerPending && dashHeld) squeezed = true;
-            startKeyerLoop();
-        }
+        if (!dotHeld) { dotHeld = true; startKeyerLoop(); }
     } else if (e.code === dashKey) {
         e.preventDefault();
-        if (!dashHeld) {
-            dashHeld = true;
-            if (keyerPending && dotHeld) squeezed = true;
-            startKeyerLoop();
-        }
+        if (!dashHeld) { dashHeld = true; startKeyerLoop(); }
     }
 }
 
@@ -1859,7 +1836,7 @@ function decodeTxChar() {
 function cleanupTx() {
     document.removeEventListener('keydown', onTxKeyDown);
     document.removeEventListener('keyup',   onTxKeyUp);
-    dotHeld = false; dashHeld = false; keyerPending = false; squeezed = false;
+    dotHeld = false; dashHeld = false; keyerPending = false;
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
     const pa = document.getElementById('tx-paddle-area');
     if (pa) pa.classList.add('hidden');
@@ -1905,7 +1882,7 @@ function launchFreeMode() {
     isPlaying = true;
     freeTextBuffer = '';
     txMorseInput = ''; txCharTimer = null;
-    dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false; squeezed = false;
+    dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
 
     // タッチ端末判定
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -1949,7 +1926,7 @@ function resetFreeMode() {
     freeTextBuffer = '';
     txMorseInput = '';
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
-    dotHeld = false; dashHeld = false; keyerPending = false; squeezed = false; lastSentSym = null;
+    dotHeld = false; dashHeld = false; keyerPending = false; lastSentSym = null;
     renderFreeInput();
     renderFreeText();
 }
@@ -1959,7 +1936,7 @@ function quitFreeMode() {
     document.removeEventListener('keydown', onTxKeyDown);
     document.removeEventListener('keyup',   onTxKeyUp);
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
-    dotHeld = false; dashHeld = false; keyerPending = false; squeezed = false;
+    dotHeld = false; dashHeld = false; keyerPending = false;
     location.reload();
 }
 
