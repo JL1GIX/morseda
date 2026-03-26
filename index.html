@@ -995,7 +995,7 @@
                 <button onclick="setNickname()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">✏️ 名前を設定</button>
             </div>
         </div>
-        <button onclick="location.reload()" style="margin-top:16px;">▶ 再挑戦</button>
+        <button onclick="retryGame()" style="margin-top:16px;">▶ 再挑戦</button>
     </div>
 </div>
 <!-- フッター -->
@@ -1988,6 +1988,12 @@ function quitGame() {
     if (gameMode === 'TX') cleanupTx();
     const mode = gameMode;
     document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
+    selectMode(mode);
+}
+function retryGame() {
+    const mode = gameMode;
+    document.getElementById('result-screen').classList.add('hidden');
     document.getElementById('start-screen').classList.remove('hidden');
     selectMode(mode);
 }
