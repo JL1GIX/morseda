@@ -1963,7 +1963,9 @@ function quitFreeMode() {
     document.removeEventListener('keyup',   onTxKeyUp);
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
     dotHeld = false; dashHeld = false; keyerPending = false;
-    location.reload();
+    document.getElementById('free-screen').classList.add('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
+    selectMode('TX');
 }
 
 // ── SNS Share ─────────────────────────────────────────────────────────────────
@@ -1984,7 +1986,10 @@ function quitGame() {
     isPlaying = false; scopeRunning = false;
     clearInterval(timerId); killCurrentAudio();
     if (gameMode === 'TX') cleanupTx();
-    location.reload();
+    const mode = gameMode;
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
+    selectMode(mode);
 }
 function endGame() {
     isPlaying = false; scopeRunning = false;
