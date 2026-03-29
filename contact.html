@@ -95,9 +95,12 @@
             display: block;
             width: 100%;
             border: none;
-            min-height: 600px;
+            min-height: 950px;
             /* iframeの白背景をなじませるための調整 */
             filter: invert(0.92) hue-rotate(100deg) saturate(0.7) brightness(0.85);
+        }
+        @media (max-width: 600px) {
+            iframe { min-height: 1100px; }
         }
         footer {
             margin: 20px auto 0;
@@ -124,8 +127,6 @@
     <div class="form-wrapper">
         <iframe
             src="https://docs.google.com/forms/d/e/1FAIpQLSd3d_BiCe4JuH5l6X1tw7S2iMUCWBijup_kufpG2jtHD0w84A/viewform?embedded=true"
-            width="640"
-            height="600"
             frameborder="0"
             marginheight="0"
             marginwidth="0"
