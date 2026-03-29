@@ -45,20 +45,39 @@
             padding: 40px;
             box-shadow: 0 0 40px rgba(0,100,55,0.2);
         }
-        .site-name {
-            font-size: 0.65rem;
-            letter-spacing: 4px;
-            color: var(--primary-dim);
-            margin-bottom: 8px;
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 4px;
+        }
+        .header-bar::before {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary-dim));
+        }
+        .header-bar::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to left, transparent, var(--primary-dim));
         }
         h1 {
+            margin: 0;
+            letter-spacing: 6px;
             font-size: 1.4rem;
-            letter-spacing: 4px;
             color: var(--primary);
-            text-shadow: 0 0 15px rgba(0,123,67,0.8);
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border);
+            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5);
+        }
+        .subtitle {
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            letter-spacing: 4px;
+            margin-bottom: 28px;
+            opacity: 0.9;
+            text-align: center;
         }
         p {
             font-size: 0.85rem;
@@ -95,8 +114,10 @@
 </head>
 <body>
 <div class="container">
-    <div class="site-name"><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">▸ モールス打 / JL1GIX</a></div>
-    <h1>CONTACT</h1>
+    <div class="header-bar">
+        <h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
+    <div class="subtitle">▸ お問い合わせ ◂</div>
 
     <p>ご質問・不具合報告・ご要望などがあればお気軽にどうぞ。</p>
 

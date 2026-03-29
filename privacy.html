@@ -45,20 +45,39 @@
             padding: 40px;
             box-shadow: 0 0 40px rgba(0,100,55,0.2);
         }
-        .site-name {
-            font-size: 0.65rem;
-            letter-spacing: 4px;
-            color: var(--primary-dim);
-            margin-bottom: 8px;
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 4px;
+        }
+        .header-bar::before {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary-dim));
+        }
+        .header-bar::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to left, transparent, var(--primary-dim));
         }
         h1 {
+            margin: 0;
+            letter-spacing: 6px;
             font-size: 1.4rem;
-            letter-spacing: 4px;
             color: var(--primary);
-            text-shadow: 0 0 15px rgba(0,123,67,0.8);
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border);
+            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5);
+        }
+        .subtitle {
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            letter-spacing: 4px;
+            margin-bottom: 28px;
+            opacity: 0.9;
+            text-align: center;
         }
         h2 {
             font-size: 0.9rem;
@@ -102,8 +121,10 @@
 </head>
 <body>
 <div class="container">
-    <div class="site-name"><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">▸ モールス打 / JL1GIX</a></div>
-    <h1>PRIVACY POLICY</h1>
+    <div class="header-bar">
+        <h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
+    <div class="subtitle">▸ プライバシーポリシー ◂</div>
 
     <h2>基本方針</h2>
     <p>本サイト「モールス打」（以下「当サイト」）は、アマチュア無線のモールス符号練習を目的としたWebアプリです。運営者（JL1GIX）は、利用者のプライバシーを尊重し、個人情報の適切な取り扱いに努めます。</p>
