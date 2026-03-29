@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>モールス打 - Contest Edition | 受信モード</title>
+    <meta name="description" content="アマチュア無線コンテストのCW交信を想定したモールス符号受信練習。コールサインとRSTをランダム生成し、スコアをランキングに登録できます。">
+    <meta property="og:title" content="モールス打 - Contest Edition">
+    <meta property="og:description" content="アマチュア無線コンテストのCW交信を想定したモールス符号練習ツール。受信・送信の両モードに対応。スコアをランキングに登録して他のユーザーと競おう。">
+    <meta property="og:url" content="https://jl1gix.com/rx.html">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://jl1gix.com/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://jl1gix.com/ogp.png">
+    <meta name="twitter:title" content="モールス打 - Contest Edition">
+    <meta name="twitter:description" content="アマチュア無線コンテストのCW交信を想定したモールス符号練習ツール。受信・送信の両モードに対応。">
+    <style>
+        :root {
+            --primary: #00d06a;
+            --primary-dim: #00b85a;
+            --bg: #080f0b;
+            --panel: #0e1f16;
+            --border: #1e5c38;
+            --error: #e74c3c;
+            --success: #00ee77;
+            --scope-bg: #050f08;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            touch-action: manipulation;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+        #game-container {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--primary);
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 50px rgba(0,100,55,0.35), 0 0 100px rgba(0,80,40,0.12), inset 0 1px 0 rgba(0,123,67,0.18);
+            width: 95%;
+            max-width: 640px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        #game-container::before {
+            content: '◈';
+            position: absolute;
+            top: 8px; left: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        #game-container::after {
+            content: '◈';
+            position: absolute;
+            top: 8px; right: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 4px;
+        }
+        .header-bar::before {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary-dim));
+        }
+        .header-bar::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to left, transparent, var(--primary-dim));
+        }
+        h1 {
+            margin: 0;
+            letter-spacing: 6px;
+            font-size: 1.6rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5), 0 0 80px rgba(0,123,67,0.2);
+        }
+        .subtitle {
+            font-size: 0.65rem;
+            color: var(--primary-dim);
+            letter-spacing: 4px;
+            margin-bottom: 16px;
+            opacity: 1.0;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.5);
+            padding: 8px 15px;
+            border-radius: 2px;
+        }
+        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .stat-label { color: var(--primary-dim); font-size: 0.68rem; letter-spacing: 2px; opacity: 1.0; }
+        .stat-value { color: var(--primary); font-size: 1.05rem; font-weight: bold; text-shadow: 0 0 10px rgba(0,123,67,0.9), 0 0 20px rgba(0,123,67,0.4); }
+        #scope-container {
+            position: relative;
+            background: var(--scope-bg);
+            border: 1px solid #2a6040;
+            border-radius: 2px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        #scope-label {
+            position: absolute;
+            top: 5px; left: 8px;
+            font-size: 0.58rem;
+            color: var(--primary-dim);
+            opacity: 1.0;
+            letter-spacing: 2px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        #scope-freq {
+            position: absolute;
+            top: 5px; right: 8px;
+            font-size: 0.58rem;
+            color: var(--primary-dim);
+            opacity: 1.0;
+            letter-spacing: 1px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        #scope-container::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.5) 100%), linear-gradient(to right, rgba(0,0,0,0.3) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.3) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        #scope-canvas { display: block; width: 100%; height: 160px; }
+        #beginner-display {
+            min-height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(0,123,67,0.25);
+            border-radius: 2px;
+        }
+        .msym-dot {
+            display: inline-block;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary), 0 0 22px rgba(0,123,67,0.5);
+            flex-shrink: 0;
+            animation: msym-in 0.07s ease-out;
+        }
+        .msym-dash {
+            display: inline-block;
+            width: 38px; height: 14px;
+            border-radius: 7px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary), 0 0 22px rgba(0,123,67,0.5);
+            flex-shrink: 0;
+            animation: msym-in 0.07s ease-out;
+        }
+        @keyframes msym-in {
+            from { opacity: 0; transform: scaleX(0.2); }
+            to   { opacity: 1; transform: scaleX(1); }
+        }
+        #input-display {
+            font-size: 2rem;
+            letter-spacing: 5px;
+            min-height: 5rem;
+            border: 1px solid var(--primary-dim);
+            border-top: 2px solid var(--primary);
+            padding: 14px 12px;
+            background: rgba(0, 15, 8, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            text-shadow: 0 0 12px rgba(0,123,67,0.9), 0 0 25px rgba(0,123,67,0.4);
+            border-radius: 2px;
+            position: relative;
+        }
+        #input-display::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px;
+            width: 10px; height: 10px;
+            border-top: 2px solid var(--success);
+            border-left: 2px solid var(--success);
+        }
+        #input-display::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; right: -1px;
+            width: 10px; height: 10px;
+            border-bottom: 2px solid var(--success);
+            border-right: 2px solid var(--success);
+        }
+        .flash-error { animation: error-flash 0.4s ease-in-out; }
+        @keyframes error-flash {
+            0%, 100% { border-top-color: var(--primary); border-color: var(--primary-dim); }
+            50% { border-color: var(--error); border-top-color: var(--error); box-shadow: 0 0 30px var(--error), inset 0 0 20px rgba(231,76,60,0.1); }
+        }
+        .flash-correct { animation: correct-flash 0.4s ease-in-out; }
+        @keyframes correct-flash {
+            0%, 100% { border-top-color: var(--primary); border-color: var(--primary-dim); }
+            50% { border-color: var(--success); border-top-color: var(--success); box-shadow: 0 0 30px var(--success), inset 0 0 20px rgba(0,255,133,0.08); }
+        }
+        .cursor { display: inline-block; width: 2px; height: 32px; background: var(--primary); animation: blink 1s infinite; margin-left: 5px; box-shadow: 0 0 12px var(--primary), 0 0 25px rgba(0,123,67,0.5); }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        #mobile-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 2rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            text-shadow: 0 0 12px rgba(0,123,67,0.9), 0 0 25px rgba(0,123,67,0.4);
+            width: 100%;
+            text-align: center;
+            caret-color: var(--primary);
+            padding: 0;
+        }
+        #mobile-input::selection { background: rgba(0,123,67,0.35); color: var(--primary); }
+        button {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 10px 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s;
+            margin-top: 10px;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            letter-spacing: 2px;
+            font-family: inherit;
+        }
+        button:hover {
+            background: rgba(0,123,67,0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0,123,67,0.35);
+            color: #fff;
+        }
+        .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.85; }
+        .quit-btn:hover { opacity: 1; }
+        select {
+            background: rgba(0,0,0,0.85);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            font-size: 0.9rem;
+            padding: 8px 30px 8px 10px;
+            border-radius: 2px;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23007b43' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+        select:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(0,123,67,0.3); }
+        .hidden { display: none !important; }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 18px 0;
+        }
+        .setting-item {
+            background: rgba(0,0,0,0.45);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 2px;
+            text-align: left;
+        }
+        .setting-label {
+            font-size: 0.68rem;
+            color: var(--primary);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: block;
+            opacity: 1.0;
+        }
+        .checkbox-item {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .checkbox-item input[type="checkbox"] {
+            appearance: none;
+            width: 18px; height: 18px;
+            border: 1px solid var(--primary-dim);
+            background: rgba(0,0,0,0.6);
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            border-radius: 1px;
+        }
+        .checkbox-item input[type="checkbox"]:checked {
+            background: rgba(0,123,67,0.2);
+            border-color: var(--primary);
+        }
+        .checkbox-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: -3px; left: 2px;
+            color: var(--primary);
+            font-size: 14px;
+            text-shadow: 0 0 6px var(--primary);
+        }
+        .checkbox-item label {
+            font-size: 0.78rem;
+            color: var(--primary);
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            line-height: 1.5;
+        }
+        .signal-indicators {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .sig-label { font-size: 0.58rem; color: var(--primary-dim); opacity: 1.0; letter-spacing: 1px; margin-right: 4px; }
+        .sig-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: rgba(0,70,35,0.4);
+            border: 1px solid rgba(0,100,50,0.5);
+        }
+        .sig-dot.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 6px var(--primary); }
+        .sig-dot.blink-active { animation: sig-blink 0.6s infinite alternate; }
+        @keyframes sig-blink {
+            from { opacity: 0.3; box-shadow: none; }
+            to   { opacity: 1; box-shadow: 0 0 8px var(--primary); }
+        }
+        #status-msg { font-size: 0.82rem; opacity: 1.0; margin-top: 10px; letter-spacing: 2px; }
+        #result-screen h2 { letter-spacing: 6px; font-size: 1.4rem; text-shadow: 0 0 20px rgba(0,123,67,1.0), 0 0 50px rgba(0,123,67,0.4); }
+        #final-result-text { font-size: clamp(1.1rem, 5.5vw, 2rem); color: var(--success); text-shadow: 0 0 20px rgba(0,180,90,0.9), 0 0 50px rgba(0,180,90,0.4); white-space: nowrap; }
+        .share-area { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+        .share-label { font-size: 0.65rem; letter-spacing: 3px; color: var(--primary-dim); opacity: 1.0; margin-bottom: 12px; }
+        .share-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .share-btn {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 16px;
+            border-radius: 3px;
+            font-size: 0.78rem;
+            font-family: inherit;
+            cursor: pointer;
+            letter-spacing: 1px;
+            border: none;
+            transition: all 0.18s;
+            margin-top: 0;
+            font-weight: bold;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .share-btn-x { background: #000; color: #fff; border: 1px solid #444; }
+        .share-btn-x:hover { background: #111; box-shadow: 0 0 14px rgba(255,255,255,0.18); color: #fff; }
+        @media (max-width: 700px) {
+            body { justify-content: flex-start; padding: 8px 0; overflow-y: auto; }
+            #game-container { padding: 12px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; }
+            h1 { font-size: 1.3rem; letter-spacing: 4px; }
+            #input-display { font-size: 1.8rem; min-height: 6rem; padding: 16px 12px; }
+            #mobile-input { font-size: 1.8rem; }
+            #scope-canvas { height: 120px; }
+            .msym-dot  { width: 12px; height: 12px; }
+            .msym-dash { width: 30px; height: 12px; }
+        }
+    </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3503091804175227" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="game-container">
+    <div class="header-bar">
+        <h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
+    <div class="subtitle">▸ AMATEUR RADIO CONTEST TRAINER ◂</div>
+
+    <!-- ═══ START SCREEN ═══ -->
+    <div id="start-screen">
+        <div id="mode-settings" style="position:relative;">
+            <!-- 音声チェック：右上 -->
+            <div id="audio-check-item" style="display:flex;position:absolute;top:0;right:0;align-items:center;gap:5px;font-size:0.72rem;color:var(--primary-dim);letter-spacing:1px;cursor:pointer;">
+                <input type="checkbox" id="audio-check" onchange="toggleSosCheck(this.checked)" style="margin:0;">
+                <span style="font-size:0.95rem;line-height:1;">🔊</span>
+                <label for="audio-check" style="cursor:pointer;white-space:nowrap;">音声チェック</label>
+            </div>
+            <!-- モード説明 -->
+            <div style="display:flex;align-items:flex-start;gap:10px;margin:15px 0;">
+                <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:0;flex:1;">
+                    コールサインとRSTを交互に受信せよ。<br>Enterで判定。正確にコピーせよ。
+                </p>
+            </div>
+            <div class="settings-grid" style="margin:18px 0 18px;">
+                <div class="setting-item">
+                    <span class="setting-label">⏱ 制限時間</span>
+                    <select id="time-select">
+                        <option value="60">1分間</option>
+                        <option value="180">3分間</option>
+                        <option value="300">5分間</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">📡 モールス速度</span>
+                    <select id="wpm-select">
+                        <option value="10">10 WPM</option>
+                        <option value="20" selected>20 WPM</option>
+                        <option value="30">30 WPM</option>
+                    </select>
+                </div>
+                <div class="setting-item checkbox-item">
+                    <input type="checkbox" id="beginner-mode-check">
+                    <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">🔰</span>
+                    <label for="beginner-mode-check">初心者モード（送出中の文字のモールスをリアルタイム表示）</label>
+                </div>
+            </div>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
+                <button onclick="unlockAndPrepare()">▶ ミッション開始</button>
+                <button onclick="location.href='index.html'" style="font-size:0.72rem;padding:6px 16px;opacity:0.5;margin-top:10px;">◀ 戻る</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ GAME SCREEN ═══ -->
+    <div id="game-screen" class="hidden">
+        <div class="signal-indicators">
+            <span class="sig-label">SIG</span>
+            <div class="sig-dot" id="sig1"></div>
+            <div class="sig-dot" id="sig2"></div>
+            <div class="sig-dot active" id="sig3"></div>
+            <div class="sig-dot active blink-active" id="sig4"></div>
+        </div>
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">▸ TIME</span>
+                <span class="stat-value" id="timer">00:00</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">▸ SCORE</span>
+                <span class="stat-value" id="score">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">▸ WPM</span>
+                <span class="stat-value" id="wpm-display">20</span>
+            </div>
+        </div>
+        <div id="scope-container">
+            <span id="scope-label">SPECTRUM ─ CW 750Hz</span>
+            <span id="scope-freq">SPAN 3kHz</span>
+            <canvas id="scope-canvas" width="600" height="160"></canvas>
+        </div>
+        <!-- 初心者モード -->
+        <div id="beginner-display" class="hidden"></div>
+        <!-- RX area -->
+        <div id="rx-area">
+            <div id="input-display">
+                <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text" enterkeyhint="send">
+            </div>
+            <button id="rx-submit-btn" onclick="submitRxInput()" style="font-size:0.78rem;padding:7px 28px;margin-top:8px;letter-spacing:2px;opacity:0.85;">▶ ENTER</button>
+        </div>
+        <div id="status-msg">READY...</div>
+        <button class="quit-btn" onclick="quitGame()">■ QUIT (中断)</button>
+    </div>
+
+    <!-- ═══ RESULT SCREEN ═══ -->
+    <div id="result-screen" class="hidden">
+        <h2>MISSION END</h2>
+        <p id="final-result-text" style="margin: 20px 0;"></p>
+        <div class="share-area">
+            <div class="share-label">▸ SHARE YOUR RESULT ◂</div>
+            <div class="share-buttons">
+                <button class="share-btn share-btn-x" onclick="shareX()">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.402 6.231H2.744l7.73-8.835L2.25 2.25h6.832l4.258 5.632 4.905-5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    X でシェア
+                </button>
+            </div>
+        </div>
+        <div id="score-reg-area" style="margin-top:18px; border-top:1px solid var(--border); padding-top:14px;">
+            <div id="score-reg-result" style="margin-bottom:12px; font-size:0.85rem; line-height:2; color:var(--primary);"></div>
+            <div id="score-reg-form" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="nickname-input" placeholder="ニックネーム（任意・10文字まで）" maxlength="10"
+                    autocomplete="off" autocapitalize="off" spellcheck="false"
+                    style="background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:2px;
+                           color:var(--primary); font-family:inherit; font-size:0.82rem;
+                           padding:8px 12px; width:230px; letter-spacing:1px; outline:none;">
+                <button onclick="setNickname()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">✏️ 名前を設定</button>
+            </div>
+        </div>
+        <button onclick="retryGame()" style="margin-top:16px;">▶ 再挑戦</button>
+    </div>
+</div>
+
+<footer style="margin-top:20px;padding:12px 0 4px;border-top:1px solid #1e5c38;font-size:0.65rem;letter-spacing:1px;opacity:0.55;text-align:center;">
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 20px;">
+        <a href="index.html" style="color:#007b43; text-decoration:none;">トップ</a>
+        <a href="ranking.html" style="color:#007b43; text-decoration:none;">ランキング</a>
+        <a href="morse-table.html" style="color:#007b43; text-decoration:none;">モールス符号表</a>
+        <a href="profile.html" style="color:#007b43; text-decoration:none;">運営者情報</a>
+        <a href="privacy.html" style="color:#007b43; text-decoration:none;">プライバシーポリシー</a>
+        <a href="contact.html" style="color:#007b43; text-decoration:none;">お問い合わせ</a>
+    </div>
+</footer>
+
+<script>
+// ── Morse code ─────────────────────────────────────────────────────────────────
+const MORSE_CODE = {
+    'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---',
+    'K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-',
+    'U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..',
+    '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....',
+    '6':'-....','7':'--...','8':'---..','9':'----.',
+    '/':'-..-.', // ポータブル
+};
+// ── State ──────────────────────────────────────────────────────────────────────
+let audioCtx = null, masterGain = null;
+let timeLeft, initialSeconds, score = 0, currentWord = '', isPlaying = false;
+let timerId, audioLoopId, activeOscillators = [];
+let isWaitingNext = false, nextType = 'CALLSIGN';
+let DOT_TIME = 0.06; // 20wpm default
+let beginnerMode = false;
+const gameMode = 'RX';
+// Scope state
+let scopeRunning = false;
+const SCOPE_W = 600, SCOPE_H = 160;
+const SPEC_H = 92, FALL_H = 68;
+const CW_X = SCOPE_W / 2;
+const SPAN_HZ = 3000;
+const PX_PER_HZ = SCOPE_W / SPAN_HZ;
+const FILT_X1 = CW_X - 250 * PX_PER_HZ;
+const FILT_X2 = CW_X + 250 * PX_PER_HZ;
+let waterfallRows = [];
+let smoothSpectrum = new Float32Array(SCOPE_W).fill(0);
+let toneStrength = 0;
+let toneSchedule = [];
+let charSchedule = [];
+// SOS check state
+let _sosCtx = null, _sosTimer = null;
+// DOM refs
+const mobileInput = document.getElementById('mobile-input');
+const displayFrame = document.getElementById('input-display');
+const beginnerDisplay = document.getElementById('beginner-display');
+let lastDisplayedMorse = null;
+
+// ── WPM ────────────────────────────────────────────────────────────────────────
+function wpmToDotTime(wpm) { return 1.2 / wpm; }
+
+// ── Callsign / RST ─────────────────────────────────────────────────────────────
+function generateCallsign() {
+    const rAZ = () => String.fromCharCode(65 + Math.floor(Math.random() * 26));
+    const r09 = () => Math.floor(Math.random() * 10).toString();
+    const rRange = (a, z) => String.fromCharCode(a.charCodeAt(0) + Math.floor(Math.random() * (z.charCodeAt(0) - a.charCodeAt(0) + 1)));
+    const pfx = Math.random() < 0.5 ? 'J' : (Math.random() < 0.5 ? '7' : '8');
+    let second;
+    if (pfx === 'J') second = rRange('A', 'S');
+    else if (pfx === '7') second = rRange('J', 'N');
+    else second = (Math.random() < 0.5 ? 'J' : 'N');
+    const call = pfx + second + r09() + rAZ() + rAZ() + rAZ();
+    if (Math.random() < 0.3) return call + '/' + r09();
+    return call;
+}
+function generateRST() {
+    const areas = ['101','102','103','104','105','106','107','108','109','110','111','112','113','114'];
+    for (let i = 2; i <= 48; i++) areas.push(i.toString().padStart(2,'0'));
+    return '5NN' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
+}
+
+// ── Audio unlock + prepare ─────────────────────────────────────────────────────
+function unlockAndPrepare() {
+    stopSosCheck();
+    document.getElementById('audio-check').checked = false;
+    const wpmVal = parseInt(document.getElementById('wpm-select').value);
+    DOT_TIME = wpmToDotTime(wpmVal);
+    document.getElementById('wpm-display').innerText = wpmVal;
+    beginnerMode = document.getElementById('beginner-mode-check').checked;
+    if (beginnerMode) beginnerDisplay.classList.remove('hidden');
+    if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AC();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(1, 0);
+        masterGain.connect(audioCtx.destination);
+    }
+    const doResume = (audioCtx.state === 'suspended') ? audioCtx.resume() : Promise.resolve();
+    const unlockBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+    const unlockSrc = audioCtx.createBufferSource();
+    unlockSrc.buffer = unlockBuf;
+    unlockSrc.connect(masterGain);
+    unlockSrc.start(0);
+    audioCtx.onstatechange = () => { if (audioCtx.state === 'suspended') audioCtx.resume(); };
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('game-screen').classList.remove('hidden');
+    mobileInput.focus();
+    initScope();
+    startScopeAnimation();
+    doResume.then(() => { setTimeout(startGame, 300); })
+            .catch(() => { setTimeout(startGame, 300); });
+}
+
+function startGame() {
+    initialSeconds = parseInt(document.getElementById('time-select').value);
+    timeLeft = initialSeconds;
+    score = 0; isPlaying = true;
+    masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
+    timerId = setInterval(tick, 1000);
+    isWaitingNext = false; nextType = 'CALLSIGN';
+    document.getElementById('status-msg').innerText = '受信中...';
+    nextWord();
+}
+
+// ── 音声チェック（SOS ループ）────────────────────────────────────────────────────
+function toggleSosCheck(on) { if (on) startSosCheck(); else stopSosCheck(); }
+
+function startSosCheck() {
+    stopSosCheck();
+    const AC = window.AudioContext || window.webkitAudioContext;
+    _sosCtx = new AC();
+    _sosLoop();
+}
+
+function stopSosCheck() {
+    if (_sosTimer) { clearTimeout(_sosTimer); _sosTimer = null; }
+    if (_sosCtx)   { try { _sosCtx.close(); } catch(e){} _sosCtx = null; }
+}
+
+function _sosLoop() {
+    if (!_sosCtx) return;
+    const dotT  = 1.2 / 20;
+    const dashT = dotT * 3;
+    const elGap = dotT;
+    const ltGap = dotT * 3;
+    const wdGap = dotT * 7;
+    const freq  = 750;
+    const letters = ['...', '---', '...'];
+    let t = _sosCtx.currentTime + 0.05;
+    let offset = 0;
+    letters.forEach((code, li) => {
+        code.split('').forEach((sym) => {
+            const dur = sym === '.' ? dotT : dashT;
+            const osc = _sosCtx.createOscillator();
+            const gn  = _sosCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            gn.gain.setValueAtTime(0, t + offset);
+            gn.gain.linearRampToValueAtTime(0.5, t + offset + 0.006);
+            gn.gain.setValueAtTime(0.5, t + offset + dur - 0.006);
+            gn.gain.linearRampToValueAtTime(0, t + offset + dur + 0.006);
+            osc.connect(gn); gn.connect(_sosCtx.destination);
+            osc.start(t + offset);
+            osc.stop(t + offset + dur + 0.05);
+            offset += dur + elGap;
+        });
+        if (li < letters.length - 1) offset += (ltGap - elGap);
+    });
+    offset += (wdGap - elGap);
+    _sosTimer = setTimeout(_sosLoop, offset * 1000);
+}
+
+// ── Audio ──────────────────────────────────────────────────────────────────────
+function killCurrentAudio() {
+    if (audioLoopId) clearTimeout(audioLoopId);
+    activeOscillators.forEach(o => { try { o.stop(); } catch(e){} });
+    activeOscillators = [];
+    toneSchedule = [];
+    charSchedule = [];
+}
+
+function tick() {
+    if (!isPlaying) return;
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+    document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if (timeLeft <= 0) endGame();
+}
+
+function nextWord() {
+    mobileInput.value = '';
+    currentWord = (nextType === 'CALLSIGN') ? generateCallsign() : generateRST();
+    nextType = (nextType === 'CALLSIGN') ? 'RST' : 'CALLSIGN';
+    playMorseLoop();
+}
+
+function playMorseLoop() {
+    if (!isPlaying || isWaitingNext) return;
+    const duration = playMorse(currentWord);
+    audioLoopId = setTimeout(playMorseLoop, duration * 1000 + 1000);
+}
+
+function playMorse(text) {
+    killCurrentAudio();
+    const startTime = audioCtx.currentTime + 0.1;
+    const startMs   = Date.now() + 100;
+    let offset = 0;
+    const charEntries = [];
+    text.split('').forEach(char => {
+        const code = MORSE_CODE[char];
+        if (!code) return;
+        const charStartOffset = offset;
+        code.split('').forEach(symbol => {
+            const dur = (symbol === '.') ? DOT_TIME : DOT_TIME * 3;
+            const osc  = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = 750;
+            gain.gain.setValueAtTime(0, startTime + offset);
+            gain.gain.linearRampToValueAtTime(0.5, startTime + offset + 0.006);
+            gain.gain.setValueAtTime(0.5, startTime + offset + dur - 0.003);
+            gain.gain.linearRampToValueAtTime(0, startTime + offset + dur + 0.006);
+            osc.connect(gain); gain.connect(masterGain);
+            osc.start(startTime + offset);
+            osc.stop(startTime + offset + dur + 0.05);
+            activeOscillators.push(osc);
+            toneSchedule.push({ onTime: startMs + offset * 1000, offTime: startMs + (offset + dur) * 1000 });
+            offset += dur + DOT_TIME;
+        });
+        charEntries.push({ morse: code, startOffset: charStartOffset });
+        offset += DOT_TIME * 2;
+    });
+    charEntries.forEach((entry, i) => {
+        entry.startMs = startMs + entry.startOffset * 1000;
+        entry.endMs   = i < charEntries.length - 1
+            ? startMs + charEntries[i + 1].startOffset * 1000
+            : startMs + (offset + 0.5) * 1000;
+    });
+    charSchedule = charEntries;
+    return offset + 0.1;
+}
+
+// ── Input ──────────────────────────────────────────────────────────────────────
+function focusMobile() { if (isPlaying) mobileInput.focus(); }
+
+function submitRxInput() {
+    if (!isPlaying || isWaitingNext) return;
+    const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
+    displayFrame.classList.remove('flash-correct', 'flash-error');
+    void displayFrame.offsetWidth;
+    if (finalInput === currentWord && currentWord !== '') {
+        mobileInput.value = '';
+        score += currentWord.length;
+        document.getElementById('score').innerText = score;
+        isWaitingNext = true;
+        displayFrame.classList.add('flash-correct');
+        killCurrentAudio();
+        if (beginnerMode) beginnerDisplay.innerHTML = '';
+        document.getElementById('status-msg').innerText = '✓ COPY OK';
+        setTimeout(() => {
+            if (!isPlaying) return;
+            isWaitingNext = false;
+            document.getElementById('status-msg').innerText = '受信中...';
+            nextWord();
+            setTimeout(() => focusMobile(), 80);
+        }, 500);
+    } else {
+        displayFrame.classList.add('flash-error');
+        setTimeout(() => focusMobile(), 50);
+    }
+}
+
+mobileInput.addEventListener('input', () => {
+    if (!isPlaying || isWaitingNext) return;
+    const raw = mobileInput.value;
+    if (raw.includes('\n') || raw.includes('\r')) {
+        mobileInput.value = raw.replace(/[\n\r]/g, '');
+        submitRxInput();
+        return;
+    }
+    const filtered = raw.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
+    if (filtered !== raw) {
+        const pos = mobileInput.selectionStart;
+        const removedBefore = raw.slice(0, pos).replace(/[A-Z0-9\/]/gi, '').length;
+        mobileInput.value = filtered;
+        const newPos = Math.max(0, pos - removedBefore);
+        mobileInput.setSelectionRange(newPos, newPos);
+    }
+});
+mobileInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); submitRxInput(); }
+});
+
+// ── Beginner mode display ──────────────────────────────────────────────────────
+function updateBeginnerDisplay() {
+    if (!beginnerMode) return;
+    const now = Date.now();
+    const current = charSchedule.find(s => now >= s.startMs && now < s.endMs);
+    const morse = current ? current.morse : null;
+    if (morse === lastDisplayedMorse) return;
+    lastDisplayedMorse = morse;
+    if (!morse) { beginnerDisplay.innerHTML = ''; return; }
+    beginnerDisplay.innerHTML = morse.split('').map(sym =>
+        `<span class="${sym === '.' ? 'msym-dot' : 'msym-dash'}"></span>`
+    ).join('');
+}
+
+// ── IC-7300 Spectrum Scope ─────────────────────────────────────────────────────
+function initScope() {
+    waterfallRows = [];
+    for (let i = 0; i < FALL_H; i++) waterfallRows.push(new Float32Array(SCOPE_W).fill(0));
+    smoothSpectrum = new Float32Array(SCOPE_W).fill(0);
+    toneStrength = 0;
+    scopeRunning = false;
+    lastDisplayedMorse = null;
+}
+
+function genSpectrum(active) {
+    const s = new Float32Array(SCOPE_W);
+    for (let x = 0; x < SCOPE_W; x++) {
+        s[x] = 0.04 + Math.random() * 0.055;
+        if (Math.random() < 0.004) s[x] += Math.random() * 0.12;
+    }
+    if (active) {
+        const peak = 0.78 + Math.random() * 0.09;
+        const sig  = 3.5;
+        for (let x = Math.max(0, CW_X - 28); x < Math.min(SCOPE_W, CW_X + 28); x++) {
+            const d = x - CW_X;
+            s[x] = Math.max(s[x], peak * Math.exp(-(d * d) / (2 * sig * sig)));
+        }
+    }
+    return s;
+}
+
+function wfColor(v) {
+    if (v < 0.10) { const t = v / 0.10; return [0, Math.round(8 + t * 22), Math.round(18 + t * 28)]; }
+    if (v < 0.30) { const t = (v - 0.10) / 0.20; return [0, Math.round(30 + t * 80), Math.round(46 - t * 26)]; }
+    if (v < 0.58) { const t = (v - 0.30) / 0.28; return [Math.round(t * 40), Math.round(110 + t * 105), Math.round(20 - t * 18)]; }
+    if (v < 0.82) { const t = (v - 0.58) / 0.24; return [Math.round(40 + t * 185), Math.round(215 + t * 40), 2]; }
+    { const t = Math.min(1, (v - 0.82) / 0.18); return [Math.round(225 + t * 30), 255, Math.round(t * 210)]; }
+}
+
+function isToneOn() {
+    const now = Date.now();
+    return toneSchedule.some(s => now >= s.onTime && now <= s.offTime);
+}
+
+function startScopeAnimation() {
+    scopeRunning = true;
+    const canvas = document.getElementById('scope-canvas');
+    const ctx = canvas.getContext('2d');
+    const fallImgData = ctx.createImageData(SCOPE_W, FALL_H);
+    let frameCount = 0;
+
+    function draw() {
+        if (!scopeRunning) return;
+        requestAnimationFrame(draw);
+        updateBeginnerDisplay();
+
+        const toneActive = isPlaying && isToneOn();
+        toneStrength = toneActive ? Math.min(1, toneStrength + 0.14) : Math.max(0, toneStrength - 0.09);
+
+        const instant = genSpectrum(toneStrength > 0.25);
+        for (let x = 0; x < SCOPE_W; x++) {
+            smoothSpectrum[x] = smoothSpectrum[x] * 0.60 + instant[x] * 0.40;
+        }
+
+        frameCount++;
+        if (frameCount % 3 === 0) {
+            const row = new Float32Array(SCOPE_W);
+            for (let x = 0; x < SCOPE_W; x++) row[x] = smoothSpectrum[x];
+            waterfallRows.unshift(row);
+            if (waterfallRows.length > FALL_H) waterfallRows.pop();
+        }
+
+        ctx.fillStyle = '#01090404';
+        ctx.fillRect(0, 0, SCOPE_W, SCOPE_H);
+        ctx.fillStyle = '#010d05';
+        ctx.fillRect(0, 0, SCOPE_W, SPEC_H);
+
+        ctx.lineWidth = 0.5;
+        for (let i = 1; i <= 4; i++) {
+            const y = SPEC_H - (i / 4.5) * (SPEC_H - 14) - 4;
+            ctx.strokeStyle = i === 2 ? 'rgba(0,110,55,0.35)' : 'rgba(0,85,40,0.2)';
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(SCOPE_W, y); ctx.stroke();
+        }
+
+        const freqOffsets = [-1000, -500, 0, 500, 1000];
+        freqOffsets.forEach(f => {
+            const x = CW_X + f * PX_PER_HZ;
+            ctx.strokeStyle = f === 0 ? 'rgba(0,140,65,0.35)' : 'rgba(0,90,45,0.22)';
+            ctx.lineWidth = f === 0 ? 0.8 : 0.5;
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, SPEC_H); ctx.stroke();
+        });
+
+        ctx.fillStyle = 'rgba(0,123,67,0.10)';
+        ctx.fillRect(FILT_X1, 0, FILT_X2 - FILT_X1, SPEC_H);
+        ctx.strokeStyle = 'rgba(0,160,80,0.38)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(FILT_X1, 0); ctx.lineTo(FILT_X1, SPEC_H);
+        ctx.moveTo(FILT_X2, 0); ctx.lineTo(FILT_X2, SPEC_H);
+        ctx.stroke();
+
+        const specTop = SPEC_H - 10;
+        const fillGrad = ctx.createLinearGradient(0, 0, 0, SPEC_H);
+        const fa = 0.22 + toneStrength * 0.38;
+        fillGrad.addColorStop(0,   `rgba(20,230,110,${fa})`);
+        fillGrad.addColorStop(0.45,`rgba(0,150,65,${fa * 0.55})`);
+        fillGrad.addColorStop(1,   'rgba(0,40,18,0)');
+        ctx.fillStyle = fillGrad;
+        ctx.beginPath(); ctx.moveTo(0, SPEC_H);
+        for (let x = 0; x < SCOPE_W; x++) {
+            const y = SPEC_H - smoothSpectrum[x] * specTop;
+            x === 0 ? ctx.lineTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.lineTo(SCOPE_W - 1, SPEC_H); ctx.closePath(); ctx.fill();
+
+        const la = 0.65 + toneStrength * 0.35;
+        ctx.strokeStyle = `rgba(0,195,85,${la})`;
+        ctx.lineWidth = 1.6;
+        ctx.shadowColor = `rgba(0,180,80,${toneStrength * 0.85})`;
+        ctx.shadowBlur = 2 + toneStrength * 10;
+        ctx.beginPath();
+        for (let x = 0; x < SCOPE_W; x++) {
+            const y = SPEC_H - smoothSpectrum[x] * specTop;
+            x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke(); ctx.shadowBlur = 0;
+
+        if (toneStrength > 0.2) {
+            const peakY = SPEC_H - smoothSpectrum[CW_X] * specTop;
+            ctx.strokeStyle = `rgba(0,210,95,${toneStrength * 0.3})`;
+            ctx.lineWidth = 1; ctx.setLineDash([3, 4]);
+            ctx.beginPath(); ctx.moveTo(CW_X, peakY + 2); ctx.lineTo(CW_X, SPEC_H); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = `rgba(140,255,170,${toneStrength * 0.95})`;
+            ctx.beginPath(); ctx.arc(CW_X, peakY, 2.8, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = `rgba(0,230,100,${toneStrength * 0.5})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.arc(CW_X, peakY, 5, 0, Math.PI * 2); ctx.stroke();
+        }
+
+        ctx.font = '7px Consolas, monospace';
+        ctx.textAlign = 'center';
+        freqOffsets.forEach(f => {
+            const x = CW_X + f * PX_PER_HZ;
+            const lbl = f === 0 ? '750Hz' : (f > 0 ? `+${f >= 1000 ? f/1000+'k' : f}` : `${f <= -1000 ? f/1000+'k' : f}`);
+            ctx.fillStyle = f === 0 ? `rgba(0,220,100,${0.5 + toneStrength * 0.5})` : 'rgba(0,150,65,0.45)';
+            ctx.fillText(lbl, x, SPEC_H - 2);
+        });
+
+        const cwAlpha = 0.5 + toneStrength * 0.5;
+        ctx.fillStyle = `rgba(0,220,100,${cwAlpha})`;
+        ctx.beginPath();
+        ctx.moveTo(CW_X - 4, SPEC_H + 1);
+        ctx.lineTo(CW_X + 4, SPEC_H + 1);
+        ctx.lineTo(CW_X, SPEC_H - 5);
+        ctx.closePath(); ctx.fill();
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = 'rgba(0,130,60,0.45)';
+        ['S9+', 'S9', 'S7', 'S5'].forEach((lbl, i) => {
+            const y = SPEC_H - ((3 - i) / 4.5) * (SPEC_H - 14) - 4;
+            ctx.fillText(lbl, SCOPE_W - 2, y - 2);
+        });
+
+        ctx.strokeStyle = 'rgba(0,110,55,0.6)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(0, SPEC_H); ctx.lineTo(SCOPE_W, SPEC_H); ctx.stroke();
+
+        const d = fallImgData.data;
+        for (let row = 0; row < Math.min(waterfallRows.length, FALL_H); row++) {
+            const rowData = waterfallRows[row];
+            const base = row * SCOPE_W * 4;
+            for (let x = 0; x < SCOPE_W; x++) {
+                const [r, g, b] = wfColor(rowData[x]);
+                const i = base + x * 4;
+                d[i] = r; d[i+1] = g; d[i+2] = b; d[i+3] = 255;
+            }
+        }
+        ctx.putImageData(fallImgData, 0, SPEC_H);
+
+        ctx.fillStyle = 'rgba(0,123,67,0.07)';
+        ctx.fillRect(FILT_X1, SPEC_H, FILT_X2 - FILT_X1, FALL_H);
+        ctx.strokeStyle = 'rgba(0,150,75,0.22)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(FILT_X1, SPEC_H); ctx.lineTo(FILT_X1, SPEC_H + FALL_H);
+        ctx.moveTo(FILT_X2, SPEC_H); ctx.lineTo(FILT_X2, SPEC_H + FALL_H);
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(0,140,60,0.35)';
+        ctx.font = '7px Consolas, monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText('WFALL', 4, SPEC_H + 10);
+    }
+    draw();
+}
+
+// ── End / Quit ─────────────────────────────────────────────────────────────────
+function quitGame() {
+    isPlaying = false; scopeRunning = false;
+    clearInterval(timerId); killCurrentAudio();
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
+}
+
+function retryGame() {
+    document.getElementById('result-screen').classList.add('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
+}
+
+function endGame() {
+    isPlaying = false; scopeRunning = false;
+    clearInterval(timerId); killCurrentAudio();
+    const minutes = Math.round(initialSeconds / 60);
+    document.getElementById('final-result-text').innerText =
+        `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min`;
+    document.getElementById('nickname-input').value = '';
+    const btn = document.getElementById('submit-score-btn');
+    btn.disabled = false;
+    btn.textContent = '✏️ 名前を設定';
+    document.getElementById('score-reg-area').style.display = score > 0 ? '' : 'none';
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+    if (score > 0) {
+        autoRegister();
+        setTimeout(() => {
+            const reg = document.getElementById('score-reg-area');
+            if (reg) reg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 300);
+    }
+}
+
+// ── SNS Share ──────────────────────────────────────────────────────────────────
+function getShareText() {
+    const minutes = Math.round(initialSeconds / 60);
+    return `【モールス打】受信モード\n${minutes}分間で${score}文字！\n#モールス打 #アマチュア無線 #CW #モールス信号\nhttps://jl1gix.com`;
+}
+function shareX() {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+// ── Score registration ─────────────────────────────────────────────────────────
+let _registeredId = null;
+async function autoRegister(retryCount = 0) {
+    if (retryCount === 0) _registeredId = null;
+    const minutes = Math.round(initialSeconds / 60);
+    const regResult = document.getElementById('score-reg-result');
+    if (retryCount === 0) {
+        regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中...</span>`;
+    }
+    if (!_registeredId) {
+        try {
+            const res = await fetch('https://api.jl1gix.com/api/scores', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nickname: 'noname', score, mode: gameMode, is_beginner: beginnerMode ? 1 : 0, minutes })
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            _registeredId = data.id;
+        } catch (e) {
+            if (retryCount < 2) {
+                regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中... (再試行 ${retryCount + 1}/2)</span>`;
+                setTimeout(() => autoRegister(retryCount + 1), (retryCount + 1) * 1000);
+            } else {
+                regResult.innerHTML =
+                    `<span style="color:var(--error); font-size:0.75rem;">登録に失敗しました　</span>` +
+                    `<button onclick="autoRegister(0)" style="font-size:0.7rem;padding:4px 12px;margin:0;margin-top:4px;">再試行</button>`;
+            }
+            return;
+        }
+    }
+    let pct = '－';
+    try {
+        const rankRes = await fetch(`https://api.jl1gix.com/api/scores/rank?score=${score}&mode=${gameMode}&minutes=${minutes}`);
+        const rankData = await rankRes.json();
+        if (rankData.percentile !== undefined) pct = rankData.percentile;
+    } catch (e) {}
+    regResult.innerHTML =
+        `<span style="color:var(--success);">✓ 登録完了！</span>　上位 <b>${pct}%</b>　` +
+        `<a href="ranking.html?mode=${gameMode}&time=${minutes}" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:4px 14px; font-size:0.75rem; letter-spacing:1px; border-radius:2px;">🏆 ランキング</a>`;
+}
+
+async function setNickname() {
+    const nickname = document.getElementById('nickname-input').value.trim();
+    if (!nickname) return;
+    if (!_registeredId) return;
+    const btn = document.getElementById('submit-score-btn');
+    btn.disabled = true;
+    btn.textContent = '設定中...';
+    try {
+        await fetch(`https://api.jl1gix.com/api/scores/${_registeredId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nickname })
+        });
+        btn.textContent = '✓ 設定済み';
+        document.getElementById('nickname-input').disabled = true;
+    } catch (e) {
+        btn.disabled = false;
+        btn.textContent = '✏️ 名前を設定';
+        alert('設定に失敗しました。もう一度お試しください。');
+    }
+}
+</script>
+</body>
+</html>

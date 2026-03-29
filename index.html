@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>モールス打</title>
+    <title>モールス打 - Contest Edition</title>
     <meta name="description" content="アマチュア無線コンテストのCW交信を想定したモールス符号練習ツール。受信・送信の両モードに対応。コールサインやRSTレポートをランダム生成し、スコアをランキングに登録できます。">
-    <meta property="og:title" content="モールス打">
+    <meta property="og:title" content="モールス打 - Contest Edition">
     <meta property="og:description" content="アマチュア無線コンテストのCW交信を想定したモールス符号練習ツール。受信・送信の両モードに対応。スコアをランキングに登録して他のユーザーと競おう。">
     <meta property="og:url" content="https://jl1gix.com">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://jl1gix.com/ogp.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://jl1gix.com/ogp.png">
-    <meta name="twitter:title" content="モールス打">
+    <meta name="twitter:title" content="モールス打 - Contest Edition">
     <meta name="twitter:description" content="アマチュア無線コンテストのCW交信を想定したモールス符号練習ツール。受信・送信の両モードに対応。スコアをランキングに登録して他のユーザーと競おう。">
     <style>
         :root {
@@ -21,9 +21,6 @@
             --bg: #080f0b;
             --panel: #0e1f16;
             --border: #1e5c38;
-            --error: #e74c3c;
-            --success: #00ee77;
-            --scope-bg: #050f08;
         }
         * { box-sizing: border-box; }
         body {
@@ -42,17 +39,13 @@
                 radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
                 radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
         }
-        /* Scanline overlay */
         body::after {
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0,0,0,0.07) 2px,
-                rgba(0,0,0,0.07) 4px
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
             );
             pointer-events: none;
             z-index: 9999;
@@ -73,7 +66,6 @@
             position: relative;
             z-index: 2;
         }
-        /* Decorative corner pieces */
         #game-container::before {
             content: '◈';
             position: absolute;
@@ -90,7 +82,6 @@
             color: var(--primary-dim);
             opacity: 0.4;
         }
-        /* Header */
         .header-bar {
             display: flex;
             align-items: center;
@@ -124,174 +115,6 @@
             margin-bottom: 16px;
             opacity: 1.0;
         }
-        /* Stats bar */
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 12px;
-            border: 1px solid var(--border);
-            background: rgba(0,0,0,0.5);
-            padding: 8px 15px;
-            border-radius: 2px;
-        }
-        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .stat-label { color: var(--primary-dim); font-size: 0.68rem; letter-spacing: 2px; opacity: 1.0; }
-        .stat-value { color: var(--primary); font-size: 1.05rem; font-weight: bold; text-shadow: 0 0 10px rgba(0,123,67,0.9), 0 0 20px rgba(0,123,67,0.4); }
-        /* Oscilloscope */
-        #scope-container {
-            position: relative;
-            background: var(--scope-bg);
-            border: 1px solid #2a6040;
-            border-radius: 2px;
-            margin-bottom: 12px;
-            overflow: hidden;
-        }
-        #scope-label {
-            position: absolute;
-            top: 5px; left: 8px;
-            font-size: 0.58rem;
-            color: var(--primary-dim);
-            opacity: 1.0;
-            letter-spacing: 2px;
-            z-index: 2;
-            pointer-events: none;
-        }
-        #scope-freq {
-            position: absolute;
-            top: 5px; right: 8px;
-            font-size: 0.58rem;
-            color: var(--primary-dim);
-            opacity: 1.0;
-            letter-spacing: 1px;
-            z-index: 2;
-            pointer-events: none;
-        }
-        #scope-container::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background:
-                linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.5) 100%),
-                linear-gradient(to right, rgba(0,0,0,0.3) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.3) 100%);
-            pointer-events: none;
-            z-index: 1;
-        }
-        #scope-canvas {
-            display: block;
-            width: 100%;
-            height: 160px;
-        }
-        /* ── 初心者モード: 文字ごとのモールス表示 ────────────────── */
-        #beginner-display {
-            min-height: 3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 10px;
-            padding: 8px 12px;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(0,123,67,0.25);
-            border-radius: 2px;
-        }
-        /* TX初心者モード時は符号が大きいので間隔を広げる */
-        #beginner-display.tx-beginner {
-            min-height: 3.8rem;
-            gap: 14px;
-        }
-        /* dot shape */
-        .msym-dot {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: var(--primary);
-            box-shadow: 0 0 10px var(--primary), 0 0 22px rgba(0,123,67,0.5);
-            flex-shrink: 0;
-            animation: msym-in 0.07s ease-out;
-        }
-        /* dash shape */
-        .msym-dash {
-            display: inline-block;
-            width: 38px;
-            height: 14px;
-            border-radius: 7px;
-            background: var(--primary);
-            box-shadow: 0 0 10px var(--primary), 0 0 22px rgba(0,123,67,0.5);
-            flex-shrink: 0;
-            animation: msym-in 0.07s ease-out;
-        }
-        /* TX用 大きいサイズ */
-        .msym-dot-lg {
-            display: inline-block;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: var(--primary);
-            box-shadow: 0 0 12px var(--primary), 0 0 28px rgba(0,192,96,0.5);
-            flex-shrink: 0;
-            animation: msym-in 0.07s ease-out;
-        }
-        .msym-dash-lg {
-            display: inline-block;
-            width: 58px;
-            height: 22px;
-            border-radius: 11px;
-            background: var(--primary);
-            box-shadow: 0 0 12px var(--primary), 0 0 28px rgba(0,192,96,0.5);
-            flex-shrink: 0;
-            animation: msym-in 0.07s ease-out;
-        }
-        @keyframes msym-in {
-            from { opacity: 0; transform: scaleX(0.2); }
-            to   { opacity: 1; transform: scaleX(1); }
-        }
-        /* Input display */
-        #input-display {
-            font-size: 2rem;
-            letter-spacing: 5px;
-            min-height: 5rem;
-            border: 1px solid var(--primary-dim);
-            border-top: 2px solid var(--primary);
-            padding: 14px 12px;
-            background: rgba(0, 15, 8, 0.95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-transform: uppercase;
-            text-shadow: 0 0 12px rgba(0,123,67,0.9), 0 0 25px rgba(0,123,67,0.4);
-            border-radius: 2px;
-            position: relative;
-        }
-        #input-display::before {
-            content: '';
-            position: absolute;
-            top: -1px; left: -1px;
-            width: 10px; height: 10px;
-            border-top: 2px solid var(--success);
-            border-left: 2px solid var(--success);
-        }
-        #input-display::after {
-            content: '';
-            position: absolute;
-            bottom: -1px; right: -1px;
-            width: 10px; height: 10px;
-            border-bottom: 2px solid var(--success);
-            border-right: 2px solid var(--success);
-        }
-        .flash-error { animation: error-flash 0.4s ease-in-out; }
-        @keyframes error-flash {
-            0%, 100% { border-top-color: var(--primary); border-color: var(--primary-dim); }
-            50% { border-color: var(--error); border-top-color: var(--error); box-shadow: 0 0 30px var(--error), inset 0 0 20px rgba(231,76,60,0.1); }
-        }
-        .flash-correct { animation: correct-flash 0.4s ease-in-out; }
-        @keyframes correct-flash {
-            0%, 100% { border-top-color: var(--primary); border-color: var(--primary-dim); }
-            50% { border-color: var(--success); border-top-color: var(--success); box-shadow: 0 0 30px var(--success), inset 0 0 20px rgba(0,255,133,0.08); }
-        }
-        .cursor { display: inline-block; width: 2px; height: 32px; background: var(--primary); animation: blink 1s infinite; margin-left: 5px; box-shadow: 0 0 12px var(--primary), 0 0 25px rgba(0,123,67,0.5); }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-        /* Buttons */
         button {
             background: transparent;
             color: var(--primary);
@@ -313,691 +136,40 @@
             box-shadow: 0 0 15px rgba(0,123,67,0.35);
             color: #fff;
         }
-        .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.85; }
-        .quit-btn:hover { opacity: 1; }
-        #mobile-input {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--primary);
-            font-family: inherit;
-            font-size: 2rem;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            text-shadow: 0 0 12px rgba(0,123,67,0.9), 0 0 25px rgba(0,123,67,0.4);
-            width: 100%;
-            text-align: center;
-            caret-color: var(--primary);
-            padding: 0;
-        }
-        #mobile-input::selection { background: rgba(0,123,67,0.35); color: var(--primary); }
-        /* Select */
-        select {
-            background: rgba(0,0,0,0.85);
-            color: var(--primary);
-            border: 1px solid var(--primary);
-            font-size: 0.9rem;
-            padding: 8px 30px 8px 10px;
-            border-radius: 2px;
-            font-family: inherit;
-            cursor: pointer;
-            outline: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23007b43' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-        }
-        select:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(0,123,67,0.3); }
-        .hidden { display: none !important; }
-        /* Start screen */
-        #start-screen p {
-            color: var(--primary);
-            font-size: 0.82rem;
-            line-height: 1.9;
-            letter-spacing: 1px;
-            border-left: 2px solid var(--primary);
-            padding-left: 12px;
-            text-align: left;
-            margin: 15px 0;
-        }
-        .settings-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 18px 0;
-        }
-        .setting-item {
-            background: rgba(0,0,0,0.45);
-            border: 1px solid var(--border);
-            padding: 12px;
-            border-radius: 2px;
-            text-align: left;
-        }
-        .setting-label {
-            font-size: 0.68rem;
-            color: var(--primary);
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            display: block;
-            opacity: 1.0;
-        }
-        .checkbox-item {
-            grid-column: 1 / -1;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-        }
-        .checkbox-item input[type="checkbox"] {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 1px solid var(--primary-dim);
-            background: rgba(0,0,0,0.6);
-            cursor: pointer;
-            position: relative;
-            flex-shrink: 0;
-            border-radius: 1px;
-        }
-        .checkbox-item input[type="checkbox"]:checked {
-            background: rgba(0,123,67,0.2);
-            border-color: var(--primary);
-        }
-        .checkbox-item input[type="checkbox"]:checked::after {
-            content: '✓';
-            position: absolute;
-            top: -3px; left: 2px;
-            color: var(--primary);
-            font-size: 14px;
-            text-shadow: 0 0 6px var(--primary);
-        }
-        .checkbox-item label {
-            font-size: 0.78rem;
-            color: var(--primary);
-            cursor: pointer;
-            letter-spacing: 0.5px;
-            line-height: 1.5;
-        }
-        /* Signal indicators */
-        .signal-indicators {
-            display: flex;
-            gap: 5px;
-            justify-content: flex-end;
-            margin-bottom: 8px;
-            align-items: center;
-        }
-        .sig-label { font-size: 0.58rem; color: var(--primary-dim); opacity: 1.0; letter-spacing: 1px; margin-right: 4px; }
-        .sig-dot {
-            width: 7px; height: 7px;
-            border-radius: 50%;
-            background: rgba(0,70,35,0.4);
-            border: 1px solid rgba(0,100,50,0.5);
-        }
-        .sig-dot.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 6px var(--primary); }
-        .sig-dot.blink-active { animation: sig-blink 0.6s infinite alternate; }
-        @keyframes sig-blink {
-            from { opacity: 0.3; box-shadow: none; }
-            to   { opacity: 1; box-shadow: 0 0 8px var(--primary); }
-        }
-        /* Status msg */
-        #status-msg { font-size: 0.82rem; opacity: 1.0; margin-top: 10px; letter-spacing: 2px; }
-        /* Result screen */
-        #result-screen h2 { letter-spacing: 6px; font-size: 1.4rem; text-shadow: 0 0 20px rgba(0,123,67,1.0), 0 0 50px rgba(0,123,67,0.4); }
-        #final-result-text { font-size: clamp(1.1rem, 5.5vw, 2rem); color: var(--success); text-shadow: 0 0 20px rgba(0,180,90,0.9), 0 0 50px rgba(0,180,90,0.4); white-space: nowrap; }
-        /* SNS Share */
-        .share-area {
-            margin-top: 20px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border);
-        }
-        .share-label {
-            font-size: 0.65rem;
-            letter-spacing: 3px;
-            color: var(--primary-dim);
-            opacity: 1.0;
-            margin-bottom: 12px;
-        }
-        .share-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .share-btn {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            padding: 9px 16px;
-            border-radius: 3px;
-            font-size: 0.78rem;
-            font-family: inherit;
-            cursor: pointer;
-            letter-spacing: 1px;
-            border: none;
-            transition: all 0.18s;
-            margin-top: 0;
-            font-weight: bold;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .share-btn-x {
-            background: #000;
-            color: #fff;
-            border: 1px solid #444;
-        }
-        .share-btn-x:hover { background: #111; box-shadow: 0 0 14px rgba(255,255,255,0.18); color: #fff; }
-        /* TX paddle buttons (mobile) */
-        #tx-paddle-area {
-            display: flex;
-            gap: 12px;
-            margin: 10px 0 4px;
-        }
-        .tx-paddle-btn {
-            flex: 1;
-            padding: 20px 10px;
-            font-size: 1rem;
-            letter-spacing: 2px;
-            border: 1px solid var(--primary);
-            background: rgba(0, 35, 18, 0.7);
-            color: var(--primary);
-            border-radius: 4px;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: none;
-            line-height: 1.5;
-            text-align: center;
-            margin-top: 0;
-            transition: background 0.1s, box-shadow 0.1s;
-        }
-        .tx-paddle-btn:active,
-        .tx-paddle-btn.pressed {
-            background: rgba(0, 123, 67, 0.35);
-            box-shadow: 0 0 22px rgba(0, 123, 67, 0.55);
-            border-color: var(--success);
-        }
-        .tx-paddle-sym {
-            display: block;
-            font-size: 1.6rem;
-            line-height: 1;
-            margin-bottom: 4px;
-            text-shadow: 0 0 10px rgba(0,123,67,0.8);
-        }
-        .tx-paddle-label {
-            display: block;
-            font-size: 0.68rem;
-            letter-spacing: 3px;
-            opacity: 0.9;
-        }
-        /* TX word display */
-        #tx-word-display {
-            font-size: 1.8rem;
-            letter-spacing: 6px;
-            min-height: 4.5rem;
-            border: 1px solid var(--primary-dim);
-            border-top: 2px solid var(--primary);
-            padding: 12px;
-            background: rgba(0, 15, 8, 0.95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 2px;
-            position: relative;
-        }
-        #tx-word-display::before {
-            content: '';
-            position: absolute;
-            top: -1px; left: -1px;
-            width: 10px; height: 10px;
-            border-top: 2px solid var(--success);
-            border-left: 2px solid var(--success);
-        }
-        #tx-word-display::after {
-            content: '';
-            position: absolute;
-            bottom: -1px; right: -1px;
-            width: 10px; height: 10px;
-            border-bottom: 2px solid var(--success);
-            border-right: 2px solid var(--success);
-        }
-        #tx-morse-input {
-            min-height: 3.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            margin-top: 8px;
-            padding: 8px 12px;
-            background: rgba(0, 0, 0, 0.45);
-            border: 1px solid rgba(0, 192, 96, 0.25);
-            border-radius: 2px;
-            color: var(--primary);
-            letter-spacing: 2px;
-        }
-        /* ── Mobile ─────────────────────────────────────────────────── */
         @media (max-width: 700px) {
-            body { justify-content: flex-start; padding: 8px 0; overflow-y: auto; }
-            #game-container {
-                padding: 12px;
-                border-radius: 0;
-                border-left: none;
-                border-right: none;
-                width: 100%;
-                max-width: 100%;
-            }
+            body { justify-content: flex-start; padding: 8px 0; }
+            #game-container { padding: 12px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; }
             h1 { font-size: 1.3rem; letter-spacing: 4px; }
-            /* 入力ボックスを最初から大きく確保 */
-            #input-display {
-                font-size: 1.8rem;
-                min-height: 6rem;
-                padding: 16px 12px;
-            }
-            #mobile-input { font-size: 1.8rem; }
-            #scope-canvas { height: 120px; }
-            /* 初心者モードのドット・ダッシュも少し小さく */
-            .msym-dot  { width: 12px; height: 12px; }
-            .msym-dash { width: 30px; height: 12px; }
-            #key-customize-wrap { display: none !important; }
         }
-        /* ── Free Input Mode ── */
-        #free-screen {
-            width: 100%;
-            max-width: 560px;
-            margin: 0 auto;
-            padding: 6px 0 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        #free-header {
-            text-align: center;
-            letter-spacing: 6px;
-            font-size: 0.7rem;
-            color: var(--primary-dim);
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border);
-        }
-        #free-header span {
-            color: var(--primary);
-            font-size: 1.0rem;
-            letter-spacing: 8px;
-        }
-        #free-input-block {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border);
-            border-radius: 2px;
-            padding: 10px 16px 12px;
-        }
-        #free-input-block .free-section-label {
-            font-size: 0.58rem;
-            color: var(--primary-dim);
-            letter-spacing: 3px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        #free-input-block .free-section-label::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-        #free-morse-render {
-            min-height: 2.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-        #free-output-block {
-            background: rgba(0,0,0,0.55);
-            border: 1px solid var(--primary);
-            border-radius: 2px;
-            padding: 0;
-            overflow: hidden;
-        }
-        #free-output-block .free-section-label {
-            font-size: 0.58rem;
-            color: var(--primary-dim);
-            letter-spacing: 3px;
-            padding: 6px 14px 5px;
-            border-bottom: 1px solid var(--border);
-            background: rgba(0,50,20,0.3);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        #free-output-block .free-section-label::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-        #free-text-display {
-            min-height: 100px;
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 12px 16px 10px;
-            font-size: 1.4rem;
-            letter-spacing: 5px;
-            color: var(--primary);
-            word-break: break-all;
-            text-align: left;
-            line-height: 1.9;
-            font-family: 'Courier New', monospace;
-        }
-        #free-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-        #free-controls .free-quit-btn {
-            font-size: 0.72rem;
-            padding: 7px 22px;
-            letter-spacing: 2px;
-        }
-        #free-controls .free-reset-btn {
-            font-size: 0.68rem;
-            padding: 6px 16px;
-            letter-spacing: 2px;
-            opacity: 0.55;
-            background: transparent;
-            border-color: var(--border);
-            color: var(--primary-dim);
-        }
-        #free-controls .free-reset-btn:hover { opacity: 0.85; }
-        #free-paddle-area {
-            display: none;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 2px;
-        }
-        #free-paddle-area.visible { display: flex; }
-        /* 設定画面のフリー入力リンク */
-        #free-mode-link {
-            display: none;
-            text-align: center;
-            margin-top: 6px;
-        }
-        #free-mode-link button {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--primary-dim);
-            font-size: 0.75rem;
-            padding: 6px 22px;
-            letter-spacing: 2px;
-            opacity: 0.75;
-            transition: opacity 0.2s, border-color 0.2s, color 0.2s;
-        }
-        #free-mode-link button:hover {
-            opacity: 1;
-            border-color: var(--primary);
-            color: var(--primary);
-            box-shadow: none;
-        }
-        /* キー設定：最も控えめなサードアクション */
-        #key-customize-btn {
-            background: transparent;
-            border: 1px solid rgba(30,92,56,0.4);
-            color: rgba(0,184,90,0.45);
-            font-size: 0.58rem;
-            padding: 3px 10px;
-            letter-spacing: 1px;
-            opacity: 1;
-            margin-top: 0;
-            transition: border-color 0.2s, color 0.2s;
-        }
-        #key-customize-btn:hover {
-            border-color: var(--border);
-            color: var(--primary-dim);
-            background: transparent;
-            box-shadow: none;
-        }
-        /* ── Key Customize Modal ── */
-        #key-customize-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.88);
-            z-index: 999;
-            align-items: center;
-            justify-content: center;
-        }
-        #key-customize-modal.open { display: flex; }
-        .kc-box {
-            background: #000f08;
-            border: 1px solid var(--primary-dim);
-            border-top: 2px solid var(--primary);
-            padding: 26px 28px;
-            width: min(340px, 88vw);
-        }
-        .kc-title { font-size: 0.7rem; letter-spacing: 3px; color: var(--primary-dim); margin-bottom: 18px; text-align: center; }
-        .kc-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 0; }
-        .kc-label { font-size: 0.78rem; letter-spacing: 2px; color: var(--primary-dim); flex-shrink: 0; }
-        .kc-key-btn {
-            background: rgba(0,123,67,0.08);
-            border: 1px solid var(--border);
-            color: var(--primary);
-            font-family: inherit;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            padding: 8px 0;
-            width: 155px;
-            cursor: pointer;
-            text-align: center;
-            transition: border-color 0.15s, background 0.15s;
-        }
-        .kc-key-btn:hover { border-color: var(--primary-dim); }
-        .kc-key-btn.listening { border-color: var(--primary); background: rgba(0,123,67,0.22); animation: blink 0.5s infinite; }
-        #kc-error { font-size: 0.7rem; letter-spacing: 1px; color: var(--error); min-height: 1.1em; text-align: center; margin: 10px 0 2px; }
     </style>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3503091804175227"
-     crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3503091804175227" crossorigin="anonymous"></script>
 </head>
 <body>
 <div id="game-container">
-    <div class="header-bar"><h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1></div>
+    <div class="header-bar">
+        <h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
     <div class="subtitle">▸ AMATEUR RADIO CONTEST TRAINER ◂</div>
-    <!-- ═══ START SCREEN ═══ -->
-    <div id="start-screen">
-        <!-- Step 1: Mode select -->
-        <div id="mode-select">
-            <div style="font-size:0.72rem;color:var(--primary-dim);letter-spacing:2px;margin:18px 0 24px;opacity:0.85;">
-                CW コンテスト交信を想定したモールス符号練習ツール
-            </div>
-            <div style="display:flex;gap:14px;justify-content:center;margin:0 0 20px;flex-wrap:wrap;">
-                <button onclick="selectMode('RX')" style="font-size:0.95rem;padding:14px 32px;letter-spacing:2px;min-width:160px;">
-                    <span style="display:block;font-size:1.4rem;margin-bottom:4px;">📻</span>受信モード
-                </button>
-                <button onclick="selectMode('TX')" style="font-size:0.95rem;padding:14px 32px;letter-spacing:2px;min-width:160px;">
-                    <span style="display:block;font-size:1.4rem;margin-bottom:4px;">📡</span>送信モード
-                </button>
-            </div>
-            <div style="display:flex;justify-content:center;gap:20px;font-size:0.65rem;letter-spacing:1.5px;opacity:0.5;flex-wrap:wrap;">
-                <a href="ranking.html" style="color:var(--primary-dim);text-decoration:none;transition:opacity 0.15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='1'">🏆 ランキング</a>
-                <a href="morse-table.html" style="color:var(--primary-dim);text-decoration:none;">モールス符号表</a>
-            </div>
-        </div>
-        <!-- Step 2: Settings (hidden until mode selected) -->
-        <div id="mode-settings" class="hidden" style="position:relative;">
-            <!-- 音声チェック：右上に配置（受信モード時のみ表示） -->
-            <div id="audio-check-item" style="display:none;position:absolute;top:0;right:0;align-items:center;gap:5px;font-size:0.72rem;color:var(--primary-dim);letter-spacing:1px;cursor:pointer;">
-                <input type="checkbox" id="audio-check" onchange="toggleSosCheck(this.checked)" style="margin:0;">
-                <span style="font-size:0.95rem;line-height:1;">🔊</span>
-                <label for="audio-check" style="cursor:pointer;white-space:nowrap;">音声チェック</label>
-            </div>
-            <div style="display:flex;align-items:flex-start;gap:10px;margin:15px 0;">
-                <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:0;flex:1;"></p>
-                <div id="key-customize-wrap" style="display:none;flex-shrink:0;padding-top:3px;">
-                    <button id="key-customize-btn" onclick="openKeyCustomize()">⌨ キー設定</button>
-                </div>
-            </div>
-            <div class="settings-grid" style="margin:18px 0 18px;">
-                <div class="setting-item">
-                    <span class="setting-label">⏱ 制限時間</span>
-                    <select id="time-select">
-                        <option value="60">1分間</option>
-                        <option value="180">3分間</option>
-                        <option value="300">5分間</option>
-                    </select>
-                </div>
-                <div class="setting-item" id="wpm-setting-item">
-                    <span class="setting-label">📡 モールス速度</span>
-                    <select id="wpm-select">
-                        <option value="10">10 WPM</option>
-                        <option value="20" selected>20 WPM</option>
-                        <option value="30">30 WPM</option>
-                    </select>
-                </div>
-                <div class="setting-item checkbox-item">
-                    <input type="checkbox" id="beginner-mode-check">
-                    <span style="font-size:1.1rem;line-height:1;flex-shrink:0;" title="初心者向けモード">🔰</span>
-                    <label for="beginner-mode-check">初心者モード（現在の文字のモールスを表示）</label>
-                </div>
-            </div>
-            <div id="free-mode-link">
-                <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
-            </div>
-            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
-                <button onclick="unlockAndPrepare()">▶ ミッション開始</button>
-                <button onclick="backToModeSelect()" style="font-size:0.72rem;padding:6px 16px;opacity:0.5;margin-top:10px;">◀ 戻る</button>
-            </div>
-        </div>
-    </div>
-    <!-- ═══ GAME SCREEN ═══ -->
-    <div id="game-screen" class="hidden">
-        <div class="signal-indicators">
-            <span class="sig-label">SIG</span>
-            <div class="sig-dot" id="sig1"></div>
-            <div class="sig-dot" id="sig2"></div>
-            <div class="sig-dot active" id="sig3"></div>
-            <div class="sig-dot active blink-active" id="sig4"></div>
-        </div>
-        <div class="stats">
-            <div class="stat-item">
-                <span class="stat-label">▸ TIME</span>
-                <span class="stat-value" id="timer">00:00</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">▸ SCORE</span>
-                <span class="stat-value" id="score">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">▸ WPM</span>
-                <span class="stat-value" id="wpm-display">20</span>
-            </div>
-        </div>
-        <!-- Spectrum Scope + Waterfall -->
-        <div id="scope-container">
-            <span id="scope-label">SPECTRUM ─ CW 750Hz</span>
-            <span id="scope-freq">SPAN 3kHz</span>
-            <canvas id="scope-canvas" width="600" height="160"></canvas>
-        </div>
-        <!-- TX paddle buttons (タッチ端末専用) -->
-        <div id="tx-paddle-area" class="hidden">
-            <button class="tx-paddle-btn" id="pad-dot"
-                ontouchstart="event.preventDefault();tapSymbol(false);">
-                <span class="tx-paddle-sym">・</span>
-                <span class="tx-paddle-label">トン</span>
-            </button>
-            <button class="tx-paddle-btn" id="pad-dash"
-                ontouchstart="event.preventDefault();tapSymbol(true);">
-                <span class="tx-paddle-sym">ー</span>
-                <span class="tx-paddle-label">ツー</span>
-            </button>
-        </div>
-        <!-- 初心者モード: 現在の文字のモールス表示 -->
-        <div id="beginner-display" class="hidden"></div>
-        <!-- RX area -->
-        <div id="rx-area">
-            <div id="input-display">
-                <input type="text" id="mobile-input" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text" enterkeyhint="send">
-            </div>
-            <button id="rx-submit-btn"
-                onclick="submitRxInput()"
-                style="font-size:0.78rem;padding:7px 28px;margin-top:8px;letter-spacing:2px;opacity:0.85;">
-                ▶ ENTER
-            </button>
-        </div>
-        <!-- TX area -->
-        <div id="tx-area" class="hidden">
-            <div id="tx-word-display">
-                <span id="tx-target-text"></span>
-            </div>
-            <div id="tx-morse-input"><span id="tx-input-render"></span></div>
-        </div>
-        <div id="status-msg">READY...</div>
-        <button class="quit-btn" onclick="quitGame()">■ QUIT (中断)</button>
-    </div>
-    <!-- ═══ FREE INPUT SCREEN ═══ -->
-    <div id="free-screen" class="hidden">
-        <div id="free-header">▸ <span>FREE INPUT</span> ◂</div>
 
-        <!-- 入力中のモールス符号 -->
-        <div id="free-input-block" style="position:relative;">
-            <div class="free-section-label">INPUT</div>
-            <div id="free-morse-render"></div>
+    <div id="mode-select">
+        <div style="font-size:0.72rem;color:var(--primary-dim);letter-spacing:2px;margin:18px 0 24px;opacity:0.85;">
+            CW コンテスト交信を想定したモールス符号練習ツール
         </div>
-
-        <!-- デコード済みテキスト -->
-        <div id="free-output-block">
-            <div class="free-section-label">DECODED</div>
-            <div id="free-text-display"><span class="cursor"></span></div>
-        </div>
-
-        <!-- コントロール -->
-        <div id="free-controls">
-            <button class="free-reset-btn" onclick="resetFreeMode()">↺ RESET</button>
-            <button class="free-quit-btn" onclick="quitFreeMode()">■ QUIT</button>
-        </div>
-
-        <!-- タッチ端末用パドルボタン -->
-        <div id="free-paddle-area">
-            <button class="tx-paddle-btn"
-                ontouchstart="event.preventDefault();tapSymbol(false);">
-                <span class="tx-paddle-sym">・</span>
-                <span class="tx-paddle-label">トン</span>
+        <div style="display:flex;gap:14px;justify-content:center;margin:0 0 20px;flex-wrap:wrap;">
+            <button onclick="location.href='rx.html'" style="font-size:0.95rem;padding:14px 32px;letter-spacing:2px;min-width:160px;">
+                <span style="display:block;font-size:1.4rem;margin-bottom:4px;">📻</span>受信モード
             </button>
-            <button class="tx-paddle-btn"
-                ontouchstart="event.preventDefault();tapSymbol(true);">
-                <span class="tx-paddle-sym">ー</span>
-                <span class="tx-paddle-label">ツー</span>
+            <button onclick="location.href='tx.html'" style="font-size:0.95rem;padding:14px 32px;letter-spacing:2px;min-width:160px;">
+                <span style="display:block;font-size:1.4rem;margin-bottom:4px;">📡</span>送信モード
             </button>
         </div>
-    </div>
-    <!-- ═══ RESULT SCREEN ═══ -->
-    <div id="result-screen" class="hidden">
-        <h2>MISSION END</h2>
-        <p id="final-result-text" style="margin: 20px 0;"></p>
-        <!-- SNS Share -->
-        <div class="share-area">
-            <div class="share-label">▸ SHARE YOUR RESULT ◂</div>
-            <div class="share-buttons">
-                <button class="share-btn share-btn-x" onclick="shareX()">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.402 6.231H2.744l7.73-8.835L2.25 2.25h6.832l4.258 5.632 4.905-5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                    X でシェア
-                </button>
-            </div>
+        <div style="display:flex;justify-content:center;gap:20px;font-size:0.65rem;letter-spacing:1.5px;opacity:0.5;flex-wrap:wrap;">
+            <a href="ranking.html" style="color:var(--primary-dim);text-decoration:none;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='1'">🏆 ランキング</a>
+            <a href="morse-table.html" style="color:var(--primary-dim);text-decoration:none;">モールス符号表</a>
         </div>
-        <!-- Score registration -->
-        <div id="score-reg-area" style="margin-top:18px; border-top:1px solid var(--border); padding-top:14px;">
-            <div id="score-reg-result" style="margin-bottom:12px; font-size:0.85rem; line-height:2; color:var(--primary);"></div>
-            <div id="score-reg-form" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; align-items:center;">
-                <input type="text" id="nickname-input" placeholder="ニックネーム（任意・10文字まで）" maxlength="10"
-                    autocomplete="off" autocapitalize="off" spellcheck="false"
-                    style="background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:2px;
-                           color:var(--primary); font-family:inherit; font-size:0.82rem;
-                           padding:8px 12px; width:230px; letter-spacing:1px; outline:none;">
-                <button onclick="setNickname()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">✏️ 名前を設定</button>
-            </div>
-        </div>
-        <button onclick="retryGame()" style="margin-top:16px;">▶ 再挑戦</button>
     </div>
 </div>
-<!-- フッター -->
+
 <footer style="
     margin-top: 20px;
     padding: 12px 0 4px;
@@ -1015,1064 +187,11 @@
         <a href="contact.html" style="color:#007b43; text-decoration:none;">お問い合わせ</a>
     </div>
 </footer>
+
 <script>
-// ── Morse code ────────────────────────────────────────────────────────────────
-const MORSE_CODE = {
-    'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---',
-    'K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-',
-    'U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..',
-    '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....',
-    '6':'-....','7':'--...','8':'---..','9':'----.',
-    '/':'-..-.', // ポータブル
-};
-// ── State ─────────────────────────────────────────────────────────────────────
-let audioCtx = null, masterGain = null;
-let timeLeft, initialSeconds, score = 0, currentWord = '', isPlaying = false;
-let timerId, audioLoopId, activeOscillators = [];
-let isWaitingNext = false, nextType = 'CALLSIGN';
-let DOT_TIME = 0.06; // 20wpm default
-let beginnerMode = false;
-// TX mode state
-let gameMode = 'RX'; // 'RX' | 'TX'
-let txWord = [], txCharIndex = 0, txMorseInput = '';
-let nextTxType = 'CALLSIGN';
-let txCharTimer = null;
-let TX_CHAR_GAP = 280;      // ms after last element ends → auto-decode (スマホは700ms)
-const TX_DOT_TIME = 0.06;   // sec — fixed keyer element speed (20 WPM)
-// Iambic keyer state
-let dotHeld = false, dashHeld = false;
-// ── Key bindings (customizable) ───────────────────────────────────────────────
-let dotKey  = 'Space';
-let dashKey = 'KeyJ';
-let _pendingDotKey = null, _pendingDashKey = null, _capturingFor = null;
-
-function getKeyLabel(code) {
-    if (code === 'Space') return 'SPACE';
-    if (code.startsWith('Key'))   return code.slice(3);
-    if (code.startsWith('Digit')) return code.slice(5);
-    const arrowMap = {ArrowUp:'↑', ArrowDown:'↓', ArrowLeft:'←', ArrowRight:'→'};
-    if (arrowMap[code]) return arrowMap[code];
-    return code;
-}
-function openKeyCustomize() {
-    _pendingDotKey  = dotKey;
-    _pendingDashKey = dashKey;
-    _capturingFor   = null;
-    document.getElementById('kc-error').textContent = '';
-    updateKcBtns();
-    document.getElementById('key-customize-modal').classList.add('open');
-    document.addEventListener('keydown', onKeyCapture);
-}
-function closeKeyCustomize() {
-    _capturingFor = null;
-    document.getElementById('key-customize-modal').classList.remove('open');
-    document.removeEventListener('keydown', onKeyCapture);
-}
-function updateKcBtns() {
-    const db = document.getElementById('dot-key-btn');
-    const ab = document.getElementById('dash-key-btn');
-    db.textContent = _capturingFor === 'dot'  ? '… キー入力待ち …' : getKeyLabel(_pendingDotKey);
-    ab.textContent = _capturingFor === 'dash' ? '… キー入力待ち …' : getKeyLabel(_pendingDashKey);
-    db.classList.toggle('listening', _capturingFor === 'dot');
-    ab.classList.toggle('listening', _capturingFor === 'dash');
-}
-function startKeyCapture(which) {
-    _capturingFor = which;
-    document.getElementById('kc-error').textContent = '';
-    updateKcBtns();
-}
-function onKeyCapture(e) {
-    if (!_capturingFor) return;
-    e.preventDefault();
-    if (e.code === 'Escape') { closeKeyCustomize(); return; }
-    if (e.code === 'Enter')  { saveKeyCustomize();  return; }
-    const code = e.code;
-    if (_capturingFor === 'dot') {
-        if (code === _pendingDashKey) {
-            document.getElementById('kc-error').textContent = '長点と同じキーは設定できません';
-            _capturingFor = null; updateKcBtns(); return;
-        }
-        _pendingDotKey = code;
-    } else {
-        if (code === _pendingDotKey) {
-            document.getElementById('kc-error').textContent = '短点と同じキーは設定できません';
-            _capturingFor = null; updateKcBtns(); return;
-        }
-        _pendingDashKey = code;
-    }
-    _capturingFor = null;
-    document.getElementById('kc-error').textContent = '';
-    updateKcBtns();
-}
-function saveKeyCustomize() {
-    dotKey  = _pendingDotKey;
-    dashKey = _pendingDashKey;
-    updateTxModeDesc();
-    closeKeyCustomize();
-}
-function updateTxModeDesc() {
-    if (document.getElementById('mode-settings').classList.contains('hidden')) return;
-    if (gameMode !== 'TX') return;
-    document.getElementById('mode-description').innerHTML =
-        `コールサインとRSTが表示される。<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
-}
-let lastSentSym = null;  // for iambic alternation ('.' or '-')
-let keyerPending = false; // true while keyer setTimeout is in flight
-// IC-7300 Style Spectrum Scope
-let scopeRunning = false;
-const SCOPE_W = 600, SCOPE_H = 160;
-const SPEC_H = 92, FALL_H = 68; // spectrum top, waterfall bottom
-// Frequency axis: CW tone always at center, ±1500 Hz span
-const CW_X = SCOPE_W / 2; // 300px — always center
-const SPAN_HZ = 3000;     // total span displayed (±1500 Hz around CW)
-const PX_PER_HZ = SCOPE_W / SPAN_HZ; // 0.2 px/Hz
-// CW filter passband ±250 Hz → ±50 px
-const FILT_X1 = CW_X - 250 * PX_PER_HZ;
-const FILT_X2 = CW_X + 250 * PX_PER_HZ;
-let waterfallRows = [];        // each entry = Float32Array(SCOPE_W), 0–1
-let smoothSpectrum = new Float32Array(SCOPE_W).fill(0);
-let toneStrength = 0;          // 0–1, smoothed tone presence
-// Tone schedule: [{onTime, offTime}] ms
-let toneSchedule = [];
-// Character schedule for beginner mode: [{morse, startMs, endMs}]
-let charSchedule = [];
-const mobileInput = document.getElementById('mobile-input');
-const displayFrame = document.getElementById('input-display');
-const beginnerDisplay = document.getElementById('beginner-display');
-// ── WPM ───────────────────────────────────────────────────────────────────────
-function wpmToDotTime(wpm) { return 1.2 / wpm; }
-// ── Callsign / RST ────────────────────────────────────────────────────────────
-function generateCallsign() {
-    const rAZ = () => String.fromCharCode(65 + Math.floor(Math.random() * 26));
-    const r09 = () => Math.floor(Math.random() * 10).toString();
-    const rRange = (a, z) => String.fromCharCode(a.charCodeAt(0) + Math.floor(Math.random() * (z.charCodeAt(0) - a.charCodeAt(0) + 1)));
-    // プレフィックス選択: J（50%）、7（25%）、8（25%）
-    const pfx = Math.random() < 0.5 ? 'J' : (Math.random() < 0.5 ? '7' : '8');
-    let second;
-    if (pfx === 'J') second = rRange('A', 'S');       // JA〜JS
-    else if (pfx === '7') second = rRange('J', 'N');   // 7J〜7N
-    else second = (Math.random() < 0.5 ? 'J' : 'N');  // 8J or 8N
-    const call = pfx + second + r09() + rAZ() + rAZ() + rAZ();
-    // 30%の確率でポータブル表記（/0〜/9）を付加
-    if (Math.random() < 0.3) {
-        return call + '/' + r09();
-    }
-    return call;
-}
-function generateRST() {
-    const areas = ['101','102','103','104','105','106','107','108','109','110','111','112','113','114'];
-    for (let i = 2; i <= 48; i++) areas.push(i.toString().padStart(2,'0'));
-    return '5NN' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
-}
-// ── Audio unlock + prepare ────────────────────────────────────────────────────
-function unlockAndPrepare() {
-    stopSosCheck();
-    document.getElementById('audio-check').checked = false;
-    if (gameMode === 'RX') {
-        const wpmVal = parseInt(document.getElementById('wpm-select').value);
-        DOT_TIME = wpmToDotTime(wpmVal);
-        document.getElementById('wpm-display').innerText = wpmVal;
-    } else {
-        DOT_TIME = TX_DOT_TIME; // TX uses fixed keyer speed
-        document.getElementById('wpm-display').innerText = 'KEY';
-    }
-    beginnerMode = document.getElementById('beginner-mode-check').checked;
-    if (beginnerMode) beginnerDisplay.classList.remove('hidden');
-    if (!audioCtx) {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AC();
-        masterGain = audioCtx.createGain();
-        masterGain.gain.setValueAtTime(1, 0);
-        masterGain.connect(audioCtx.destination);
-    }
-    const doResume = (audioCtx.state === 'suspended')
-        ? audioCtx.resume()
-        : Promise.resolve();
-    const unlockBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
-    const unlockSrc = audioCtx.createBufferSource();
-    unlockSrc.buffer = unlockBuf;
-    unlockSrc.connect(masterGain);
-    unlockSrc.start(0);
-    audioCtx.onstatechange = () => {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-    };
-    document.getElementById('start-screen').classList.add('hidden');
-    document.getElementById('game-screen').classList.remove('hidden');
-    if (gameMode === 'RX') mobileInput.focus();
-    initScope();
-    startScopeAnimation();
-    doResume.then(() => { setTimeout(startGame, 300); })
-            .catch(() => { setTimeout(startGame, 300); });
-}
-function startGame() {
-    initialSeconds = parseInt(document.getElementById('time-select').value);
-    timeLeft = initialSeconds;
-    score = 0; isPlaying = true;
-    masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
-    timerId = setInterval(tick, 1000);
-    if (gameMode === 'TX') {
-        startTxGame();
-    } else {
-        isWaitingNext = false; nextType = 'CALLSIGN';
-        document.getElementById('status-msg').innerText = '受信中...';
-        nextWord();
-    }
-}
-// ── 音声チェック（SOS ループ）─────────────────────────────────────────────────
-let _sosCtx = null, _sosTimer = null;
-function toggleSosCheck(on) {
-    if (on) startSosCheck(); else stopSosCheck();
-}
-function startSosCheck() {
-    stopSosCheck();
-    const AC = window.AudioContext || window.webkitAudioContext;
-    _sosCtx = new AC();
-    _sosLoop();
-}
-function stopSosCheck() {
-    if (_sosTimer) { clearTimeout(_sosTimer); _sosTimer = null; }
-    if (_sosCtx)   { try { _sosCtx.close(); } catch(e){} _sosCtx = null; }
-}
-function _sosLoop() {
-    if (!_sosCtx) return;
-    const dotT  = 1.2 / 20;        // 0.06s at 20 WPM
-    const dashT = dotT * 3;         // 0.18s
-    const elGap = dotT;             // 要素間隔
-    const ltGap = dotT * 3;         // 文字間隔
-    const wdGap = dotT * 7;         // 語間隔
-    const freq  = 750;
-    // SOS = ... --- ...
-    const letters = ['...', '---', '...'];
-    let t = _sosCtx.currentTime + 0.05;
-    let offset = 0;
-    letters.forEach((code, li) => {
-        code.split('').forEach((sym, si) => {
-            const dur = sym === '.' ? dotT : dashT;
-            const osc = _sosCtx.createOscillator();
-            const gn  = _sosCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = freq;
-            gn.gain.setValueAtTime(0, t + offset);
-            gn.gain.linearRampToValueAtTime(0.5, t + offset + 0.006);
-            gn.gain.setValueAtTime(0.5, t + offset + dur - 0.006);
-            gn.gain.linearRampToValueAtTime(0, t + offset + dur + 0.006);
-            osc.connect(gn); gn.connect(_sosCtx.destination);
-            osc.start(t + offset);
-            osc.stop(t + offset + dur + 0.05);
-            offset += dur + elGap;
-        });
-        // 文字後の追加ギャップ（elGap はすでに加算済み）
-        if (li < letters.length - 1) offset += (ltGap - elGap);
-    });
-    // 語末は word gap（elGap 分は加算済みなので残りを追加）
-    offset += (wdGap - elGap);
-    _sosTimer = setTimeout(_sosLoop, offset * 1000);
-}
-
-// ── Audio ──────────────────────────────────────────────────────────────────────
-function killCurrentAudio() {
-    if (audioLoopId) clearTimeout(audioLoopId);
-    activeOscillators.forEach(o => { try { o.stop(); } catch(e){} });
-    activeOscillators = [];
-    toneSchedule = [];
-    charSchedule = [];
-}
-function tick() {
-    if (!isPlaying) return;
-    timeLeft--;
-    const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-    document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    if (timeLeft <= 0) endGame();
-}
-function nextWord() {
-    mobileInput.value = '';
-    currentWord =(nextType === 'CALLSIGN') ? generateCallsign() : generateRST();
-    nextType = (nextType === 'CALLSIGN') ? 'RST' : 'CALLSIGN';
-    playMorseLoop();
-}
-function playMorseLoop() {
-    if (!isPlaying || isWaitingNext) return;
-    const duration = playMorse(currentWord);
-    audioLoopId = setTimeout(playMorseLoop, duration * 1000 + 1000);
-}
-function playMorse(text) {
-    killCurrentAudio();
-    const startTime = audioCtx.currentTime + 0.1;
-    const startMs   = Date.now() + 100;
-    let offset = 0;
-    const charEntries = [];
-    text.split('').forEach(char => {
-        const code = MORSE_CODE[char];
-        if (!code) return;
-        const charStartOffset = offset;
-        code.split('').forEach(symbol => {
-            const dur = (symbol === '.') ? DOT_TIME : DOT_TIME * 3;
-            const osc  = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = 750;
-            gain.gain.setValueAtTime(0, startTime + offset);
-            gain.gain.linearRampToValueAtTime(0.5, startTime + offset + 0.006);
-            gain.gain.setValueAtTime(0.5, startTime + offset + dur - 0.003);
-            gain.gain.linearRampToValueAtTime(0, startTime + offset + dur + 0.006);
-            osc.connect(gain); gain.connect(masterGain);
-            osc.start(startTime + offset);
-            osc.stop(startTime + offset + dur + 0.05);
-            activeOscillators.push(osc);
-            toneSchedule.push({ onTime: startMs + offset * 1000, offTime: startMs + (offset + dur) * 1000 });
-            offset += dur + DOT_TIME;
-        });
-        charEntries.push({ morse: code, startOffset: charStartOffset });
-        offset += DOT_TIME * 2;
-    });
-    charEntries.forEach((entry, i) => {
-        entry.startMs = startMs + entry.startOffset * 1000;
-        entry.endMs   = i < charEntries.length - 1
-            ? startMs + charEntries[i + 1].startOffset * 1000
-            : startMs + (offset + 0.5) * 1000;
-    });
-    charSchedule = charEntries;
-    return offset + 0.1;
-}
-// ── Input ──────────────────────────────────────────────────────────────────────
-function focusMobile() { if (isPlaying && gameMode === 'RX') mobileInput.focus(); }
-
-function submitRxInput() {
-    if (!isPlaying || isWaitingNext || gameMode !== 'RX') return;
-    const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
-    displayFrame.classList.remove('flash-correct', 'flash-error');
-    void displayFrame.offsetWidth;
-    if (finalInput === currentWord && currentWord !== '') {
-        mobileInput.value = '';
-        score += currentWord.length;
-        document.getElementById('score').innerText = score;
-        isWaitingNext = true;
-        displayFrame.classList.add('flash-correct');
-        killCurrentAudio();
-        if (beginnerMode) beginnerDisplay.innerHTML = '';
-        document.getElementById('status-msg').innerText = '✓ COPY OK';
-        setTimeout(() => {
-            if (!isPlaying) return;
-            isWaitingNext = false;
-            document.getElementById('status-msg').innerText = '受信中...';
-            nextWord();
-            // モバイルで自動リフォーカス
-            setTimeout(() => focusMobile(), 80);
-        }, 500);
-    } else {
-        displayFrame.classList.add('flash-error');
-        // 不正解でもリフォーカスを維持
-        setTimeout(() => focusMobile(), 50);
-    }
-}
-
-mobileInput.addEventListener('input', () => {
-    if (!isPlaying || isWaitingNext) return;
-    const raw = mobileInput.value;
-    // iOS等で改行文字が入る場合（Return キー代替）
-    if (raw.includes('\n') || raw.includes('\r')) {
-        mobileInput.value = raw.replace(/[\n\r]/g, '');
-        submitRxInput();
-        return;
-    }
-    // 有効文字のみ残す（カーソル位置を保持）
-    const filtered = raw.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
-    if (filtered !== raw) {
-        const pos = mobileInput.selectionStart;
-        const removedBefore = raw.slice(0, pos).replace(/[A-Z0-9\/]/gi, '').length;
-        mobileInput.value = filtered;
-        const newPos = Math.max(0, pos - removedBefore);
-        mobileInput.setSelectionRange(newPos, newPos);
-    }
-});
-mobileInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        submitRxInput();
-    }
-});
-// ── Beginner mode display ─────────────────────────────────────────────────────
-let lastDisplayedMorse = null;
-function updateBeginnerDisplay() {
-    if (!beginnerMode || gameMode !== 'RX') return;
-    const now = Date.now();
-    const current = charSchedule.find(s => now >= s.startMs && now < s.endMs);
-    const morse = current ? current.morse : null;
-    if (morse === lastDisplayedMorse) return;
-    lastDisplayedMorse = morse;
-    if (!morse) {
-        beginnerDisplay.innerHTML = '';
-        return;
-    }
-    beginnerDisplay.innerHTML = morse.split('').map(sym =>
-        `<span class="${sym === '.' ? 'msym-dot' : 'msym-dash'}"></span>`
-    ).join('');
-}
-// ── IC-7300 Spectrum Scope ────────────────────────────────────────────────────
-function initScope() {
-    waterfallRows = [];
-    for (let i = 0; i < FALL_H; i++) waterfallRows.push(new Float32Array(SCOPE_W).fill(0));
-    smoothSpectrum = new Float32Array(SCOPE_W).fill(0);
-    toneStrength = 0;
-    scopeRunning = false;
-    lastDisplayedMorse = null;
-}
-// Generate instant spectrum (signal strength 0–1 per X pixel)
-function genSpectrum(active) {
-    const s = new Float32Array(SCOPE_W);
-    for (let x = 0; x < SCOPE_W; x++) {
-        s[x] = 0.04 + Math.random() * 0.055;
-        if (Math.random() < 0.004) s[x] += Math.random() * 0.12; // occasional noise spike
-    }
-    if (active) {
-        // Narrow gaussian CW spike at CW_X
-        const peak = 0.78 + Math.random() * 0.09;
-        const sig  = 3.5; // sigma in pixels (narrow CW)
-        for (let x = Math.max(0, CW_X - 28); x < Math.min(SCOPE_W, CW_X + 28); x++) {
-            const d = x - CW_X;
-            s[x] = Math.max(s[x], peak * Math.exp(-(d * d) / (2 * sig * sig)));
-        }
-    }
-    return s;
-}
-// ICOM-style waterfall color (dark→teal→green→yellow→white), green-tinted for game theme
-function wfColor(v) {
-    if (v < 0.10) { const t = v / 0.10; return [0, Math.round(8 + t * 22), Math.round(18 + t * 28)]; }
-    if (v < 0.30) { const t = (v - 0.10) / 0.20; return [0, Math.round(30 + t * 80), Math.round(46 - t * 26)]; }
-    if (v < 0.58) { const t = (v - 0.30) / 0.28; return [Math.round(t * 40), Math.round(110 + t * 105), Math.round(20 - t * 18)]; }
-    if (v < 0.82) { const t = (v - 0.58) / 0.24; return [Math.round(40 + t * 185), Math.round(215 + t * 40), 2]; }
-    { const t = Math.min(1, (v - 0.82) / 0.18); return [Math.round(225 + t * 30), 255, Math.round(t * 210)]; }
-}
-function isToneOn() {
-    const now = Date.now();
-    return toneSchedule.some(s => now >= s.onTime && now <= s.offTime);
-}
-function startScopeAnimation() {
-    scopeRunning = true;
-    const canvas = document.getElementById('scope-canvas');
-    const ctx = canvas.getContext('2d');
-    const fallImgData = ctx.createImageData(SCOPE_W, FALL_H);
-    let frameCount = 0;
-
-    function draw() {
-        if (!scopeRunning) return;
-        requestAnimationFrame(draw);
-        updateBeginnerDisplay();
-
-        const toneActive = isPlaying && isToneOn();
-        // Smooth tone strength
-        toneStrength = toneActive
-            ? Math.min(1, toneStrength + 0.14)
-            : Math.max(0, toneStrength - 0.09);
-
-        // Build instant spectrum and smooth it
-        const instant = genSpectrum(toneStrength > 0.25);
-        for (let x = 0; x < SCOPE_W; x++) {
-            smoothSpectrum[x] = smoothSpectrum[x] * 0.60 + instant[x] * 0.40;
-        }
-
-        // Update waterfall (~20fps)
-        frameCount++;
-        if (frameCount % 3 === 0) {
-            const row = new Float32Array(SCOPE_W);
-            for (let x = 0; x < SCOPE_W; x++) row[x] = smoothSpectrum[x];
-            waterfallRows.unshift(row);
-            if (waterfallRows.length > FALL_H) waterfallRows.pop();
-        }
-
-        // ── Clear ────────────────────────────────────────────────────
-        ctx.fillStyle = '#01090404';
-        ctx.fillRect(0, 0, SCOPE_W, SCOPE_H);
-
-        // ── SPECTRUM AREA (top SPEC_H px) ────────────────────────────
-
-        // Background
-        ctx.fillStyle = '#010d05';
-        ctx.fillRect(0, 0, SCOPE_W, SPEC_H);
-
-        // dB grid lines (horizontal)
-        ctx.lineWidth = 0.5;
-        for (let i = 1; i <= 4; i++) {
-            const y = SPEC_H - (i / 4.5) * (SPEC_H - 14) - 4;
-            ctx.strokeStyle = i === 2 ? 'rgba(0,110,55,0.35)' : 'rgba(0,85,40,0.2)';
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(SCOPE_W, y); ctx.stroke();
-        }
-
-        // Frequency grid lines (vertical) — relative offsets from center
-        const freqOffsets = [-1000, -500, 0, 500, 1000]; // Hz relative to CW center
-        freqOffsets.forEach(f => {
-            const x = CW_X + f * PX_PER_HZ;
-            ctx.strokeStyle = f === 0 ? 'rgba(0,140,65,0.35)' : 'rgba(0,90,45,0.22)';
-            ctx.lineWidth = f === 0 ? 0.8 : 0.5;
-            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, SPEC_H); ctx.stroke();
-        });
-
-        // Filter passband (CW ±250Hz) — shaded rectangle
-        ctx.fillStyle = 'rgba(0,123,67,0.10)';
-        ctx.fillRect(FILT_X1, 0, FILT_X2 - FILT_X1, SPEC_H);
-        ctx.strokeStyle = 'rgba(0,160,80,0.38)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(FILT_X1, 0); ctx.lineTo(FILT_X1, SPEC_H);
-        ctx.moveTo(FILT_X2, 0); ctx.lineTo(FILT_X2, SPEC_H);
-        ctx.stroke();
-
-        // Spectrum fill (gradient below line, IC-7300 "fill+line" mode)
-        const specTop = SPEC_H - 10;
-        const fillGrad = ctx.createLinearGradient(0, 0, 0, SPEC_H);
-        const fa = 0.22 + toneStrength * 0.38;
-        fillGrad.addColorStop(0,   `rgba(20,230,110,${fa})`);
-        fillGrad.addColorStop(0.45,`rgba(0,150,65,${fa * 0.55})`);
-        fillGrad.addColorStop(1,   'rgba(0,40,18,0)');
-        ctx.fillStyle = fillGrad;
-        ctx.beginPath();
-        ctx.moveTo(0, SPEC_H);
-        for (let x = 0; x < SCOPE_W; x++) {
-            const y = SPEC_H - smoothSpectrum[x] * specTop;
-            x === 0 ? ctx.lineTo(x, y) : ctx.lineTo(x, y);
-        }
-        ctx.lineTo(SCOPE_W - 1, SPEC_H);
-        ctx.closePath();
-        ctx.fill();
-
-        // Spectrum line
-        const la = 0.65 + toneStrength * 0.35;
-        ctx.strokeStyle = `rgba(0,195,85,${la})`;
-        ctx.lineWidth = 1.6;
-        ctx.shadowColor = `rgba(0,180,80,${toneStrength * 0.85})`;
-        ctx.shadowBlur = 2 + toneStrength * 10;
-        ctx.beginPath();
-        for (let x = 0; x < SCOPE_W; x++) {
-            const y = SPEC_H - smoothSpectrum[x] * specTop;
-            x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-
-        // CW spike peak marker (bright dot + dashed vertical)
-        if (toneStrength > 0.2) {
-            const peakY = SPEC_H - smoothSpectrum[CW_X] * specTop;
-            // Dashed vertical from peak to bottom
-            ctx.strokeStyle = `rgba(0,210,95,${toneStrength * 0.3})`;
-            ctx.lineWidth = 1;
-            ctx.setLineDash([3, 4]);
-            ctx.beginPath(); ctx.moveTo(CW_X, peakY + 2); ctx.lineTo(CW_X, SPEC_H); ctx.stroke();
-            ctx.setLineDash([]);
-            // Bright dot at peak
-            ctx.fillStyle = `rgba(140,255,170,${toneStrength * 0.95})`;
-            ctx.beginPath(); ctx.arc(CW_X, peakY, 2.8, 0, Math.PI * 2); ctx.fill();
-            // Outer glow ring
-            ctx.strokeStyle = `rgba(0,230,100,${toneStrength * 0.5})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.arc(CW_X, peakY, 5, 0, Math.PI * 2); ctx.stroke();
-        }
-
-        // Frequency labels at bottom of spectrum area (relative to CW center)
-        ctx.font = '7px Consolas, monospace';
-        ctx.textAlign = 'center';
-        freqOffsets.forEach(f => {
-            const x = CW_X + f * PX_PER_HZ;
-            const lbl = f === 0 ? '750Hz' : (f > 0 ? `+${f >= 1000 ? f/1000+'k' : f}` : `${f <= -1000 ? f/1000+'k' : f}`);
-            ctx.fillStyle = f === 0 ? `rgba(0,220,100,${0.5 + toneStrength * 0.5})` : 'rgba(0,150,65,0.45)';
-            ctx.fillText(lbl, x, SPEC_H - 2);
-        });
-        // Center frequency marker
-        const cwAlpha = 0.5 + toneStrength * 0.5;
-        ctx.fillStyle = `rgba(0,220,100,${cwAlpha})`;
-        ctx.beginPath();
-        ctx.moveTo(CW_X - 4, SPEC_H + 1);
-        ctx.lineTo(CW_X + 4, SPEC_H + 1);
-        ctx.lineTo(CW_X, SPEC_H - 5);
-        ctx.closePath();
-        ctx.fill();
-
-        // dB labels on right edge
-        ctx.textAlign = 'right';
-        ctx.fillStyle = 'rgba(0,130,60,0.45)';
-        ['S9+', 'S9', 'S7', 'S5'].forEach((lbl, i) => {
-            const y = SPEC_H - ((3 - i) / 4.5) * (SPEC_H - 14) - 4;
-            ctx.fillText(lbl, SCOPE_W - 2, y - 2);
-        });
-
-        // ── Divider ───────────────────────────────────────────────────
-        ctx.strokeStyle = 'rgba(0,110,55,0.6)';
-        ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(0, SPEC_H); ctx.lineTo(SCOPE_W, SPEC_H); ctx.stroke();
-
-        // ── WATERFALL AREA (bottom FALL_H px) ────────────────────────
-        // Build pixel data from waterfallRows
-        const d = fallImgData.data;
-        for (let row = 0; row < Math.min(waterfallRows.length, FALL_H); row++) {
-            const rowData = waterfallRows[row];
-            const base = row * SCOPE_W * 4;
-            for (let x = 0; x < SCOPE_W; x++) {
-                const [r, g, b] = wfColor(rowData[x]);
-                const i = base + x * 4;
-                d[i] = r; d[i+1] = g; d[i+2] = b; d[i+3] = 255;
-            }
-        }
-        ctx.putImageData(fallImgData, 0, SPEC_H);
-
-        // Filter passband overlay on waterfall
-        ctx.fillStyle = 'rgba(0,123,67,0.07)';
-        ctx.fillRect(FILT_X1, SPEC_H, FILT_X2 - FILT_X1, FALL_H);
-        ctx.strokeStyle = 'rgba(0,150,75,0.22)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(FILT_X1, SPEC_H); ctx.lineTo(FILT_X1, SPEC_H + FALL_H);
-        ctx.moveTo(FILT_X2, SPEC_H); ctx.lineTo(FILT_X2, SPEC_H + FALL_H);
-        ctx.stroke();
-
-        // "WFALL" label on waterfall
-        ctx.fillStyle = 'rgba(0,140,60,0.35)';
-        ctx.font = '7px Consolas, monospace';
-        ctx.textAlign = 'left';
-        ctx.fillText('WFALL', 4, SPEC_H + 10);
-    }
-    draw();
-}
-// ── TX Mode ───────────────────────────────────────────────────────────────────
-// Reverse lookup: morse string → char
-const MORSE_REVERSE = {};
-Object.entries(MORSE_CODE).forEach(([ch, code]) => { MORSE_REVERSE[code] = ch; });
-
-function selectMode(mode) {
-    gameMode = mode;
-    document.getElementById('mode-select').classList.add('hidden');
-    document.getElementById('mode-settings').classList.remove('hidden');
-    const desc    = document.getElementById('mode-description');
-    const wpmItem = document.getElementById('wpm-setting-item');
-    const audioCheckItem = document.getElementById('audio-check-item');
-    const freeModeLink = document.getElementById('free-mode-link');
-    const keyCustWrap  = document.getElementById('key-customize-wrap');
-    if (mode === 'RX') {
-        desc.innerHTML = 'コールサインとRSTを交互に受信せよ。<br>Enterで判定。正確にコピーせよ。';
-        document.querySelector('label[for="beginner-mode-check"]').innerText =
-            '初心者モード（送出中の文字のモールスをリアルタイム表示）';
-        wpmItem.style.display = '';
-        audioCheckItem.style.display = 'flex';
-        freeModeLink.style.display = 'none';
-        keyCustWrap.style.display = 'none';
-    } else {
-        desc.innerHTML = `コールサインとRSTが表示される。<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
-        document.querySelector('label[for="beginner-mode-check"]').innerText =
-            '初心者モード（現在打つ文字のモールスを表示）';
-        wpmItem.style.display = 'none';
-        audioCheckItem.style.display = 'none';
-        freeModeLink.style.display = 'block';
-        keyCustWrap.style.display = 'block';
-    }
-}
-
-function backToModeSelect() {
-    stopSosCheck();
-    document.getElementById('audio-check').checked = false;
-    document.getElementById('mode-settings').classList.add('hidden');
-    document.getElementById('mode-select').classList.remove('hidden');
-}
-
-function startTxGame() {
-    txCharIndex = 0; txMorseInput = ''; txCharTimer = null;
-    dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
-    nextTxType = 'CALLSIGN';
-    document.getElementById('rx-area').classList.add('hidden');
-    document.getElementById('tx-area').classList.remove('hidden');
-    // パドルボタンはタッチ端末のみ表示。判定ギャップも緩和
-    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    TX_CHAR_GAP = isTouch ? 700 : 280;
-    if (isTouch) document.getElementById('tx-paddle-area').classList.remove('hidden');
-    document.getElementById('status-msg').innerText = 'TRANSMIT...';
-    document.addEventListener('keydown', onTxKeyDown);
-    document.addEventListener('keyup',   onTxKeyUp);
-    nextTxWord();
-}
-
-function nextTxWord() {
-    const raw = (nextTxType === 'CALLSIGN') ? generateCallsign() : generateRST();
-    nextTxType = (nextTxType === 'CALLSIGN') ? 'RST' : 'CALLSIGN';
-    txWord = raw.split('');
-    txCharIndex = 0; txMorseInput = '';
-    renderTxInput();
-    updateTxDisplay();
-    if (beginnerMode) updateTxBeginnerDisplay();
-    document.getElementById('status-msg').innerText = 'TRANSMIT...';
-}
-
-function updateTxDisplay() {
-    const target = document.getElementById('tx-target-text');
-    target.innerHTML = txWord.map((ch, i) => {
-        if (i < txCharIndex) {
-            return `<span style="color:var(--success);opacity:0.55;">${ch}</span>`;
-        } else if (i === txCharIndex) {
-            return `<span style="color:#fff;text-shadow:0 0 15px var(--primary);">${ch}</span>`;
-        } else {
-            return `<span style="opacity:0.3;">${ch}</span>`;
-        }
-    }).join('');
-}
-
-function updateTxBeginnerDisplay() {
-    if (!beginnerMode) return;
-    const ch = txWord[txCharIndex];
-    if (!ch) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
-    const code = MORSE_CODE[ch];
-    if (!code) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
-    beginnerDisplay.classList.add('tx-beginner');
-    beginnerDisplay.innerHTML = code.split('').map(sym =>
-        `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
-    ).join('');
-}
-
-function renderTxInput() {
-    const box = document.getElementById('tx-morse-input');
-    box.style.display = '';
-    document.getElementById('tx-input-render').innerHTML = txMorseInput.split('').map(sym =>
-        `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
-    ).join('');
-}
-
-// ── Iambic keyer loop ─────────────────────────────────────────────────────────
-function keyerStep() {
-    keyerPending = false;
-    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
-
-    if (!dotHeld && !dashHeld) {
-        // Both paddles released → start character gap timer
-        if (txMorseInput && !txCharTimer) {
-            txCharTimer = setTimeout(
-                gameMode === 'FREE' ? decodeFreeChar : decodeTxChar,
-                TX_CHAR_GAP
-            );
-        }
-        return; // stop loop; onTxKeyDown will restart it
-    }
-
-    // New element incoming → cancel any pending decode
-    if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
-
-    // Iambic: if both held, alternate from last sent; else follow held paddle
-    let sym;
-    if (dotHeld && dashHeld) {
-        sym = (lastSentSym === '.') ? '-' : '.';
-    } else {
-        sym = dotHeld ? '.' : '-';
-    }
-    lastSentSym = sym;
-
-    // Play element and accumulate input
-    playSidetone(sym === '-');
-    txMorseInput += sym;
-    if (gameMode === 'FREE') renderFreeInput(); else renderTxInput();
-
-    // Schedule next step: element duration + inter-element gap (1 dot)
-    const elemMs = (sym === '.' ? TX_DOT_TIME : TX_DOT_TIME * 3) * 1000;
-    const gapMs  = TX_DOT_TIME * 1000;
-    keyerPending = true;
-    setTimeout(keyerStep, elemMs + gapMs);
-}
-
-function startKeyerLoop() {
-    if (!keyerPending) keyerStep();
-}
-
-// ── Touch paddle buttons (タッチ端末・単押し専用) ─────────────────────────────
-function tapSymbol(isDash) {
-    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
-    if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
-    const sym = isDash ? '-' : '.';
-    playSidetone(isDash);
-    txMorseInput += sym;
-    if (gameMode === 'FREE') renderFreeInput(); else renderTxInput();
-    txCharTimer = setTimeout(
-        gameMode === 'FREE' ? decodeFreeChar : decodeTxChar,
-        TX_CHAR_GAP
-    );
-}
-
-function onTxKeyDown(e) {
-    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
-    if (e.code === dotKey) {
-        e.preventDefault();
-        if (!dotHeld) { dotHeld = true; startKeyerLoop(); }
-    } else if (e.code === dashKey) {
-        e.preventDefault();
-        if (!dashHeld) { dashHeld = true; startKeyerLoop(); }
-    }
-}
-
-function onTxKeyUp(e) {
-    if (e.code === dotKey)       dotHeld  = false;
-    else if (e.code === dashKey) dashHeld = false;
-}
-
-function playSidetone(isDash) {
-    if (!audioCtx) return;
-    const dur = isDash ? TX_DOT_TIME * 3 : TX_DOT_TIME;
-    const t   = audioCtx.currentTime;
-    const ms  = Date.now();
-    const osc = audioCtx.createOscillator();
-    const gn  = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = 750;
-    gn.gain.setValueAtTime(0, t);
-    gn.gain.linearRampToValueAtTime(0.4, t + 0.006);
-    gn.gain.setValueAtTime(0.4, t + dur - 0.003);
-    gn.gain.linearRampToValueAtTime(0, t + dur + 0.006);
-    osc.connect(gn); gn.connect(masterGain);
-    osc.start(t); osc.stop(t + dur + 0.01);
-    toneSchedule.push({ onTime: ms, offTime: ms + dur * 1000 });
-}
-
-function decodeTxChar() {
-    txCharTimer = null;
-    const decoded  = MORSE_REVERSE[txMorseInput] || null;
-    const expected = txWord[txCharIndex];
-    const txArea   = document.getElementById('tx-area');
-    txMorseInput = '';
-    renderTxInput();
-    lastSentSym = null; // reset iambic alternation for next character
-
-    if (decoded === expected) {
-        // Correct
-        txCharIndex++;
-        score++;
-        document.getElementById('score').innerText = score;
-        txArea.classList.remove('flash-error');
-        txArea.classList.add('flash-correct');
-        setTimeout(() => txArea.classList.remove('flash-correct'), 400);
-        document.getElementById('status-msg').innerText = `✓ ${expected}`;
-        if (txCharIndex >= txWord.length) {
-            document.getElementById('status-msg').innerText = '✓ WORD OK';
-            setTimeout(() => { if (!isPlaying) return; nextTxWord(); }, 600);
-        } else {
-            updateTxDisplay();
-            if (beginnerMode) updateTxBeginnerDisplay();
-        }
-    } else {
-        // Wrong — retry same character
-        txArea.classList.remove('flash-correct');
-        txArea.classList.add('flash-error');
-        setTimeout(() => txArea.classList.remove('flash-error'), 400);
-        document.getElementById('status-msg').innerText = `✗ RETRY: ${expected}`;
-    }
-}
-
-function cleanupTx() {
-    document.removeEventListener('keydown', onTxKeyDown);
-    document.removeEventListener('keyup',   onTxKeyUp);
-    dotHeld = false; dashHeld = false; keyerPending = false;
-    if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
-    const pa = document.getElementById('tx-paddle-area');
-    if (pa) pa.classList.add('hidden');
-    beginnerDisplay.classList.remove('tx-beginner');
-}
-
-// ── Free Input Mode ───────────────────────────────────────────────────────────
-let freeTextBuffer = '';
-
-function startFreeMode() {
-    // AudioContext を初期化（TX モードの unlockAndPrepare と完全同様）
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!audioCtx) {
-        audioCtx = new AC();
-        masterGain = audioCtx.createGain();
-        masterGain.gain.setValueAtTime(1, 0);
-        masterGain.connect(audioCtx.destination);
-    }
-    const doResume = (audioCtx.state === 'suspended') ? audioCtx.resume() : Promise.resolve();
-    const unlockBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
-    const unlockSrc = audioCtx.createBufferSource();
-    unlockSrc.buffer = unlockBuf;
-    unlockSrc.connect(masterGain);
-    unlockSrc.start(0);
-    audioCtx.onstatechange = () => { if (audioCtx.state === 'suspended') audioCtx.resume(); };
-
-    // 画面切替（タップ直後に行う）
-    document.getElementById('start-screen').classList.add('hidden');
-    document.getElementById('free-screen').classList.remove('hidden');
-    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    if (isTouch) document.getElementById('free-paddle-area').classList.add('visible');
-
-    // resume完了後 300ms 待ってからキーヤー開始（unlockAndPrepare と同じ手順）
-    doResume.then(() => { setTimeout(launchFreeMode, 300); })
-            .catch(() => { setTimeout(launchFreeMode, 300); });
-}
-
-function launchFreeMode() {
-    masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
-
-    // 状態初期化
-    gameMode = 'FREE';
-    isPlaying = true;
-    freeTextBuffer = '';
-    txMorseInput = ''; txCharTimer = null;
-    dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
-
-    // タッチ端末判定
-    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    TX_CHAR_GAP = isTouch ? 700 : 280;
-
-    // 初期描画
-    renderFreeInput();
-    renderFreeText();
-
-    // キーボードリスナー登録
-    document.addEventListener('keydown', onTxKeyDown);
-    document.addEventListener('keyup',   onTxKeyUp);
-}
-
-function decodeFreeChar() {
-    txCharTimer = null;
-    const decoded = MORSE_REVERSE[txMorseInput] || '?';
-    txMorseInput = '';
-    lastSentSym = null;
-    renderFreeInput();
-    freeTextBuffer += decoded;
-    renderFreeText();
-}
-
-function renderFreeInput() {
-    document.getElementById('free-morse-render').innerHTML = txMorseInput.split('').map(sym =>
-        `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
-    ).join('');
-}
-
-function renderFreeText() {
-    const el = document.getElementById('free-text-display');
-    el.textContent = freeTextBuffer;
-    const cursor = document.createElement('span');
-    cursor.className = 'cursor';
-    el.appendChild(cursor);
-    el.scrollTop = el.scrollHeight;
-}
-
-function resetFreeMode() {
-    freeTextBuffer = '';
-    txMorseInput = '';
-    if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
-    dotHeld = false; dashHeld = false; keyerPending = false; lastSentSym = null;
-    renderFreeInput();
-    renderFreeText();
-}
-
-function quitFreeMode() {
-    isPlaying = false;
-    document.removeEventListener('keydown', onTxKeyDown);
-    document.removeEventListener('keyup',   onTxKeyUp);
-    if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
-    dotHeld = false; dashHeld = false; keyerPending = false;
-    document.getElementById('free-screen').classList.add('hidden');
-    document.getElementById('start-screen').classList.remove('hidden');
-    selectMode('TX');
-}
-
-// ── SNS Share ─────────────────────────────────────────────────────────────────
-function getShareText() {
-    const minutes = Math.round(initialSeconds / 60);
-    const modeLabel = gameMode === 'TX' ? '送信' : '受信';
-    return `【モールス打】${modeLabel}モード\n${minutes}分間で${score}文字！\n#モールス打 #アマチュア無線 #CW #モールス信号\nhttps://jl1gix.com`;
-}
-
-function shareX() {
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-}
-
-
-// ── End / Quit ────────────────────────────────────────────────────────────────
-function quitGame() {
-    isPlaying = false; scopeRunning = false;
-    clearInterval(timerId); killCurrentAudio();
-    if (gameMode === 'TX') cleanupTx();
-    const mode = gameMode;
-    document.getElementById('game-screen').classList.add('hidden');
-    document.getElementById('start-screen').classList.remove('hidden');
-    selectMode(mode);
-}
-function retryGame() {
-    const mode = gameMode;
-    document.getElementById('result-screen').classList.add('hidden');
-    document.getElementById('start-screen').classList.remove('hidden');
-    selectMode(mode);
-}
-function endGame() {
-    isPlaying = false; scopeRunning = false;
-    clearInterval(timerId); killCurrentAudio();
-    if (gameMode === 'TX') cleanupTx();
-    const minutes = Math.round(initialSeconds / 60);
-    document.getElementById('final-result-text').innerText =
-        `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min`;
-    document.getElementById('nickname-input').value = '';
-    const btn = document.getElementById('submit-score-btn');
-    btn.disabled = false;
-    btn.textContent = '✏️ 名前を設定';
-    document.getElementById('score-reg-area').style.display = score > 0 ? '' : 'none';
-    document.getElementById('game-screen').classList.add('hidden');
-    document.getElementById('result-screen').classList.remove('hidden');
-    if (score > 0) {
-        autoRegister();
-        setTimeout(() => {
-            const reg = document.getElementById('score-reg-area');
-            if (reg) reg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 300);
-    }
-}
-let _registeredId = null;
-async function autoRegister(retryCount = 0) {
-    if (retryCount === 0) _registeredId = null;
-    const minutes = Math.round(initialSeconds / 60);
-    const regResult = document.getElementById('score-reg-result');
-    if (retryCount === 0) {
-        regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中...</span>`;
-    }
-
-    // ── Step 1: POST（まだ登録されていない場合のみ）──
-    if (!_registeredId) {
-        try {
-            const res = await fetch('https://api.jl1gix.com/api/scores', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nickname: 'noname',
-                    score,
-                    mode: gameMode,
-                    is_beginner: beginnerMode ? 1 : 0,
-                    minutes
-                })
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            _registeredId = data.id;
-        } catch (e) {
-            if (retryCount < 2) {
-                regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中... (再試行 ${retryCount + 1}/2)</span>`;
-                setTimeout(() => autoRegister(retryCount + 1), (retryCount + 1) * 1000);
-            } else {
-                regResult.innerHTML =
-                    `<span style="color:var(--error); font-size:0.75rem;">登録に失敗しました　</span>` +
-                    `<button onclick="autoRegister(0)" style="font-size:0.7rem;padding:4px 12px;margin:0;margin-top:4px;">再試行</button>`;
-            }
-            return;
-        }
-    }
-
-    // ── Step 2: ランク取得（失敗しても登録成功として扱う）──
-    let pct = '－';
-    try {
-        const rankRes = await fetch(`https://api.jl1gix.com/api/scores/rank?score=${score}&mode=${gameMode}&minutes=${minutes}`);
-        const rankData = await rankRes.json();
-        if (rankData.percentile !== undefined) pct = rankData.percentile;
-    } catch (e) { /* ランク取得失敗は無視 */ }
-
-    regResult.innerHTML =
-        `<span style="color:var(--success);">✓ 登録完了！</span>　上位 <b>${pct}%</b>　` +
-        `<a href="ranking.html?mode=${gameMode}&time=${minutes}" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:4px 14px; font-size:0.75rem; letter-spacing:1px; border-radius:2px;">🏆 ランキング</a>`;
-}
-
 // ── ホーム画面：スペクトラムスコープ（JL1GIX 20WPM）────────────────────────────
 (function() {
-    /* ---- モールスタイミング ---- */
-    const H_DIT = 1200 / 20;  // 60ms (20 WPM)
+    const H_DIT = 1200 / 20;
     const H_MORSE = { J:'.---', L:'.-..', 1:'.----', G:'--.', I:'..', X:'-..-' };
 
     function buildCycle(text) {
@@ -2080,19 +199,18 @@ async function autoRegister(retryCount = 0) {
         let t = 0;
         [...text].forEach((ch, ci) => {
             const code = H_MORSE[ch] || '';
-            [...code].forEach((s, si) => {
+            [...code].forEach((s) => {
                 const dur = s === '.' ? H_DIT : H_DIT * 3;
                 ev.push({ on: t, off: t + dur });
-                t += dur + H_DIT;               // 符号 + 符号間隔
+                t += dur + H_DIT;
             });
-            if (ci < text.length - 1) t += H_DIT * 2; // 文字間: 合計3 dit
+            if (ci < text.length - 1) t += H_DIT * 2;
         });
-        t += H_DIT * 4;  // 語間: 合計7 dit
+        t += H_DIT * 4;
         return { ev, total: t };
     }
     const { ev: CY_EV, total: CY_MS } = buildCycle('JL1GIX');
 
-    /* ---- スコープキャンバス ---- */
     const SW = 580, SPEC_H = 80, FALL_H = 52, SH = SPEC_H + FALL_H;
     const CW_X = SW / 2;
     const PX_HZ = SW / 3000;
@@ -2118,8 +236,6 @@ async function autoRegister(retryCount = 0) {
     modeSelEl.style.zIndex = '0';
     modeSelEl.insertBefore(sc, modeSelEl.firstChild);
 
-    /* ---- 他局信号（JL1GIX中央 + 周辺4局）---- */
-    // offset: Hz, amp: 最大振幅, period: ON/OFFサイクルms, duty: ONデューティ比
     const PHANTOM = [
         { offset: -880, amp: 0.52, period: 3100, duty: 0.42 },
         { offset: -450, amp: 0.38, period: 2200, duty: 0.35 },
@@ -2128,7 +244,6 @@ async function autoRegister(retryCount = 0) {
     ];
     const phantomStr = new Float32Array(PHANTOM.length).fill(0);
 
-    /* ---- 状態変数 ---- */
     let hActive = false, animId, cycStart;
     let wfRows = [], smoothSpec = new Float32Array(SW).fill(0);
     let tStr = 0, fN = 0;
@@ -2138,13 +253,11 @@ async function autoRegister(retryCount = 0) {
         const t = (Date.now() - cycStart) % CY_MS;
         return CY_EV.some(e => t >= e.on && t <= e.off);
     }
-
     function isPhantomOn(idx) {
         const p = PHANTOM[idx];
         const t = (Date.now() + idx * 1373) % p.period;
         return t < p.period * p.duty;
     }
-
     function addPeak(s, cx, amp) {
         const sig2 = 2 * 3.5 * 3.5;
         const peak = amp + Math.random() * 0.06;
@@ -2153,7 +266,6 @@ async function autoRegister(retryCount = 0) {
             s[x] = Math.max(s[x], peak * Math.exp(-(d * d) / sig2));
         }
     }
-
     function genSpec(mainActive) {
         const s = new Float32Array(SW);
         for (let x = 0; x < SW; x++) {
@@ -2166,7 +278,6 @@ async function autoRegister(retryCount = 0) {
         });
         return s;
     }
-
     function wfCol(v) {
         if (v < 0.10) { const t = v/0.10; return [0, ~~(8+t*22), ~~(18+t*28)]; }
         if (v < 0.30) { const t = (v-0.10)/0.20; return [0, ~~(30+t*80), ~~(46-t*26)]; }
@@ -2174,46 +285,34 @@ async function autoRegister(retryCount = 0) {
         if (v < 0.82) { const t = (v-0.58)/0.24; return [~~(40+t*185), ~~(215+t*40), 2]; }
         const t = Math.min(1,(v-0.82)/0.18); return [~~(225+t*30), 255, ~~(t*210)];
     }
-
     function drawFrame() {
         if (!hActive) return;
         animId = requestAnimationFrame(drawFrame);
         const ctx = sc.getContext('2d');
-
         tStr = isToneOn() ? Math.min(1, tStr + 0.14) : Math.max(0, tStr - 0.09);
         PHANTOM.forEach((p, i) => {
             phantomStr[i] = isPhantomOn(i) ? Math.min(1, phantomStr[i] + 0.10) : Math.max(0, phantomStr[i] - 0.07);
         });
-
         const inst = genSpec(tStr > 0.25);
         for (let x = 0; x < SW; x++) smoothSpec[x] = smoothSpec[x] * 0.60 + inst[x] * 0.40;
-
         if (++fN % 3 === 0) {
             wfRows.unshift(smoothSpec.slice());
             if (wfRows.length > FALL_H) wfRows.pop();
         }
-
-        // ── スペクトラム背景 ──────────────────────
         ctx.fillStyle = '#010d05';
         ctx.fillRect(0, 0, SW, SPEC_H);
-
-        // dBグリッド
         ctx.lineWidth = 0.5;
         for (let i = 1; i <= 4; i++) {
             const y = SPEC_H - (i / 4.5) * (SPEC_H - 14) - 4;
             ctx.strokeStyle = i === 2 ? 'rgba(0,110,55,0.35)' : 'rgba(0,85,40,0.2)';
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(SW, y); ctx.stroke();
         }
-
-        // 周波数グリッド
         [-1000, -500, 0, 500, 1000].forEach(f => {
             const x = CW_X + f * PX_HZ;
             ctx.strokeStyle = f === 0 ? 'rgba(0,140,65,0.35)' : 'rgba(0,90,45,0.22)';
             ctx.lineWidth = f === 0 ? 0.8 : 0.5;
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, SPEC_H); ctx.stroke();
         });
-
-        // フィルタ帯域
         ctx.fillStyle = 'rgba(0,123,67,0.10)';
         ctx.fillRect(FX1, 0, FX2 - FX1, SPEC_H);
         ctx.strokeStyle = 'rgba(0,160,80,0.38)';
@@ -2222,8 +321,6 @@ async function autoRegister(retryCount = 0) {
         ctx.moveTo(FX1, 0); ctx.lineTo(FX1, SPEC_H);
         ctx.moveTo(FX2, 0); ctx.lineTo(FX2, SPEC_H);
         ctx.stroke();
-
-        // スペクトラム塗り
         const sTop = SPEC_H - 10;
         const fa = 0.22 + tStr * 0.38;
         const g = ctx.createLinearGradient(0, 0, 0, SPEC_H);
@@ -2234,8 +331,6 @@ async function autoRegister(retryCount = 0) {
         ctx.beginPath(); ctx.moveTo(0, SPEC_H);
         for (let x = 0; x < SW; x++) ctx.lineTo(x, SPEC_H - smoothSpec[x] * sTop);
         ctx.lineTo(SW - 1, SPEC_H); ctx.closePath(); ctx.fill();
-
-        // スペクトラムライン
         ctx.strokeStyle = `rgba(0,195,85,${0.65 + tStr * 0.35})`;
         ctx.lineWidth = 1.6;
         ctx.shadowColor = `rgba(0,180,80,${tStr * 0.85})`;
@@ -2247,8 +342,6 @@ async function autoRegister(retryCount = 0) {
         }
         ctx.stroke();
         ctx.shadowBlur = 0;
-
-        // ピークマーカー
         if (tStr > 0.2) {
             const py = SPEC_H - smoothSpec[~~CW_X] * sTop;
             ctx.strokeStyle = `rgba(0,210,95,${tStr * 0.3})`;
@@ -2261,13 +354,9 @@ async function autoRegister(retryCount = 0) {
             ctx.lineWidth = 1;
             ctx.beginPath(); ctx.arc(CW_X, py, 5, 0, Math.PI * 2); ctx.stroke();
         }
-
-        // 区切り線
         ctx.strokeStyle = 'rgba(0,110,55,0.6)';
         ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(0, SPEC_H); ctx.lineTo(SW, SPEC_H); ctx.stroke();
-
-        // ── ウォーターフォール ──────────────────────
         const d = fallImg.data;
         for (let row = 0; row < Math.min(wfRows.length, FALL_H); row++) {
             const rData = wfRows[row];
@@ -2279,7 +368,6 @@ async function autoRegister(retryCount = 0) {
             }
         }
         ctx.putImageData(fallImg, 0, SPEC_H);
-
         ctx.fillStyle = 'rgba(0,123,67,0.07)';
         ctx.fillRect(FX1, SPEC_H, FX2 - FX1, FALL_H);
         ctx.strokeStyle = 'rgba(0,150,75,0.22)';
@@ -2289,7 +377,6 @@ async function autoRegister(retryCount = 0) {
         ctx.moveTo(FX2, SPEC_H); ctx.lineTo(FX2, SPEC_H + FALL_H);
         ctx.stroke();
     }
-
     function setHomeVis(v) {
         hActive = v;
         sc.style.opacity = v ? '0.42' : '0';
@@ -2306,57 +393,9 @@ async function autoRegister(retryCount = 0) {
             cancelAnimationFrame(animId);
         }
     }
-
-    const obs = new MutationObserver(() => {
-        const vis = !modeSelEl.classList.contains('hidden');
-        if (vis !== hActive) setHomeVis(vis);
-    });
-    obs.observe(modeSelEl, { attributes: true, attributeFilter: ['class'] });
-
     if (document.readyState !== 'loading') setHomeVis(true);
     else window.addEventListener('DOMContentLoaded', () => setHomeVis(true));
 })();
-
-async function setNickname() {
-    const nickname = document.getElementById('nickname-input').value.trim();
-    if (!nickname) return;
-    if (!_registeredId) return;
-    const btn = document.getElementById('submit-score-btn');
-    btn.disabled = true;
-    btn.textContent = '設定中...';
-    try {
-        await fetch(`https://api.jl1gix.com/api/scores/${_registeredId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nickname })
-        });
-        btn.textContent = '✓ 設定済み';
-        document.getElementById('nickname-input').disabled = true;
-    } catch (e) {
-        btn.disabled = false;
-        btn.textContent = '✏️ 名前を設定';
-        alert('設定に失敗しました。もう一度お試しください。');
-    }
-}
 </script>
-<!-- ═══ KEY CUSTOMIZE MODAL ═══ -->
-<div id="key-customize-modal">
-    <div class="kc-box">
-        <div class="kc-title">⌨ キーカスタマイズ</div>
-        <div class="kc-row">
-            <span class="kc-label">▸ 短点（・）</span>
-            <button class="kc-key-btn" id="dot-key-btn" onclick="startKeyCapture('dot')"></button>
-        </div>
-        <div class="kc-row">
-            <span class="kc-label">▸ 長点（－）</span>
-            <button class="kc-key-btn" id="dash-key-btn" onclick="startKeyCapture('dash')"></button>
-        </div>
-        <div id="kc-error"></div>
-        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">
-            <button onclick="saveKeyCustomize()" style="font-size:0.75rem;padding:7px 22px;letter-spacing:2px;">✓ 保存</button>
-            <button onclick="closeKeyCustomize()" style="font-size:0.7rem;padding:6px 14px;opacity:0.5;">✕ キャンセル</button>
-        </div>
-    </div>
-</div>
 </body>
 </html>
