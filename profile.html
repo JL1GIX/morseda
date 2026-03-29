@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>モールス符号について - モールス打</title>
-    <meta name="description" content="モールス符号（CW）の歴史・仕組み・アマチュア無線との関係を解説。コンテスト交信でよく使われる略語やQ符号なども紹介します。">
-    <meta property="og:title" content="モールス符号について - モールス打">
-    <meta property="og:description" content="モールス符号（CW）の歴史・仕組み・アマチュア無線との関係を解説します。">
-    <meta property="og:url" content="https://jl1gix.com/about-morse.html">
+    <title>運営者情報 - モールス打</title>
+    <meta name="description" content="モールス打の運営者・JL1GIXのプロフィールとサイト制作経緯。ウェブで気軽にCW練習がしたくて自作したモールス符号練習ツールです。">
+    <meta property="og:title" content="運営者情報 - モールス打">
+    <meta property="og:description" content="モールス打の運営者・JL1GIXのプロフィールとサイト制作経緯を紹介します。">
+    <meta property="og:url" content="https://jl1gix.com/profile.html">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="モールス符号について - モールス打">
-    <meta name="twitter:description" content="モールス符号（CW）の歴史・仕組み・アマチュア無線との関係を解説します。">
+    <meta name="twitter:title" content="運営者情報 - モールス打">
+    <meta name="twitter:description" content="モールス打の運営者・JL1GIXのプロフィールとサイト制作経緯を紹介します。">
     <style>
         :root {
             --primary: #00c060;
@@ -129,26 +129,31 @@
             margin: 0 0 14px;
             letter-spacing: 0.5px;
         }
-        .highlight-box {
+        .profile-box {
             background: rgba(0,0,0,0.4);
             border: 1px solid var(--border);
             border-radius: 2px;
-            padding: 14px 16px;
-            margin: 12px 0;
-            font-size: 0.84rem;
-            line-height: 2.0;
-            color: rgba(0,210,105,0.95);
+            padding: 18px 20px;
+            margin: 14px 0;
         }
-        .morse-example {
-            display: inline-block;
-            background: rgba(0,192,96,0.08);
-            border: 1px solid rgba(0,192,96,0.2);
-            padding: 2px 10px;
-            border-radius: 2px;
+        .profile-callsign {
+            font-size: 1.6rem;
+            letter-spacing: 6px;
             color: var(--success);
-            letter-spacing: 4px;
-            font-size: 1rem;
-            margin: 0 4px;
+            text-shadow: 0 0 15px rgba(0,238,119,0.6);
+            margin-bottom: 12px;
+        }
+        .profile-item {
+            font-size: 0.8rem;
+            color: rgba(0,192,96,0.8);
+            line-height: 2;
+            letter-spacing: 1px;
+        }
+        .profile-label {
+            color: var(--primary-dim);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            margin-right: 10px;
         }
         .section-divider {
             border: none;
@@ -187,39 +192,32 @@
     <div class="header-bar">
         <h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1>
     </div>
-    <div class="subtitle">▸ モールス符号について ◂</div>
+    <div class="subtitle">▸ 運営者情報 ◂</div>
 
-    <h2>▸ モールス符号とは</h2>
-    <p>モールス符号（Morse code）は、短点（・）と長点（－）の組み合わせで文字や数字を表す通信方式です。1837年にアメリカの発明家サミュエル・モールスによって考案され、電信通信の標準的な手段として世界中に普及しました。短点を「トン」、長点を「ツー」と呼び、そのリズムの組み合わせで全ての文字を表現します。</p>
-    <p>例えば、SOS（遭難信号）は <span class="morse-example">・・・　－－－　・・・</span> と表され、世界共通の緊急信号として今も使われています。</p>
+    <h2>▸ 管理者プロフィール</h2>
+    <div class="profile-box">
+        <div class="profile-callsign">JL1GIX</div>
+        <div class="profile-item">
+            <span class="profile-label">免許</span>第三級アマチュア無線技士<br>
+            <span class="profile-label">開局</span>2025年<br>
+            <span class="profile-label">SNS</span><a href="https://x.com/JL1GIX" target="_blank" rel="noopener noreferrer" style="color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:5px; vertical-align:middle;"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.402 6.231H2.744l7.73-8.835L2.25 2.25h6.832l4.258 5.632 4.905-5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> @JL1GIX</a>
+        </div>
+    </div>
 
-    <h2>▸ アマチュア無線とモールス通信</h2>
-    <p>アマチュア無線（ハム）の世界では、モールス符号による通信をCW（Continuous Wave）と呼びます。音声通話と異なり、電波が弱い状況や雑音の多い環境でも信号を伝えやすいという特性があり、遠距離通信（DX）やコンテスト交信で現在も広く使われています。</p>
-    <p>かつてはアマチュア無線の上位免許を取得するためにモールス試験が必須でしたが、現在は試験から外れています。それでもCW運用への人気は根強く、世界中の局が日々モールスで交信しています。</p>
+    <h2>▸ このサイトを作った経緯</h2>
+    <p>ウェブブラウザで気軽にモールス符号の練習がしたいと思ったのがきっかけです。でも、いざ探してみると「これだ」と思えるものがなかなか見つからなくて。ならば自分で作ってしまおう、というのがモールス打の始まりです。</p>
+    <p>最初はシンプルな受信練習ツールでしたが、使いながら「スマホでも使いたい」「送信の練習もしたい」「ランキングで他の人と比べたい」といった要望を自分自身に感じるたびに機能を追加してきました。今も少しずつアップデートしています。</p>
 
     <hr class="section-divider">
 
-    <h2>▸ アマチュア無線コンテストとCW</h2>
-    <p>アマチュア無線のコンテストでは、制限時間内にできるだけ多くの局と交信してポイントを競います。CW部門のコンテストでは、スピードと正確さが求められます。一般的なコンテスト交信の流れは以下の通りです。</p>
+    <h2>▸ 開発のこだわり</h2>
+    <p>モールス打を作るうえで最も意識したのは「初心者でも迷わず使える」ことです。CWの練習を始めたばかりの方が、難しい設定をせずにすぐに練習を始められるよう、UIをシンプルに保つことにこだわりました。</p>
+    <p>初心者モードでは、現在流れている文字のモールス符号をリアルタイムで画面に表示します。「聴こえたけどこれ何の符号？」という瞬間に確認できるので、符号を覚えながら並行して練習できます。コールサインやRSTレポートを実際のコンテスト形式で生成しているため、本番さながらの練習ができるのも特徴です。</p>
+    <p>また、スマートフォンでも快適に使えるようタッチ操作に最適化されています。通勤時間や隙間時間にも気軽にモールスの練習ができます。</p>
 
-    <div class="highlight-box">
-        <strong style="color:var(--success);">コンテスト交信の典型的な流れ：</strong><br><br>
-        1. CQ CQ　（呼び出し）<br>
-        2. 相手局コールサイン　（例：JA1ABC）<br>
-        3. RST レポート　（例：5NN）<br>
-        4. コンテストナンバー　（例：101H）<br><br>
-        <span style="opacity:0.7; font-size:0.78rem;">※ モールス打はこの交信パターンをシミュレートして練習できます</span>
-    </div>
-
-    <h2>▸ RSTレポートとは</h2>
-    <p>RST（Readability・Signal Strength・Tone）レポートは、受信した信号の品質を数値で伝える規格です。CWコンテストでは「5NN」（了解度5・信号強度9・トーン9）が定型として広く使われており、モールス打でも「5NN」を使用しています。コンテストでは実際の信号品質に関わらずこの定型を送るのが一般的です。</p>
-
-    <h2>▸ コールサインの読み方</h2>
-    <p>日本のアマチュア無線局のコールサインは「JA1ABC」のような形式をしています。最初の文字（プリフィックス）がエリアと種別を示し、数字がエリア番号、末尾のアルファベット（サフィックス）が個別の識別子です。モールス打では日本のコールサイン（JA〜JZ、7J〜7N系）をランダムに生成して練習できます。</p>
-
-    <h2>▸ モールス習得のメリット</h2>
-    <p>モールス符号を習得することには、単なる通信手段を超えた価値があります。電波伝搬の悪いコンディション時でも交信できる実用的なスキルであることに加え、世界中のアマチュア無線家と共通の言語でつながれる喜びがあります。また、規則的なリズムを学ぶ過程は集中力や記憶力のトレーニングにもなると言われています。</p>
-    <p>現代では軍事・商業用途での使用はほとんどなくなりましたが、アマチュア無線コミュニティではCWは今も「無線の原点」として親しまれており、多くの局が積極的にCW運用を楽しんでいます。</p>
+    <h2>▸ 今後について</h2>
+    <p>自分自身がCWを学んでいる途中なので、練習していて「こんな機能があれば」と思ったことをどんどん追加していく予定です。同じようにコンテストCWを練習したい方の役に立てれば嬉しいです。</p>
+    <p>ご意見・ご要望は<a href="contact.html" style="color:var(--primary); text-decoration:none;">お問い合わせ</a>からお気軽にどうぞ。</p>
 
     <div style="text-align:center;">
         <a href="https://jl1gix.com" class="back-btn">◀ トップに戻る</a>
@@ -229,11 +227,9 @@
 <footer>
     <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 20px;">
         <a href="https://jl1gix.com" style="color:#007b43; text-decoration:none;">トップ</a>
-        <a href="howto.html" style="color:#007b43; text-decoration:none;">使い方</a>
         <a href="morse-table.html" style="color:#007b43; text-decoration:none;">モールス符号表</a>
-        <a href="about-morse.html" style="color:#007b43; text-decoration:none;">モールス符号について</a>
         <a href="ranking.html" style="color:#007b43; text-decoration:none;">ランキング</a>
-        <a href="about.html" style="color:#007b43; text-decoration:none;">サイトについて</a>
+        <a href="profile.html" style="color:#007b43; text-decoration:none;">運営者情報</a>
         <a href="privacy.html" style="color:#007b43; text-decoration:none;">プライバシーポリシー</a>
         <a href="contact.html" style="color:#007b43; text-decoration:none;">お問い合わせ</a>
     </div>
