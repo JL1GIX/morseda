@@ -644,6 +644,7 @@ function startGame() {
     initialSeconds = parseInt(document.getElementById('time-select').value);
     timeLeft = initialSeconds;
     score = 0; isPlaying = true;
+    mobileInput.value = '';
     masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
     timerId = setInterval(tick, 1000);
     isWaitingNext = false; nextType = 'CALLSIGN';
@@ -701,8 +702,17 @@ function _sosLoop() {
 
 // ── Audio ──────────────────────────────────────────────────────────────────────
 function killCurrentAudio() {
-    if (audioLoopId) clearTimeout(audioLoopId);
-    activeOscillators.forEach(o => { try { o.stop(); } catch(e){} });
+    if (audioLoopId) { clearTimeout(audioLoopId); audioLoopId = null; }
+    if (audioCtx) {
+        const now = audioCtx.currentTime;
+        activeOscillators.forEach(({ osc, gain }) => {
+            try {
+                gain.gain.cancelScheduledValues(now);
+                gain.gain.setValueAtTime(0, now);
+                osc.stop(now + 0.01);
+            } catch(e) {}
+        });
+    }
     activeOscillators = [];
     toneSchedule = [];
     charSchedule = [];
@@ -717,7 +727,6 @@ function tick() {
 }
 
 function nextWord() {
-    mobileInput.value = '';
     currentWord = (nextType === 'CALLSIGN') ? generateCallsign() : generateRST();
     nextType = (nextType === 'CALLSIGN') ? 'RST' : 'CALLSIGN';
     playMorseLoop();
@@ -752,7 +761,7 @@ function playMorse(text) {
             osc.connect(gain); gain.connect(masterGain);
             osc.start(startTime + offset);
             osc.stop(startTime + offset + dur + 0.05);
-            activeOscillators.push(osc);
+            activeOscillators.push({ osc, gain });
             toneSchedule.push({ onTime: startMs + offset * 1000, offTime: startMs + (offset + dur) * 1000 });
             offset += dur + DOT_TIME;
         });
