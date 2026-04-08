@@ -824,6 +824,7 @@ function startGame() {
     initialSeconds = parseInt(document.getElementById('time-select').value);
     timeLeft = initialSeconds;
     score = 0; isPlaying = true;
+    document.getElementById('score').innerText = 0;
     masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
     timerId = setInterval(tick, 1000);
     startTxGame();
