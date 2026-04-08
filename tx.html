@@ -1284,6 +1284,7 @@ function quitGame() {
     isPlaying = false; scopeRunning = false;
     clearInterval(timerId); killCurrentAudio();
     cleanupTx();
+    score = 0;
     gameMode = 'TX';
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('start-screen').classList.remove('hidden');
