@@ -681,7 +681,7 @@ let txWord = [], txCharIndex = 0, txMorseInput = '';
 let nextTxType = 'CALLSIGN';
 let txCharTimer = null;
 let TX_CHAR_GAP = 280;
-const TX_DOT_TIME = 0.048; // 25 WPM (1200/25 = 48ms)
+const TX_DOT_TIME = 1.2 / 23; // 23 WPM (dit ≈ 52ms)
 // Iambic keyer state
 let dotHeld = false, dashHeld = false;
 let lastSentSym = null;
