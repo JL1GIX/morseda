@@ -451,12 +451,12 @@
                 <div class="setting-item">
                     <span class="setting-label">📡 モールス速度</span>
                     <select id="wpm-select">
-                        <option value="20" selected>20 WPM</option>
+                        <option value="20">20 WPM</option>
                         <option value="21">21 WPM</option>
                         <option value="22">22 WPM</option>
                         <option value="23">23 WPM</option>
                         <option value="24">24 WPM</option>
-                        <option value="25">25 WPM</option>
+                        <option value="25" selected>25 WPM</option>
                         <option value="26">26 WPM</option>
                         <option value="27">27 WPM</option>
                         <option value="28">28 WPM</option>
@@ -575,7 +575,7 @@ let audioCtx = null, masterGain = null;
 let timeLeft, initialSeconds, score = 0, currentWord = '', isPlaying = false;
 let timerId, audioLoopId, activeOscillators = [];
 let isWaitingNext = false, nextType = 'CALLSIGN';
-let DOT_TIME = 0.06; // 20wpm default
+let DOT_TIME = 1.2 / 25; // 25 WPM default
 let beginnerMode = false;
 const gameMode = 'RX';
 // Scope state
