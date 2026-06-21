@@ -456,12 +456,12 @@
                         <option value="22">22 WPM</option>
                         <option value="23">23 WPM</option>
                         <option value="24">24 WPM</option>
-                        <option value="25" selected>25 WPM</option>
+                        <option value="25">25 WPM</option>
                         <option value="26">26 WPM</option>
                         <option value="27">27 WPM</option>
                         <option value="28">28 WPM</option>
                         <option value="29">29 WPM</option>
-                        <option value="30">30 WPM</option>
+                        <option value="30" selected>30 WPM</option>
                     </select>
                 </div>
                 <div class="setting-item checkbox-item">
@@ -575,7 +575,7 @@ let audioCtx = null, masterGain = null;
 let timeLeft, initialSeconds, score = 0, currentWord = '', isPlaying = false;
 let timerId, audioLoopId, activeOscillators = [];
 let isWaitingNext = false, nextType = 'CALLSIGN';
-let DOT_TIME = 1.2 / 25; // 25 WPM default
+let DOT_TIME = 1.2 / 30; // 30 WPM default
 let beginnerMode = false;
 const gameMode = 'RX';
 // Scope state
