@@ -457,7 +457,7 @@
                 </div>
                 <div class="setting-item">
                     <span class="setting-label">📡 モールス速度</span>
-                    <select id="wpm-select">
+                    <select id="wpm-select" onchange="onWpmSelectChange()">
                         <option value="20">20 WPM</option>
                         <option value="21">21 WPM</option>
                         <option value="22">22 WPM</option>
@@ -676,6 +676,14 @@ function startGame() {
 
 // ── 音声チェック（SOS ループ）────────────────────────────────────────────────────
 function toggleSosCheck(on) { if (on) startSosCheck(); else stopSosCheck(); }
+function onWpmSelectChange() {
+    // 音声チェックが ON のとき、選択された WPM で SOS を流し直す
+    const cb = document.getElementById('audio-check');
+    if (cb && cb.checked) {
+        stopSosCheck();
+        startSosCheck();
+    }
+}
 
 function startSosCheck() {
     stopSosCheck();
@@ -691,7 +699,9 @@ function stopSosCheck() {
 
 function _sosLoop() {
     if (!_sosCtx) return;
-    const dotT  = 1.2 / 20;
+    const wpmSel = document.getElementById('wpm-select');
+    const wpm   = wpmSel ? (parseInt(wpmSel.value) || 30) : 30;
+    const dotT  = 1.2 / wpm;
     const dashT = dotT * 3;
     const elGap = dotT;
     const ltGap = dotT * 3;
