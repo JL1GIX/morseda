@@ -887,7 +887,7 @@ function startTxGame() {
     dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
     nextTxType = 'CALLSIGN';
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    TX_CHAR_GAP = Math.round(TX_DOT_TIME * 1000 * (isTouch ? 5 : 2.5));  // dit×2.5 (desktop) / dit×5 (touch): WPMに応じて自動スケール
+    TX_CHAR_GAP = Math.round(TX_DOT_TIME * 1000 * 2.5);  // dit×2.5: WPMに応じて自動スケール(デスクトップ/モバイル共通)
     if (isTouch) document.getElementById('tx-paddle-area').classList.remove('hidden');
     document.getElementById('status-msg').innerText = 'TRANSMIT...';
     document.addEventListener('keydown', onTxKeyDown);
@@ -1091,7 +1091,7 @@ function launchFreeMode() {
     txMorseInput = ''; txCharTimer = null;
     dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    TX_CHAR_GAP = Math.round(TX_DOT_TIME * 1000 * (isTouch ? 5 : 2.5));  // dit×2.5 (desktop) / dit×5 (touch): WPMに応じて自動スケール
+    TX_CHAR_GAP = Math.round(TX_DOT_TIME * 1000 * 2.5);  // dit×2.5: WPMに応じて自動スケール(デスクトップ/モバイル共通)
     renderFreeInput();
     renderFreeText();
     document.addEventListener('keydown', onTxKeyDown);
