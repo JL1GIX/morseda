@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3503091804175227" crossorigin="anonymous"></script>
+    <link rel="canonical" href="https://jl1gix.com/cw-guide.html">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:site_name" content="モールス打">
+    <meta name="twitter:site" content="@JL1GIX">
+    <meta name="twitter:creator" content="@JL1GIX">
+    <meta name="author" content="JL1GIX">
+    <meta name="theme-color" content="#080f0b">
+    <title>CW通信(モールス通信)入門ガイド - モールス打</title>
+    <meta name="description" content="アマチュア無線のCW(モールス通信)を基礎から解説。CWとモールス符号の違い、交信の基本フォーマット、よく使う略語、CWが今も使われる理由、始め方まで。">
+    <meta property="og:title" content="CW通信(モールス通信)入門ガイド - モールス打">
+    <meta property="og:description" content="アマチュア無線のCW(モールス通信)を基礎から解説。CWとモールス符号の違い、交信の基本フォーマット、よく使う略語、CWが今も使われる理由、始め方まで。">
+    <meta property="og:url" content="https://jl1gix.com/cw-guide.html">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://jl1gix.com/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://jl1gix.com/ogp.png">
+    <meta name="twitter:title" content="CW通信(モールス通信)入門ガイド - モールス打">
+    <meta name="twitter:description" content="アマチュア無線のCW(モールス通信)を基礎から解説。CWとモールス符号の違い、交信の基本フォーマット、よく使う略語、CWが今も使われる理由、始め方まで。">
+    <style>
+        :root {
+            --primary: #00c060;
+            --primary-dim: #00a050;
+            --bg: #080f0b;
+            --panel: #0e1f16;
+            --border: #1e5c38;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { scrollbar-gutter: stable; }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--primary);
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.8;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--primary);
+            border-radius: 4px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(0,100,55,0.2);
+        }
+        .header-bar { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 4px; }
+        .header-bar::before { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--primary-dim)); }
+        .header-bar::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(to left, transparent, var(--primary-dim)); }
+        h1 { margin: 0; letter-spacing: 6px; font-size: 1.4rem; color: var(--primary); text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5); }
+        .subtitle { font-size: 0.6rem; color: var(--primary-dim); letter-spacing: 4px; margin-bottom: 28px; opacity: 0.9; text-align: center; }
+        h2 { font-size: 0.95rem; letter-spacing: 2px; color: var(--primary); margin: 30px 0 12px; padding-left: 10px; border-left: 2px solid var(--primary); }
+        h3 { font-size: 0.85rem; letter-spacing: 1px; color: var(--primary); margin: 20px 0 8px; opacity: 0.95; }
+        p, li { font-size: 0.85rem; color: var(--primary-dim); margin-bottom: 10px; }
+        ul, ol { padding-left: 24px; margin-bottom: 12px; }
+        li { margin-bottom: 6px; }
+        a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+        a:hover { opacity: 0.7; }
+        .updated { font-size: 0.7rem; color: var(--primary-dim); opacity: 0.6; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+        table { border-collapse: collapse; margin: 12px 0 18px; width: 100%; font-size: 0.82rem; }
+        th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; color: var(--primary-dim); }
+        th { color: var(--primary); background: rgba(0,80,40,0.15); }
+        .callout { background: rgba(0,80,40,0.15); border-left: 3px solid var(--primary); padding: 12px 15px; margin: 15px 0; font-size: 0.82rem; }
+        footer { margin: 20px auto 0; padding: 12px 0 4px; border-top: 1px solid #1e5c38; font-size: 0.65rem; letter-spacing: 1px; opacity: 0.55; text-align: center; width: 95%; max-width: 760px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header-bar">
+        <h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
+    <div class="subtitle">▸ CW通信 入門ガイド ◂</div>
+
+    <h2>1. CW とは何か</h2>
+    <p>CW は "Continuous Wave"(連続波)の略で、無変調の搬送波をキーで断続することで情報を伝える通信方式です。断続のリズム(短音・長音の組み合わせ)がモールス符号であり、CW = モールス通信 と考えて実用上問題ありません。</p>
+    <p>アマチュア無線界隈では 100 年以上使われ続けている最古参のモードで、現在でも世界中で多くの無線家が愛用しています。CW の魅力は、シンプルな仕組みでありながら圧倒的な通信性能を発揮すること、そして「熟練」の要素があること、そして手動でのキーイングという物理的な楽しさにあります。</p>
+
+    <h2>2. なぜ今も CW が使われるのか</h2>
+    <p>音声(SSB)やデジタル(FT8 など)がある現代でも、CW は根強い人気を保っています。理由は主に 4 つです。</p>
+
+    <h3>① 電波の到達性能が抜群</h3>
+    <p>CW は帯域が狭い(数十 Hz〜数百 Hz)ため、同じ送信電力で SSB(帯域 2.4kHz)より **信号対雑音比(SN比)が高く** なります。結果として弱電界(遠距離・低出力・悪コンディション)でも交信が成立します。100W の SSB より 5W の CW の方が遠くまで届く、ということが実際にあります。</p>
+
+    <h3>② 世界共通言語</h3>
+    <p>言葉の壁を越えて交信できます。ロシア、中国、南米、アフリカ、どこの局とも同じフォーマットで交信可能。基本的な単語(RST、73、TU、CQ など)を覚えれば、初対面の海外局とも 1 分で交信できるようになります。</p>
+
+    <h3>③ シンプルな機材で成立</h3>
+    <p>送信側はキー 1 つ、受信側は耳とペンだけあれば良いので、災害時や停電時、山岳運用など「複雑な機材が使えない環境」で威力を発揮します。実際、災害時の緊急通信で CW が最終手段として活躍した事例は多くあります。</p>
+
+    <h3>④ 「熟練」の楽しさ</h3>
+    <p>音声通信は誰でも同じレベルで話せますが、CW は打鍵・受信ともに **習熟差が明確に出る技術** です。3 WPM の初心者から 40 WPM 超の達人まで幅広く、少しずつ上達を実感できます。この「積み上げる楽しみ」が CW の大きな魅力です。</p>
+
+    <h2>3. CW とモールス符号の違い</h2>
+    <p>厳密には別の概念です:</p>
+    <ul>
+        <li><strong>モールス符号</strong>：情報を「短音・長音」の組み合わせで表現する **符号体系**。文字コード的な位置づけ。</li>
+        <li><strong>CW</strong>：モールス符号を電波として送出するための **通信モード**。無変調電波を断続する方式。</li>
+    </ul>
+    <p>アマチュア無線の免許では「A1A」という電波型式として表記され、これが CW を指します。とはいえ、口語では「モールス通信 = CW」と同義で使われることがほとんどです。</p>
+
+    <h2>4. CW 交信の基本フォーマット</h2>
+    <p>CW 交信はほぼ決まったパターンで進みます。基本の流れを覚えれば、あとは応用です。</p>
+
+    <h3>CQ を出す(呼び出し)</h3>
+    <p><code>CQ CQ CQ DE JL1GIX JL1GIX PSE K</code></p>
+    <p>意味:「誰か聞こえる? こちらは JL1GIX、応答どうぞ」。CQ を 3 回、自局コールサインを 2 回、PSE K で応答を求めます。</p>
+
+    <h3>応答する</h3>
+    <p><code>JL1GIX DE JA1XYZ JA1XYZ K</code></p>
+    <p>意味:「JL1GIX さん、こちら JA1XYZ です、どうぞ」。相手局を 1 回、自局を 2 回。</p>
+
+    <h3>本文交換(レポート交換)</h3>
+    <p><code>JA1XYZ DE JL1GIX GE OM UR RST 599 599 BK</code></p>
+    <p>意味:「こんばんは(GE)、了解しました、貴局のシグナルレポートは 599 です、応答どうぞ」。UR = your、OM = old man、BK = break。</p>
+
+    <h3>終了</h3>
+    <p><code>TU 73 DE JL1GIX SK</code></p>
+    <p>意味:「ありがとう、さようなら、JL1GIX からでした、通信終了」。TU = Thank you、73 = さようなら、SK = 交信終了のプロサイン。</p>
+
+    <h2>5. CW でよく使う略語・Q符号</h2>
+    <p>CW では効率のために略語や Q 符号が多用されます。詳細は<a href="prosign.html">プロサイン・Q符号一覧</a>ページを参照してください。よく使うものだけここで紹介:</p>
+    <ul>
+        <li><strong>73</strong>：さようなら、よろしく</li>
+        <li><strong>88</strong>：Love and kisses(女性局への挨拶)</li>
+        <li><strong>TU</strong>：Thank you</li>
+        <li><strong>OM / YL / XYL</strong>：Old Man / Young Lady / eXYL(奥様)</li>
+        <li><strong>QRZ?</strong>：私を呼んでいたのは誰ですか?</li>
+        <li><strong>QRM</strong>：混信があります</li>
+        <li><strong>QRN</strong>：空電・ノイズがあります</li>
+        <li><strong>QSY</strong>：周波数を変更します</li>
+        <li><strong>QSL</strong>：受信証明カード / 了解</li>
+        <li><strong>K</strong>：応答どうぞ</li>
+        <li><strong>KN</strong>：指名した局のみ応答どうぞ</li>
+        <li><strong>SK</strong>：交信終了</li>
+        <li><strong>AR</strong>：送信終了(まだ交信は続く)</li>
+    </ul>
+
+    <h2>6. CW の楽しみ方いろいろ</h2>
+
+    <h3>コンテスト</h3>
+    <p>週末を中心に世界中でコンテストが開催されます。CQ WW CW(11 月)、ARRL DX CW(2 月)、JIDX CW(4 月)などが有名。短時間に多数の局と交信し、得点を競います。<a href="contest.html">コンテスト入門ページ</a>で詳しく解説しています。</p>
+
+    <h3>DX ハンティング</h3>
+    <p>遠方の希少な国・地域(DXCC エンティティ)と交信して集める趣味です。CW は弱電界に強いため、DX ハンティングでは特に威力を発揮します。</p>
+
+    <h3>ラグチュー(雑談)</h3>
+    <p>コンテストや DX と対極的な楽しみ方。同じ相手と 30 分〜1 時間、天気や機材、無線談義を CW で交わします。ゆっくりした速度で行われることが多く、初心者にもおすすめ。</p>
+
+    <h3>SOTA / POTA</h3>
+    <p>山岳運用(SOTA)・公園運用(POTA)は、低出力・簡易アンテナ・野外運用でどれだけ交信できるかを楽しむアクティビティ。CW の弱電界性能が活きます。</p>
+
+    <h2>7. 現代の CW 事情</h2>
+    <p>2000 年代以降、多くの国でモールス試験が廃止され、資格取得のためのモールスは不要になりました。しかし、それは「モールスが不要になった」ということではなく、「モールスは実用スキルとして自主的に学ぶもの」になったということです。</p>
+    <p>むしろ試験がなくなったことで、義務ではなく趣味として CW を楽しむ人が増えているとも言えます。世界中のアマチュア無線家が今も CW で交信を楽しんでおり、日本でも CW 専門クラブや練習会が活発に活動しています。</p>
+
+    <h2>8. CW を始めるには</h2>
+    <ol>
+        <li><strong>モールス符号を覚える</strong> → <a href="learn.html">学習ガイド</a>を参照</li>
+        <li><strong>受信練習</strong> → モールス打の<a href="rx.html">受信モード</a>で 20 WPM 前後まで練習</li>
+        <li><strong>送信練習</strong> → <a href="tx.html">送信モード</a>で打鍵の練習(パソコンキーボードでも OK)</li>
+        <li><strong>実機を用意</strong> → 縦振り電鍵・複式電鍵・エレキー(パドル)のいずれか</li>
+        <li><strong>実際の交信</strong> → CQ を出したり、他局の CQ に応答したり</li>
+    </ol>
+    <p>いきなり実機を買わなくても、モールス打で符号の習得と交信フォーマットの練習は完結できます。段階を踏んで CW の世界に慣れていってください。</p>
+
+    <p class="updated">最終更新日：2026年</p>
+</div>
+
+<footer>
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 18px;">
+        <a href="https://jl1gix.com" style="color:#007b43; text-decoration:none;">トップ</a>
+        <a href="learn.html" style="color:#007b43; text-decoration:none;">学習ガイド</a>
+        <a href="cw-guide.html" style="color:#007b43; text-decoration:none;">CW入門</a>
+        <a href="contest.html" style="color:#007b43; text-decoration:none;">コンテスト入門</a>
+        <a href="how-to-use.html" style="color:#007b43; text-decoration:none;">使い方</a>
+        <a href="prosign.html" style="color:#007b43; text-decoration:none;">プロサイン一覧</a>
+        <a href="morse-table.html" style="color:#007b43; text-decoration:none;">モールス符号表</a>
+        <a href="ranking.html" style="color:#007b43; text-decoration:none;">ランキング</a>
+        <a href="profile.html" style="color:#007b43; text-decoration:none;">運営者情報</a>
+        <a href="privacy.html" style="color:#007b43; text-decoration:none;">プライバシー</a>
+        <a href="contact.html" style="color:#007b43; text-decoration:none;">お問い合わせ</a>
+    </div>
+    <div style="margin-top:8px; font-size:0.62rem; opacity:0.7; letter-spacing:1px;">Inspired by <a href="https://sushida.net/" target="_blank" rel="noopener noreferrer" style="color:#007b43; text-decoration:underline; text-underline-offset:2px;">寿司打</a></div>
+</footer>
+</body>
+</html>

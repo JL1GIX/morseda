@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3503091804175227" crossorigin="anonymous"></script>
+    <link rel="canonical" href="https://jl1gix.com/how-to-use.html">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:site_name" content="モールス打">
+    <meta name="twitter:site" content="@JL1GIX">
+    <meta name="twitter:creator" content="@JL1GIX">
+    <meta name="author" content="JL1GIX">
+    <meta name="theme-color" content="#080f0b">
+    <title>モールス打の使い方 完全ガイド - モールス打</title>
+    <meta name="description" content="モールス打の全機能を徹底解説。受信モード・送信モード・フリー入力モードの操作方法、WPM設定、キーボードショートカット、ランキング登録、スコアアップのコツまで。">
+    <meta property="og:title" content="モールス打の使い方 完全ガイド - モールス打">
+    <meta property="og:description" content="モールス打の全機能を徹底解説。受信モード・送信モード・フリー入力モードの操作方法、WPM設定、キーボードショートカット、ランキング登録、スコアアップのコツまで。">
+    <meta property="og:url" content="https://jl1gix.com/how-to-use.html">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://jl1gix.com/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://jl1gix.com/ogp.png">
+    <meta name="twitter:title" content="モールス打の使い方 完全ガイド - モールス打">
+    <meta name="twitter:description" content="モールス打の全機能を徹底解説。受信モード・送信モード・フリー入力モードの操作方法、WPM設定、キーボードショートカット、ランキング登録、スコアアップのコツまで。">
+    <style>
+        :root {
+            --primary: #00c060;
+            --primary-dim: #00a050;
+            --bg: #080f0b;
+            --panel: #0e1f16;
+            --border: #1e5c38;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { scrollbar-gutter: stable; }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--primary);
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.8;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--primary);
+            border-radius: 4px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(0,100,55,0.2);
+        }
+        .header-bar { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 4px; }
+        .header-bar::before { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--primary-dim)); }
+        .header-bar::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(to left, transparent, var(--primary-dim)); }
+        h1 { margin: 0; letter-spacing: 6px; font-size: 1.4rem; color: var(--primary); text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5); }
+        .subtitle { font-size: 0.6rem; color: var(--primary-dim); letter-spacing: 4px; margin-bottom: 28px; opacity: 0.9; text-align: center; }
+        h2 { font-size: 0.95rem; letter-spacing: 2px; color: var(--primary); margin: 30px 0 12px; padding-left: 10px; border-left: 2px solid var(--primary); }
+        h3 { font-size: 0.85rem; letter-spacing: 1px; color: var(--primary); margin: 20px 0 8px; opacity: 0.95; }
+        p, li { font-size: 0.85rem; color: var(--primary-dim); margin-bottom: 10px; }
+        ul, ol { padding-left: 24px; margin-bottom: 12px; }
+        li { margin-bottom: 6px; }
+        a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+        a:hover { opacity: 0.7; }
+        .updated { font-size: 0.7rem; color: var(--primary-dim); opacity: 0.6; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+        table { border-collapse: collapse; margin: 12px 0 18px; width: 100%; font-size: 0.82rem; }
+        th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; color: var(--primary-dim); }
+        th { color: var(--primary); background: rgba(0,80,40,0.15); }
+        .callout { background: rgba(0,80,40,0.15); border-left: 3px solid var(--primary); padding: 12px 15px; margin: 15px 0; font-size: 0.82rem; }
+        footer { margin: 20px auto 0; padding: 12px 0 4px; border-top: 1px solid #1e5c38; font-size: 0.65rem; letter-spacing: 1px; opacity: 0.55; text-align: center; width: 95%; max-width: 760px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header-bar">
+        <h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
+    <div class="subtitle">▸ モールス打 使い方 ◂</div>
+
+    <h2>1. モールス打とは</h2>
+    <p>モールス打は、アマチュア無線コンテストの CW 交信を想定したモールス符号練習ツールです。ブラウザだけで動作し、インストールや会員登録は不要。PC でもスマートフォンでも遊べます。</p>
+    <p>本ページでは、モールス打のすべての機能と使い方を詳しく解説します。初めての方も、すでに使っている方の再確認にも役立つ内容です。</p>
+
+    <h2>2. トップページ</h2>
+    <p><a href="https://jl1gix.com/">https://jl1gix.com/</a> にアクセスすると、モード選択画面が表示されます。以下の 2 つのモードから選んで開始します。</p>
+    <ul>
+        <li><strong>受信モード</strong>：スピーカーから流れる CW 音を聞き取り、キーボードで入力する</li>
+        <li><strong>送信モード</strong>：画面に表示された文字を、キーボードやパドルでモールスに変換して送信する</li>
+    </ul>
+    <p>下部からは、ランキング、モールス符号表、各種学習コンテンツにアクセスできます。</p>
+
+    <h2>3. 受信モードの使い方</h2>
+
+    <h3>設定画面</h3>
+    <p>受信モードに入ると、以下の設定が可能です:</p>
+    <ul>
+        <li><strong>制限時間</strong>：1 分 / 3 分 / 5 分から選択</li>
+        <li><strong>モールス速度(WPM)</strong>：10 WPM から 30 WPM まで 1 WPM 刻みで選択(初期値 30 WPM)</li>
+        <li><strong>初心者モード</strong>：送出中の文字のモールス符号をリアルタイムで画面表示。ONにするとランキング登録時に「初心者マーク」が付く</li>
+    </ul>
+
+    <h3>音声チェック</h3>
+    <p>右上の「🔊 音声チェック」にチェックを入れると、SOS 符号(・・・−−−・・・)がループ再生されます。ヘッドフォンやスピーカーの音量調整、音質確認に使います。WPM を変更すると、その速度に合わせて SOS の再生速度も自動追従します。</p>
+
+    <h3>ゲーム開始</h3>
+    <p>「▶ ミッション開始」をクリックすると、コールサインと RST レポートが交互に音声で流れます。</p>
+    <ul>
+        <li><strong>コールサイン例</strong>：JL1GIX、7K1ABC、8J1RL/1</li>
+        <li><strong>RST 例</strong>:5NN108(599 + 都道府県コード 108 = 千葉)</li>
+    </ul>
+    <p>聞き取った内容を画面下部の入力欄に打ち込み、Enter で判定します。正解なら次の問題へ、間違えたら赤くフラッシュして同じ問題が続きます。</p>
+
+    <h3>スコアの計算</h3>
+    <p>正解した文字数がそのままスコアになります。1 分・3 分・5 分の各時間内でどれだけ多く正解できるかを競います。</p>
+
+    <h3>QUIT ボタン</h3>
+    <p>制限時間に達する前でも、QUIT ボタンで中断できます。中断した場合、スコアはリセットされ、ランキング登録もされません。</p>
+
+    <h2>4. 送信モードの使い方</h2>
+
+    <h3>キーボードでの操作</h3>
+    <p>デスクトップでは、キーボードのキーを CW キーヤーとして使えます。</p>
+    <ul>
+        <li><strong>短点(・)</strong>: 左キー(デフォルト:左 Shift または[)</li>
+        <li><strong>長点(−)</strong>: 右キー(デフォルト:右 Shift または])</li>
+        <li><strong>長押しで連続入力</strong>:キーを押し続けると、Iambic キーヤーが連続的に短点・長点を送出</li>
+        <li><strong>両押しでスクィーズ</strong>:両方のキーを同時に押すと、短点と長点が交互に自動生成される(Iambic モード)</li>
+    </ul>
+
+    <h3>パドルボタン(スマホ・タブレット)</h3>
+    <p>タッチデバイスでは、画面下部に「トン」「ツー」の 2 つのボタンが表示されます。</p>
+    <ul>
+        <li><strong>タップ</strong>:1 つの短点または長点を送出</li>
+        <li><strong>長押し</strong>:連続的に送出(PC のキーボードと同じ挙動)</li>
+        <li><strong>両方同時押し</strong>:PC 同様、Iambic モードで自動交互送出</li>
+    </ul>
+
+    <h3>デコード判定</h3>
+    <p>打鍵が終わって一定時間(dit の 2 倍程度、モバイルは 5 倍程度)経過すると、モールス打が自動で「今の入力を文字にデコード」します。正解なら次の文字へ、不正解なら赤フラッシュして再入力になります。</p>
+
+    <h3>初心者モード</h3>
+    <p>受信モード同様、ON にすると次に打つべき文字のモールス符号が画面に表示されます。まだ完全に符号を覚えていない段階での学習に有効です。</p>
+
+    <h2>5. フリー入力モード(送信モード内)</h2>
+    <p>送信モードの設定画面から「📝 フリー入力モード」を選ぶと、自由に文字を打って音を確認できるモードに入れます。</p>
+    <ul>
+        <li>お題は表示されず、自分の打ちたい文字を自由に打鍵</li>
+        <li>デコードされた文字がリアルタイムで画面に表示される</li>
+        <li>打った符号(・−)も表示されるので、自分の打鍵が正しいか確認できる</li>
+    </ul>
+    <p>実機の代わりに、打鍵の練習・トーンの確認・新しい文字の暗記に便利です。</p>
+
+    <h2>6. ランキング機能</h2>
+    <p>ゲーム終了後、スコアを送信するとランキングに登録できます。</p>
+
+    <h3>ニックネーム登録</h3>
+    <ul>
+        <li>入力欄に **半角英大文字と半角数字のみ**(10 文字まで)を入力</li>
+        <li>「✏️ 名前を設定」ボタンまたは Enter キーで確定</li>
+        <li>未入力の場合は「noname」として登録される</li>
+    </ul>
+
+    <h3>ランキング閲覧</h3>
+    <p>フッターの「ランキング」から、受信モード・送信モード・時間別(1 分・3 分・5 分)のトップスコアを見られます。自分がどの位置にいるかもパーセンタイルで表示されます。</p>
+
+    <h2>7. WPM の選び方(初心者ガイド)</h2>
+    <p>WPM(Words Per Minute)は 1 分間に送信できる標準単語数の指標です。適切な WPM を選ぶことで、効率的な学習ができます。</p>
+
+    <table>
+    <tr><th>WPM</th><th>目安のレベル</th><th>用途</th></tr>
+    <tr><td>10</td><td>入門</td><td>符号を覚えたばかり。音として認識する練習</td></tr>
+    <tr><td>15</td><td>初級</td><td>単語をゆっくり聞き取れる段階</td></tr>
+    <tr><td>20</td><td>中級</td><td>実用速度の入口。ラグチューが可能</td></tr>
+    <tr><td>25</td><td>上級</td><td>コンテストでも十分な速度</td></tr>
+    <tr><td>30</td><td>ハイクラス</td><td>コンテスト上位・DX で威力発揮</td></tr>
+    </table>
+
+    <p>おすすめの上達ルート:「10 → 15 → 20 → 25 → 30」と 5 WPM ずつ段階的に上げる。1 WPM ずつ細かく上げるのも有効。各速度で 100% 近く取れるようになったら次へ。</p>
+
+    <h2>8. スコアアップのコツ</h2>
+
+    <h3>受信モード</h3>
+    <ul>
+        <li><strong>符号表を見ずに音だけで判断</strong>:「見て確認」する癖があると絶対に速度が上がらない</li>
+        <li><strong>コールサイン形式に慣れる</strong>:「先頭が J → 次は A〜S」というパターンを体に染み込ませる</li>
+        <li><strong>ミスしたらすぐ気にしない</strong>:止まると連鎖失点する。1 文字ミスしても次の文字に集中</li>
+    </ul>
+
+    <h3>送信モード</h3>
+    <ul>
+        <li><strong>リズムを一定に</strong>:短点・長点の長さと間隔を機械的に揃える</li>
+        <li><strong>キーボードなら Iambic を活用</strong>:両押しで自動交互になるので、K や C など交互パターンの文字が楽になる</li>
+        <li><strong>デコード判定を待たない</strong>:確信があれば次の文字に進んで OK</li>
+    </ul>
+
+    <h2>9. モールス符号表</h2>
+    <p>フッターの「モールス符号表」から、全アルファベット・数字・記号のモールス符号一覧を見られます。学習中はブックマークして、忘れた文字をすぐ確認できるようにしておくと便利です。</p>
+
+    <h2>10. モバイル vs PC</h2>
+    <p>モールス打は PC・スマホどちらでも動作します。</p>
+    <ul>
+        <li><strong>PC</strong>:キーボードでの打鍵、大画面で情報量が多い。本格練習向き。</li>
+        <li><strong>スマホ</strong>:通勤中・待ち時間などにサクッと。パドルボタン UI で親指操作。</li>
+    </ul>
+    <p>両方を使い分けると、「PC でじっくり学習・スマホで隙間時間に反復」という理想的な学習リズムが作れます。</p>
+
+    <h2>11. トラブルシューティング</h2>
+
+    <h3>音が出ない</h3>
+    <p>ブラウザの自動再生ポリシーで最初のクリックが必要です。「▶ ミッション開始」ボタンを押した瞬間に音声が有効化されます。それでも出ない場合はブラウザの音量設定、または OS の出力先を確認してください。</p>
+
+    <h3>送信モードでデコードされない</h3>
+    <p>短点・長点の長さや間隔にばらつきがあると、モールス打が符号を認識できません。以下を試してください:</p>
+    <ul>
+        <li>WPM を下げて、リズムを一定に保ちやすくする</li>
+        <li>短点はごく短く、長点は短点の 3 倍を意識する</li>
+        <li>文字と文字の間は、要素間より少し長めに空ける</li>
+    </ul>
+
+    <h3>ランキングに登録されない</h3>
+    <p>ゲーム中に QUIT した場合は登録されません。制限時間が完全に終了するまでプレイしてください。またサーバーとの通信エラーの可能性もあるので、時間をおいて再試行してください。</p>
+
+    <h2>12. まとめ</h2>
+    <p>モールス打は「受信モード」「送信モード」「フリー入力モード」の 3 つを中心に、幅広いレベルの CW 学習者に対応しています。毎日 15 分の練習を 3 ヶ月続ければ、確実に上達を実感できるはずです。</p>
+    <p>他の学習リソースと組み合わせて、モールス打をぜひ活用してください。<a href="learn.html">学習ガイド</a>や<a href="cw-guide.html">CW 通信入門</a>も併せて読むと、より深く理解できます。</p>
+
+    <p class="updated">最終更新日：2026年</p>
+</div>
+
+<footer>
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 18px;">
+        <a href="https://jl1gix.com" style="color:#007b43; text-decoration:none;">トップ</a>
+        <a href="learn.html" style="color:#007b43; text-decoration:none;">学習ガイド</a>
+        <a href="cw-guide.html" style="color:#007b43; text-decoration:none;">CW入門</a>
+        <a href="contest.html" style="color:#007b43; text-decoration:none;">コンテスト入門</a>
+        <a href="how-to-use.html" style="color:#007b43; text-decoration:none;">使い方</a>
+        <a href="prosign.html" style="color:#007b43; text-decoration:none;">プロサイン一覧</a>
+        <a href="morse-table.html" style="color:#007b43; text-decoration:none;">モールス符号表</a>
+        <a href="ranking.html" style="color:#007b43; text-decoration:none;">ランキング</a>
+        <a href="profile.html" style="color:#007b43; text-decoration:none;">運営者情報</a>
+        <a href="privacy.html" style="color:#007b43; text-decoration:none;">プライバシー</a>
+        <a href="contact.html" style="color:#007b43; text-decoration:none;">お問い合わせ</a>
+    </div>
+    <div style="margin-top:8px; font-size:0.62rem; opacity:0.7; letter-spacing:1px;">Inspired by <a href="https://sushida.net/" target="_blank" rel="noopener noreferrer" style="color:#007b43; text-decoration:underline; text-underline-offset:2px;">寿司打</a></div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3503091804175227" crossorigin="anonymous"></script>
+    <link rel="canonical" href="https://jl1gix.com/learn.html">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:site_name" content="モールス打">
+    <meta name="twitter:site" content="@JL1GIX">
+    <meta name="twitter:creator" content="@JL1GIX">
+    <meta name="author" content="JL1GIX">
+    <meta name="theme-color" content="#080f0b">
+    <title>モールス符号の覚え方・練習法ガイド - モールス打</title>
+    <meta name="description" content="モールス符号を効率よく覚える方法を徹底解説。合調法・音による学習・Koch法・Farnsworth法など、実用速度まで最短で到達するコツを紹介。アマチュア無線CW通信の入門にも。">
+    <meta property="og:title" content="モールス符号の覚え方・練習法ガイド - モールス打">
+    <meta property="og:description" content="モールス符号を効率よく覚える方法を徹底解説。合調法・音による学習・Koch法・Farnsworth法など、実用速度まで最短で到達するコツを紹介。アマチュア無線CW通信の入門にも。">
+    <meta property="og:url" content="https://jl1gix.com/learn.html">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://jl1gix.com/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://jl1gix.com/ogp.png">
+    <meta name="twitter:title" content="モールス符号の覚え方・練習法ガイド - モールス打">
+    <meta name="twitter:description" content="モールス符号を効率よく覚える方法を徹底解説。合調法・音による学習・Koch法・Farnsworth法など、実用速度まで最短で到達するコツを紹介。アマチュア無線CW通信の入門にも。">
+    <style>
+        :root {
+            --primary: #00c060;
+            --primary-dim: #00a050;
+            --bg: #080f0b;
+            --panel: #0e1f16;
+            --border: #1e5c38;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { scrollbar-gutter: stable; }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--primary);
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.8;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--primary);
+            border-radius: 4px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(0,100,55,0.2);
+        }
+        .header-bar { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 4px; }
+        .header-bar::before { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--primary-dim)); }
+        .header-bar::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(to left, transparent, var(--primary-dim)); }
+        h1 { margin: 0; letter-spacing: 6px; font-size: 1.4rem; color: var(--primary); text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5); }
+        .subtitle { font-size: 0.6rem; color: var(--primary-dim); letter-spacing: 4px; margin-bottom: 28px; opacity: 0.9; text-align: center; }
+        h2 { font-size: 0.95rem; letter-spacing: 2px; color: var(--primary); margin: 30px 0 12px; padding-left: 10px; border-left: 2px solid var(--primary); }
+        h3 { font-size: 0.85rem; letter-spacing: 1px; color: var(--primary); margin: 20px 0 8px; opacity: 0.95; }
+        p, li { font-size: 0.85rem; color: var(--primary-dim); margin-bottom: 10px; }
+        ul, ol { padding-left: 24px; margin-bottom: 12px; }
+        li { margin-bottom: 6px; }
+        a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+        a:hover { opacity: 0.7; }
+        .updated { font-size: 0.7rem; color: var(--primary-dim); opacity: 0.6; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+        table { border-collapse: collapse; margin: 12px 0 18px; width: 100%; font-size: 0.82rem; }
+        th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; color: var(--primary-dim); }
+        th { color: var(--primary); background: rgba(0,80,40,0.15); }
+        .callout { background: rgba(0,80,40,0.15); border-left: 3px solid var(--primary); padding: 12px 15px; margin: 15px 0; font-size: 0.82rem; }
+        footer { margin: 20px auto 0; padding: 12px 0 4px; border-top: 1px solid #1e5c38; font-size: 0.65rem; letter-spacing: 1px; opacity: 0.55; text-align: center; width: 95%; max-width: 760px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header-bar">
+        <h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
+    <div class="subtitle">▸ モールス符号 学習ガイド ◂</div>
+
+    <h2>1. モールス符号を覚える意味</h2>
+    <p>モールス符号は 19 世紀に発明されて以来、170 年以上にわたって世界中で使われ続けている通信方式です。今の時代でもアマチュア無線家、船舶、航空、非常時の通信手段として現役で利用されており、単なる古典技術ではなく「今も使える実用スキル」として学ぶ価値があります。</p>
+    <p>特にアマチュア無線の CW（連続波）通信では、SSB（音声通信）に比べて到達距離が長く、ノイズの中でも通じやすいという物理的な優位性があります。海外との弱電界での交信を目指す無線家にとって、モールス符号の習得は必須と言っていい技術です。</p>
+
+    <h2>2. 覚え方の 3 大アプローチ</h2>
+    <p>モールス符号を覚える方法は大きく分けて 3 つあります。それぞれに長所と短所があり、多くの学習者は複数を組み合わせて習得しています。</p>
+
+    <h3>① 視覚アプローチ(符号表を見て覚える)</h3>
+    <p>「A は・−」「B は−・・・」というように、符号表を見ながら暗記する方法です。とっつきやすく短期記憶には有効ですが、実際に音を聞いたときに「頭の中で符号表を思い出す→照合する」という 2 段階の処理が発生するため、**高速な受信には不向き** です。あくまで入口として使い、後述の音アプローチに移行するのが望ましいです。</p>
+
+    <h3>② 音アプローチ(音として覚える)</h3>
+    <p>「A の音は・−」ではなく「A の音はディダー」というリズムそのものを直接文字と結びつける方法です。ケント大学のケーラー（Koch）が提唱した Koch 法や、実用速度で最初から聞かせる Farnsworth 法などが代表的で、最終的に高速受信を目指すなら **この方法が最重要** です。</p>
+    <p>この方法では、最初から実用速度(15〜20 WPM)で音を聞き、脳がリズムパターンとして文字を認識するように訓練します。文字間のスペースを長めに取ることで、脳がパターンを認識する時間を確保しつつ、単一の音は速いテンポで聞き取る訓練ができます。</p>
+
+    <h3>③ 合調法(語呂合わせで覚える)</h3>
+    <p>日本で古くから伝わる方法で、モールス符号の長短のパターンを日本語の語呂で覚えます。たとえば A(・−)は「アレー」、B(−・・・)は「ビフテキ」、C(−・−・)は「クセモノ」といった具合。初心者が最初の 26 文字を「体感的に」覚えるのに極めて効果的です。</p>
+
+    <div class="callout">📌 <strong>合調法主要文字の例</strong>：A アレー / B ビフテキ / C クセモノ / D ドードー / E エ / F ハーモニカ / G ゴロゴー / H ホシフキ / I イー / J ジーエンスイ / K カー / L ラモッター / M モー / N ノー / O オノー / P ペポポポ / Q コーコッコー / R ラリー / S サシスセ / T テ / U ウーラー / V ビタミンAー / W ワトソン / X ケンローケー / Y ヨーコーソー / Z ゾーゾーミー</div>
+
+    <h2>3. 覚える順序のおすすめ</h2>
+    <p>26 文字を一気に覚えようとすると挫折します。以下の順で少しずつ足していくのが定石です。</p>
+    <ol>
+        <li><strong>短い文字から</strong>：E(・)、T(−)、A(・−)、I(・・)、N(−・)、M(−−)</li>
+        <li><strong>次に頻出文字</strong>：S、O、R、H、L、D</li>
+        <li><strong>そして残り</strong>：K、W、B、V、G、F、U、Y、P、Q、X、Z、J、C</li>
+        <li><strong>数字と記号</strong>：文字が全部覚えられたら 0〜9、続いて「/」「?」など</li>
+    </ol>
+    <p>1 日に 2〜3 文字ずつ足すペースが理想。前日に覚えた文字を復習しつつ、新しい文字を追加していきます。1 ヶ月ほどで全 36 文字(アルファベット + 数字)を制覇できます。</p>
+
+    <h2>4. スピードアップのコツ</h2>
+    <p>ある程度の文字を覚えたら、速度を上げていく段階に入ります。ここでよくある壁が「10 WPM を超えられない」問題です。以下のポイントを押さえると突破しやすくなります。</p>
+    <ul>
+        <li><strong>符号表を見ずに音だけで判断する訓練</strong>：頭の中で符号を「翻訳」しないこと。音がそのまま文字として脳に届くように反復する。</li>
+        <li><strong>Farnsworth 法の活用</strong>：文字自体の速度は 20 WPM、文字間のスペースだけ広げるという方法。脳が「速い音のリズム」に慣れる。</li>
+        <li><strong>短いセッション × 高頻度</strong>：1 日 15 分を毎日、が 1 週間に 1 回 2 時間より効果的。</li>
+        <li><strong>コールサイン練習</strong>：ランダム文字列より、実際の交信で使う「コールサイン + RST」のパターンを繰り返す方が実践的。</li>
+    </ul>
+
+    <h2>5. よくある壁と乗り越え方</h2>
+    <p><strong>壁①：特定の文字だけ聞き取れない</strong> → その文字だけを 100 回連続で聞く「集中破壊」を試してください。脳がその文字だけを特別扱いしていることが多く、他文字と同レベルにするには集中的な曝露が必要です。</p>
+    <p><strong>壁②：文字は分かるが単語にならない</strong> → 単文字受信に慣れすぎて、文字間のスペースを「区切り」として認識するのが遅くなっています。文字間隔を段階的に短くする訓練が有効です。</p>
+    <p><strong>壁③：長い単語で頭が真っ白になる</strong> → 短期記憶容量の問題です。5 文字以上の単語は「聞きながらメモを取る」訓練で対応します。慣れると聞き取り→書き取りが自動化され、次の文字も並行で処理できるようになります。</p>
+
+    <h2>6. モールス打での練習の使い方</h2>
+    <p>本サイトの<a href="rx.html">受信モード</a>は、実際のコンテスト形式でランダムなコールサインと RST レポートが流れます。10〜30 WPM の 12 段階で速度を選べるので、自分のレベルに合わせて練習できます。</p>
+    <p><a href="tx.html">送信モード</a>では、表示された文字をキーボードやパドルボタンで打鍵し、モールス打が自動デコードして正解判定します。Iambic キーヤーにも対応しているので、実機で使う縦振り・複式電鍵・エレキーの練習にもなります。</p>
+    <p>また<a href="tx.html">送信モードのフリー入力</a>では、好きな文字を打って音を確認できます。実機を持ち出せない場面での日常練習に便利です。</p>
+
+    <h2>7. 学習頻度の目安</h2>
+    <p>短時間高頻度が原則です。以下は目安:</p>
+    <ul>
+        <li><strong>初心者(0〜10 WPM)</strong>：毎日 10〜15 分</li>
+        <li><strong>中級者(10〜20 WPM)</strong>：毎日 15〜30 分、週に 1 回は 60 分の集中セッション</li>
+        <li><strong>上級者(20 WPM 以上)</strong>：週に 3〜4 回、30〜60 分ずつ</li>
+    </ul>
+    <p>2 週間の休止で速度が 20% 落ちるとされます。習慣化がすべてです。</p>
+
+    <h2>8. まとめ</h2>
+    <p>モールス符号の習得は、正しい順序と方法を守れば誰でも到達可能です。合調法で入口を作り、音として脳に刻み、実際の交信フォーマットで慣れる。この 3 ステップを守れば、3〜6 ヶ月で実用速度(20 WPM)、1 年で高速交信(25〜30 WPM)が視野に入ります。</p>
+    <p>モールス打はそのすべての段階をサポートする無料ツールです。ぜひ日々の練習に活用してください。</p>
+
+    <p class="updated">最終更新日：2026年</p>
+</div>
+
+<footer>
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 18px;">
+        <a href="https://jl1gix.com" style="color:#007b43; text-decoration:none;">トップ</a>
+        <a href="learn.html" style="color:#007b43; text-decoration:none;">学習ガイド</a>
+        <a href="cw-guide.html" style="color:#007b43; text-decoration:none;">CW入門</a>
+        <a href="contest.html" style="color:#007b43; text-decoration:none;">コンテスト入門</a>
+        <a href="how-to-use.html" style="color:#007b43; text-decoration:none;">使い方</a>
+        <a href="prosign.html" style="color:#007b43; text-decoration:none;">プロサイン一覧</a>
+        <a href="morse-table.html" style="color:#007b43; text-decoration:none;">モールス符号表</a>
+        <a href="ranking.html" style="color:#007b43; text-decoration:none;">ランキング</a>
+        <a href="profile.html" style="color:#007b43; text-decoration:none;">運営者情報</a>
+        <a href="privacy.html" style="color:#007b43; text-decoration:none;">プライバシー</a>
+        <a href="contact.html" style="color:#007b43; text-decoration:none;">お問い合わせ</a>
+    </div>
+    <div style="margin-top:8px; font-size:0.62rem; opacity:0.7; letter-spacing:1px;">Inspired by <a href="https://sushida.net/" target="_blank" rel="noopener noreferrer" style="color:#007b43; text-decoration:underline; text-underline-offset:2px;">寿司打</a></div>
+</footer>
+</body>
+</html>
