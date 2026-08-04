@@ -935,6 +935,12 @@ function updateTxBeginnerDisplay() {
 
 function renderTxInput() {
     const box = document.getElementById('tx-morse-input');
+    // 送信モード(TX)で初心者モードOFFなら打鍵中の短点・長点は非表示(音だけで判断)
+    if (gameMode === 'TX' && !beginnerMode) {
+        box.style.display = 'none';
+        document.getElementById('tx-input-render').innerHTML = '';
+        return;
+    }
     box.style.display = '';
     document.getElementById('tx-input-render').innerHTML = txMorseInput.split('').map(sym =>
         `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
