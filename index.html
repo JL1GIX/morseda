@@ -220,35 +220,6 @@
             <a href="morse-table.html" style="color:var(--primary-dim);text-decoration:none;">モールス符号表</a>
         </div>
     </div>
-
-    <!-- 学習コンテンツセクション (SEO / AdSense向けの実質コンテンツ) -->
-    <div style="max-width: 640px; margin: 24px auto 0; padding: 20px 24px; background: rgba(14,31,22,0.75); border: 1px solid #1e5c38; border-top: 2px solid #00c060; border-radius: 4px; box-shadow: 0 0 20px rgba(0,100,55,0.15); position: relative; z-index: 2;">
-        <h2 style="font-size: 0.9rem; letter-spacing: 3px; color: #00c060; text-align: center; margin: 0 0 8px; text-shadow: 0 0 12px rgba(0,123,67,0.6);">📚 モールス学習コンテンツ</h2>
-        <p style="font-size: 0.78rem; line-height: 1.9; color: #00a050; text-align: left; margin: 12px 0;">モールス打は、アマチュア無線コンテストの CW(モールス通信)交信を想定した無料のブラウザ練習ツールです。10〜30 WPM の 12 段階で速度を選び、実際のコンテスト形式でコールサインと RST レポートを聞き取ったり打鍵したりして、モールス符号の受信・送信を効率よく学べます。PC はキーボード、スマートフォンは画面上のパドルボタンで操作でき、Iambic キーヤーにも対応しています。</p>
-        <p style="font-size: 0.78rem; line-height: 1.9; color: #00a050; text-align: left; margin: 12px 0;">初心者から上級者まで、以下の解説ページと合わせて活用することで、無理なく段階的にステップアップできます。</p>
-        <ul style="list-style: none; padding: 0; margin: 15px 0 0;">
-            <li style="border-left: 2px solid #00c060; padding: 6px 0 6px 12px; margin-bottom: 10px;">
-                <a href="learn.html" style="color: #00c060; text-decoration: none; font-size: 0.82rem; letter-spacing: 1px;">▸ モールス符号の覚え方・練習法ガイド</a>
-                <div style="font-size: 0.72rem; color: #00a050; margin-top: 3px; opacity: 0.85;">合調法・音による学習・Koch / Farnsworth 法など、実用速度まで最短で到達するコツ</div>
-            </li>
-            <li style="border-left: 2px solid #00c060; padding: 6px 0 6px 12px; margin-bottom: 10px;">
-                <a href="cw-guide.html" style="color: #00c060; text-decoration: none; font-size: 0.82rem; letter-spacing: 1px;">▸ CW 通信入門ガイド</a>
-                <div style="font-size: 0.72rem; color: #00a050; margin-top: 3px; opacity: 0.85;">CW の基礎から交信フォーマット・略語・楽しみ方まで幅広く解説</div>
-            </li>
-            <li style="border-left: 2px solid #00c060; padding: 6px 0 6px 12px; margin-bottom: 10px;">
-                <a href="contest.html" style="color: #00c060; text-decoration: none; font-size: 0.82rem; letter-spacing: 1px;">▸ CW コンテスト参加ガイド</a>
-                <div style="font-size: 0.72rem; color: #00a050; margin-top: 3px; opacity: 0.85;">主要コンテスト、交信フォーマット、得点計算、実戦準備までを網羅</div>
-            </li>
-            <li style="border-left: 2px solid #00c060; padding: 6px 0 6px 12px; margin-bottom: 10px;">
-                <a href="prosign.html" style="color: #00c060; text-decoration: none; font-size: 0.82rem; letter-spacing: 1px;">▸ プロサイン・Q 符号・略語一覧</a>
-                <div style="font-size: 0.72rem; color: #00a050; margin-top: 3px; opacity: 0.85;">AR/SK/KN、QRZ/QSY/QSL など CW 必須リファレンス</div>
-            </li>
-            <li style="border-left: 2px solid #00c060; padding: 6px 0 6px 12px;">
-                <a href="how-to-use.html" style="color: #00c060; text-decoration: none; font-size: 0.82rem; letter-spacing: 1px;">▸ モールス打の使い方完全ガイド</a>
-                <div style="font-size: 0.72rem; color: #00a050; margin-top: 3px; opacity: 0.85;">全機能の操作方法・WPM の選び方・スコアアップのコツを詳解</div>
-            </li>
-        </ul>
-    </div>
 </div>
 
 <footer style="
@@ -485,5 +456,27 @@
     else window.addEventListener('DOMContentLoaded', () => setHomeVis(true));
 })();
 </script>
+<!-- ハンバーガーメニュー -->
+<button id="menu-btn" aria-label="メニューを開く" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);">☰</button>
+<div id="menu-overlay" onclick="document.getElementById('menu-panel').classList.remove('open');this.classList.remove('open');" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:998;"></div>
+<nav id="menu-panel" aria-label="サイト内メニュー" style="position:fixed;top:0;right:0;height:100vh;width:270px;background:#0e1f16;border-left:1px solid #1e5c38;transform:translateX(100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:-5px 0 25px rgba(0,0,0,0.6);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ ゲーム</h3>
+    <a href="/" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 ホーム</a>
+    <a href="/rx.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 受信モード</a>
+    <a href="/tx.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 送信モード</a>
+    <a href="/ranking.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 ランキング</a>
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ 学習コンテンツ</h3>
+    <a href="/learn.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📚 学習ガイド</a>
+    <a href="/cw-guide.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📖 CW入門</a>
+    <a href="/contest.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏁 コンテスト入門</a>
+    <a href="/prosign.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📑 プロサイン一覧</a>
+    <a href="/how-to-use.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ 使い方</a>
+    <a href="/morse-table.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 モールス符号表</a>
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ その他</h3>
+    <a href="/profile.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 運営者情報</a>
+    <a href="/privacy.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 プライバシー</a>
+    <a href="/contact.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ お問い合わせ</a>
+</nav>
+<style>#menu-panel.open{transform:translateX(0);}#menu-overlay.open{opacity:1;pointer-events:auto;}#menu-btn:hover{background:rgba(0,100,55,0.25);}nav#menu-panel a:hover{background:rgba(0,100,55,0.15);padding-left:6px;transition:padding 0.15s;}</style>
 </body>
 </html>
