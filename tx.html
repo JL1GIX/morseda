@@ -839,7 +839,14 @@ function unlockAndPrepare() {
     TX_DOT_TIME = 1.2 / wpmVal;
     document.getElementById('wpm-display').innerText = wpmVal;
     beginnerMode = document.getElementById('beginner-mode-check').checked;
-    if (beginnerMode) beginnerDisplay.classList.remove('hidden');
+    if (beginnerMode) {
+        beginnerDisplay.classList.remove('hidden');
+    } else {
+        // 前回のプレイで残った初心者表示を消す
+        beginnerDisplay.classList.add('hidden');
+        beginnerDisplay.classList.remove('tx-beginner');
+        beginnerDisplay.innerHTML = '';
+    }
     if (!audioCtx) {
         const AC = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AC();
@@ -892,6 +899,11 @@ function startTxGame() {
     txCharIndex = 0; txMorseInput = ''; txCharTimer = null;
     dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
     nextTxType = 'CALLSIGN';
+    // 前回プレイの短点・長点表示をクリア
+    const _txMorseBox = document.getElementById('tx-morse-input');
+    const _txMorseRender = document.getElementById('tx-input-render');
+    if (_txMorseRender) _txMorseRender.innerHTML = '';
+    if (_txMorseBox) _txMorseBox.style.display = beginnerMode ? '' : 'none';
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     TX_CHAR_GAP = Math.round(TX_DOT_TIME * 1000 * (isTouch ? 5.0 : 2.0));  // モバイル: dit×5.0 / デスクトップ: dit×2.0 (どちらもWPM連動)
     if (isTouch) document.getElementById('tx-paddle-area').classList.remove('hidden');
