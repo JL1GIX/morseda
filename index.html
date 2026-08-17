@@ -280,7 +280,7 @@
     }
     const { ev: CY_EV, total: CY_MS } = buildCycle('JL1GIX');
 
-    const SW = 580, SPEC_H = 80, FALL_H = 52, SH = SPEC_H + FALL_H;
+    const SW = 1160, SPEC_H = 100, FALL_H = 60, SH = SPEC_H + FALL_H;
     const CW_X = SW / 2;
     const PX_HZ = SW / 3000;
     const FX1 = CW_X - 250 * PX_HZ, FX2 = CW_X + 250 * PX_HZ;
@@ -306,10 +306,18 @@
     modeSelEl.insertBefore(sc, modeSelEl.firstChild);
 
     const PHANTOM = [
+        { offset:-1380, amp: 0.42, period: 2400, duty: 0.32 },
+        { offset:-1120, amp: 0.48, period: 3300, duty: 0.40 },
         { offset: -880, amp: 0.52, period: 3100, duty: 0.42 },
+        { offset: -640, amp: 0.36, period: 1800, duty: 0.28 },
         { offset: -450, amp: 0.38, period: 2200, duty: 0.35 },
+        { offset: -220, amp: 0.30, period: 2600, duty: 0.33 },
+        { offset:  260, amp: 0.34, period: 2100, duty: 0.36 },
         { offset:  430, amp: 0.46, period: 2750, duty: 0.38 },
+        { offset:  680, amp: 0.32, period: 1950, duty: 0.30 },
         { offset:  860, amp: 0.34, period: 1900, duty: 0.30 },
+        { offset: 1150, amp: 0.44, period: 2900, duty: 0.38 },
+        { offset: 1400, amp: 0.38, period: 2500, duty: 0.34 },
     ];
     const phantomStr = new Float32Array(PHANTOM.length).fill(0);
 
