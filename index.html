@@ -152,7 +152,18 @@
             body { justify-content: flex-start; padding: 8px 0; }
             #game-container { padding: 12px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; }
             h1 { font-size: 1.7rem; letter-spacing: 5px; }
+            /* ホームのモード選択ボタン: モバイルでも左右並びを維持 */
+            .mode-btn-row { gap: 8px !important; }
+            .mode-btn-row button {
+                font-size: 0.9rem !important;
+                padding: 14px 6px !important;
+                letter-spacing: 1px !important;
+                min-width: 0 !important;
+                flex: 1 1 0 !important;
+            }
+            .mode-btn-row button > span { font-size: 1.55rem !important; margin-bottom: 4px !important; }
         }
+    </style>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -194,7 +205,6 @@
       "keywords": "モールス符号, CW, モールス信号, アマチュア無線, 練習, コンテスト, 受信, 送信, パドル, Iambic"
     }
     </script>
-    </style>
 </head>
 <body>
 <div id="game-container">
@@ -207,7 +217,7 @@
         <div style="font-size:1rem;color:var(--primary-dim);letter-spacing:3px;margin:24px 0 32px;opacity:0.85;">
             CW コンテスト交信を想定したモールス符号練習ツール
         </div>
-        <div style="display:flex;gap:14px;justify-content:center;margin:0 0 20px;flex-wrap:wrap;">
+        <div class="mode-btn-row" style="display:flex;gap:14px;justify-content:center;margin:0 0 20px;flex-wrap:nowrap;">
             <button onclick="location.href='rx.html'" style="font-size:1.25rem;padding:22px 48px;letter-spacing:3px;min-width:220px;">
                 <span style="display:block;font-size:2rem;margin-bottom:6px;">📻</span>受信モード
             </button>
