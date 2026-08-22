@@ -616,6 +616,23 @@
     <!-- ═══ FREE INPUT SCREEN ═══ -->
     <div id="free-screen" class="hidden">
         <div id="free-header">▸ <span>FREE INPUT</span> ◂</div>
+        <div id="free-wpm-row" style="display:flex;align-items:center;justify-content:center;gap:10px;">
+            <span class="setting-label" style="margin-bottom:0;">📡 モールス速度</span>
+            <select id="free-wpm-select" onchange="changeFreeWpm()">
+                <option value="10">10 WPM</option>
+                <option value="20">20 WPM</option>
+                <option value="21">21 WPM</option>
+                <option value="22">22 WPM</option>
+                <option value="23">23 WPM</option>
+                <option value="24">24 WPM</option>
+                <option value="25" selected>25 WPM</option>
+                <option value="26">26 WPM</option>
+                <option value="27">27 WPM</option>
+                <option value="28">28 WPM</option>
+                <option value="29">29 WPM</option>
+                <option value="30">30 WPM</option>
+            </select>
+        </div>
         <div id="free-input-block" style="position:relative;">
             <div class="free-section-label">INPUT</div>
             <div id="free-morse-render"></div>
@@ -1120,7 +1137,9 @@ function startFreeMode() {
 function launchFreeMode() {
     masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
     gameMode = 'FREE';
-    const wpmValFree = parseInt(document.getElementById('wpm-select').value);
+    // 開始画面の速度設定を引き継ぎ、フリー入力画面側のセレクタにも反映
+    document.getElementById('free-wpm-select').value = document.getElementById('wpm-select').value;
+    const wpmValFree = parseInt(document.getElementById('free-wpm-select').value);
     TX_DOT_TIME = 1.2 / wpmValFree;
     isPlaying = true;
     freeTextBuffer = '';
@@ -1132,6 +1151,16 @@ function launchFreeMode() {
     renderFreeText();
     document.addEventListener('keydown', onTxKeyDown);
     document.addEventListener('keyup',   onTxKeyUp);
+}
+
+function changeFreeWpm() {
+    const wpmVal = parseInt(document.getElementById('free-wpm-select').value);
+    TX_DOT_TIME = 1.2 / wpmVal;
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    TX_CHAR_GAP = Math.round(TX_DOT_TIME * 1000 * (isTouch ? 5.0 : 2.0));  // モバイル: dit×5.0 / デスクトップ: dit×2.0 (どちらもWPM連動)
+    // 開始画面のセレクタとも同期しておく
+    const mainSel = document.getElementById('wpm-select');
+    if (mainSel) mainSel.value = String(wpmVal);
 }
 
 function decodeFreeChar() {
