@@ -551,6 +551,11 @@
                     <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">🔰</span>
                     <label for="beginner-mode-check">初心者モード（現在打つ文字のモールスを表示）</label>
                 </div>
+                <div class="setting-item checkbox-item">
+                    <input type="checkbox" id="morseboard-mode-check" onchange="updateTxModeDesc()">
+                    <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">⌨️</span>
+                    <label for="morseboard-mode-check">MorseBoardモード（Bluetoothパドルで打鍵する場合はチェック）</label>
+                </div>
             </div>
             <div id="free-mode-link">
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
@@ -720,6 +725,7 @@ let timeLeft, initialSeconds, score = 0, isPlaying = false;
 let timerId, activeOscillators = [];
 let DOT_TIME = 0.06;
 let beginnerMode = false;
+let morseboardMode = false; // MorseBoard(Bluetoothパドル)使用を明示するための表示切り替えのみ。キー入力自体はJ/スペースの通常キーヤーで処理される
 let gameMode = 'TX'; // 'TX' | 'FREE'
 // TX mode state
 let txWord = [], txCharIndex = 0, txMorseInput = '';
@@ -820,6 +826,12 @@ function saveKeyCustomize() {
     closeKeyCustomize();
 }
 function updateTxModeDesc() {
+    const mbCheck = document.getElementById('morseboard-mode-check');
+    if (mbCheck && mbCheck.checked) {
+        document.getElementById('mode-description').innerHTML =
+            `コールサインとRSTが表示される。<br>MorseBoardをBluetoothでペアリングし、電鍵を打鍵。<br>パドル左＝${getKeyLabel(dotKey)}キー(短点)、右＝${getKeyLabel(dashKey)}キー(長点)として認識されます。`;
+        return;
+    }
     document.getElementById('mode-description').innerHTML =
         `コールサインとRSTが表示される。<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
 }
@@ -852,6 +864,7 @@ function unlockAndPrepare() {
     TX_DOT_TIME = 1.2 / wpmVal;
     document.getElementById('wpm-display').innerText = wpmVal;
     beginnerMode = document.getElementById('beginner-mode-check').checked;
+    morseboardMode = document.getElementById('morseboard-mode-check').checked;
     if (beginnerMode) {
         beginnerDisplay.classList.remove('hidden');
     } else {
@@ -919,8 +932,9 @@ function startTxGame() {
     if (_txMorseBox) _txMorseBox.style.display = beginnerMode ? '' : 'none';
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     TX_CHAR_GAP = Math.round(TX_DOT_TIME * 1000 * (isTouch ? 5.0 : 2.0));  // モバイル: dit×5.0 / デスクトップ: dit×2.0 (どちらもWPM連動)
-    if (isTouch) document.getElementById('tx-paddle-area').classList.remove('hidden');
-    document.getElementById('status-msg').innerText = 'TRANSMIT...';
+    // MorseBoardモードでは物理パドルを使う想定のため、画面タッチパドルは出さない(キー入力の扱い自体は通常のキーヤーと同じ)
+    if (isTouch && !morseboardMode) document.getElementById('tx-paddle-area').classList.remove('hidden');
+    document.getElementById('status-msg').innerText = morseboardMode ? 'MORSEBOARD READY...' : 'TRANSMIT...';
     document.addEventListener('keydown', onTxKeyDown);
     document.addEventListener('keyup',   onTxKeyUp);
     nextTxWord();
