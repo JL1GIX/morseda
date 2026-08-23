@@ -551,6 +551,11 @@
                     <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">🔰</span>
                     <label for="beginner-mode-check">初心者モード（現在打つ文字のモールスを表示）</label>
                 </div>
+                <div class="setting-item checkbox-item">
+                    <input type="checkbox" id="morseboard-mode-check" onchange="updateTxModeDesc()">
+                    <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">⌨️</span>
+                    <label for="morseboard-mode-check">MorseBoardモード（Bluetooth CWデコーダーからの文字入力に対応）</label>
+                </div>
             </div>
             <div id="free-mode-link">
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
@@ -720,6 +725,7 @@ let timeLeft, initialSeconds, score = 0, isPlaying = false;
 let timerId, activeOscillators = [];
 let DOT_TIME = 0.06;
 let beginnerMode = false;
+let morseboardMode = false; // MorseBoard等のBluetooth CWデコーダーからの直接文字入力モード
 let gameMode = 'TX'; // 'TX' | 'FREE'
 // TX mode state
 let txWord = [], txCharIndex = 0, txMorseInput = '';
@@ -820,6 +826,12 @@ function saveKeyCustomize() {
     closeKeyCustomize();
 }
 function updateTxModeDesc() {
+    const mbCheck = document.getElementById('morseboard-mode-check');
+    if (mbCheck && mbCheck.checked) {
+        document.getElementById('mode-description').innerHTML =
+            `コールサインとRSTが表示される。<br>MorseBoard等のBluetooth CWデコーダーをキーボードとしてペアリングし、電鍵を打鍵。<br>デコーダー側で変換された文字がそのまま解答として送信されます。`;
+        return;
+    }
     document.getElementById('mode-description').innerHTML =
         `コールサインとRSTが表示される。<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
 }
@@ -852,6 +864,7 @@ function unlockAndPrepare() {
     TX_DOT_TIME = 1.2 / wpmVal;
     document.getElementById('wpm-display').innerText = wpmVal;
     beginnerMode = document.getElementById('beginner-mode-check').checked;
+    morseboardMode = document.getElementById('morseboard-mode-check').checked;
     if (beginnerMode) {
         beginnerDisplay.classList.remove('hidden');
     } else {
@@ -916,11 +929,13 @@ function startTxGame() {
     const _txMorseBox = document.getElementById('tx-morse-input');
     const _txMorseRender = document.getElementById('tx-input-render');
     if (_txMorseRender) _txMorseRender.innerHTML = '';
-    if (_txMorseBox) _txMorseBox.style.display = beginnerMode ? '' : 'none';
+    // MorseBoardモードでは短点・長点は表示しない(デコーダー側で完結しているため)
+    if (_txMorseBox) _txMorseBox.style.display = (beginnerMode && !morseboardMode) ? '' : 'none';
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     TX_CHAR_GAP = Math.round(TX_DOT_TIME * 1000 * (isTouch ? 5.0 : 2.0));  // モバイル: dit×5.0 / デスクトップ: dit×2.0 (どちらもWPM連動)
-    if (isTouch) document.getElementById('tx-paddle-area').classList.remove('hidden');
-    document.getElementById('status-msg').innerText = 'TRANSMIT...';
+    // MorseBoardモードではパドル入力は使わないためタッチパドルは出さない
+    if (isTouch && !morseboardMode) document.getElementById('tx-paddle-area').classList.remove('hidden');
+    document.getElementById('status-msg').innerText = morseboardMode ? 'MORSEBOARD READY...' : 'TRANSMIT...';
     document.addEventListener('keydown', onTxKeyDown);
     document.addEventListener('keyup',   onTxKeyUp);
     nextTxWord();
@@ -1035,6 +1050,13 @@ function paddleUp(isDash) {
 
 function onTxKeyDown(e) {
     if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
+    // MorseBoard等のBluetooth CWデコーダーは、電鍵の入力をデコードして
+    // 通常のアルファベット/数字キーとしてそのまま送ってくる(HIDキーボード扱い)。
+    // その場合は短点・長点の合成をせず、届いた文字をそのまま解答として扱う。
+    if (gameMode === 'TX' && morseboardMode) {
+        handleMorseboardKey(e);
+        return;
+    }
     if (e.code === dotKey) {
         e.preventDefault();
         if (!dotHeld) { dotHeld = true; startKeyerLoop(); }
@@ -1042,6 +1064,20 @@ function onTxKeyDown(e) {
         e.preventDefault();
         if (!dashHeld) { dashHeld = true; startKeyerLoop(); }
     }
+}
+
+// MorseBoard(Bluetoothキーボード型CWデコーダー)からのキー入力を処理。
+// 通常のキー入力イベントとして届くため、モールス符号に含まれる文字のみを
+// そのままデコード済み文字として扱い、既存の正誤判定ロジックに渡す。
+function handleMorseboardKey(e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const key = e.key;
+    if (!key || key.length !== 1) return; // Enter/Backspace/Shift等の特殊キーは無視
+    const ch = key.toUpperCase();
+    if (!MORSE_CODE[ch]) return; // モールス符号表にない文字は無視
+    e.preventDefault();
+    if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
+    decodeTxChar(ch);
 }
 
 function onTxKeyUp(e) {
@@ -1067,14 +1103,18 @@ function playSidetone(isDash) {
     toneSchedule.push({ onTime: ms, offTime: ms + dur * 1000 });
 }
 
-function decodeTxChar() {
+function decodeTxChar(directChar) {
+    // directChar が渡された場合(MorseBoard等からの直接文字入力)は、
+    // 短点・長点から組み立てる通常の処理をスキップしてそのまま判定に使う。
     txCharTimer = null;
-    const decoded  = MORSE_REVERSE[txMorseInput] || null;
+    const decoded  = directChar !== undefined ? directChar : (MORSE_REVERSE[txMorseInput] || null);
     const expected = txWord[txCharIndex];
     const txArea   = document.getElementById('tx-area');
-    txMorseInput = '';
-    renderTxInput();
-    lastSentSym = null;
+    if (directChar === undefined) {
+        txMorseInput = '';
+        renderTxInput();
+        lastSentSym = null;
+    }
     if (decoded === expected) {
         txCharIndex++;
         score++;
