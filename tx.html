@@ -551,10 +551,11 @@
                     <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">🔰</span>
                     <label for="beginner-mode-check">初心者モード（現在打つ文字のモールスを表示）</label>
                 </div>
-            </div>
-            <div style="margin:4px 0 2px; padding:10px 14px; border:1px solid var(--border); border-radius:2px; background:rgba(0,0,0,0.3); font-size:0.72rem; line-height:1.8; color:var(--primary-dim); text-align:left;">
-                ⌨️ <strong style="color:var(--primary);">Morse Board等のBluetooth電鍵をお使いの方へ：</strong><br>
-                左パドル→<strong>スペースキー</strong>（短点）、右パドル→<strong>Jキー</strong>（長点）としてペアリングすれば、そのまま送信モードで使用できます。（「⌨ キー設定」で割り当てを変更している場合は、そちらに合わせてください）
+                <div class="setting-item checkbox-item">
+                    <input type="checkbox" id="morse-board-mode-check" onchange="updateTxModeDesc()">
+                    <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">⌨️</span>
+                    <label for="morse-board-mode-check">Morse Boardモード（入力された文字をそのまま判定）</label>
+                </div>
             </div>
             <div id="free-mode-link">
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
@@ -724,6 +725,7 @@ let timeLeft, initialSeconds, score = 0, isPlaying = false;
 let timerId, activeOscillators = [];
 let DOT_TIME = 0.06;
 let beginnerMode = false;
+let morseBoardMode = false;
 let gameMode = 'TX'; // 'TX' | 'FREE'
 // TX mode state
 let txWord = [], txCharIndex = 0, txMorseInput = '';
@@ -824,6 +826,12 @@ function saveKeyCustomize() {
     closeKeyCustomize();
 }
 function updateTxModeDesc() {
+    const morseBoardModeCheck = document.getElementById('morse-board-mode-check');
+    if (morseBoardModeCheck && morseBoardModeCheck.checked) {
+        document.getElementById('mode-description').innerHTML =
+            `コールサインとRSTが表示される。<br>Morse BoardをPCに接続し、表示された文字をパドルで入力。<br>キーボードとして入力された英数字を、そのまま解答として判定します。`;
+        return;
+    }
     document.getElementById('mode-description').innerHTML =
         `コールサインとRSTが表示される。<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
 }
@@ -854,7 +862,8 @@ function unlockAndPrepare() {
     gameMode = 'TX';
     const wpmVal = parseInt(document.getElementById('wpm-select').value);
     TX_DOT_TIME = 1.2 / wpmVal;
-    document.getElementById('wpm-display').innerText = wpmVal;
+    morseBoardMode = document.getElementById('morse-board-mode-check').checked;
+    document.getElementById('wpm-display').innerText = morseBoardMode ? 'KEY' : wpmVal;
     beginnerMode = document.getElementById('beginner-mode-check').checked;
     if (beginnerMode) {
         beginnerDisplay.classList.remove('hidden');
@@ -920,11 +929,11 @@ function startTxGame() {
     const _txMorseBox = document.getElementById('tx-morse-input');
     const _txMorseRender = document.getElementById('tx-input-render');
     if (_txMorseRender) _txMorseRender.innerHTML = '';
-    if (_txMorseBox) _txMorseBox.style.display = beginnerMode ? '' : 'none';
+    if (_txMorseBox) _txMorseBox.style.display = (beginnerMode && !morseBoardMode) ? '' : 'none';
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     TX_CHAR_GAP = Math.round(TX_DOT_TIME * 1000 * (isTouch ? 5.0 : 2.0));  // モバイル: dit×5.0 / デスクトップ: dit×2.0 (どちらもWPM連動)
-    if (isTouch) document.getElementById('tx-paddle-area').classList.remove('hidden');
-    document.getElementById('status-msg').innerText = 'TRANSMIT...';
+    if (isTouch && !morseBoardMode) document.getElementById('tx-paddle-area').classList.remove('hidden');
+    document.getElementById('status-msg').innerText = morseBoardMode ? 'MORSE BOARD READY...' : 'TRANSMIT...';
     document.addEventListener('keydown', onTxKeyDown);
     document.addEventListener('keyup',   onTxKeyUp);
     nextTxWord();
@@ -938,7 +947,7 @@ function nextTxWord() {
     renderTxInput();
     updateTxDisplay();
     if (beginnerMode) updateTxBeginnerDisplay();
-    document.getElementById('status-msg').innerText = 'TRANSMIT...';
+    document.getElementById('status-msg').innerText = morseBoardMode ? 'MORSE BOARD READY...' : 'TRANSMIT...';
 }
 
 function updateTxDisplay() {
@@ -965,7 +974,7 @@ function updateTxBeginnerDisplay() {
 function renderTxInput() {
     const box = document.getElementById('tx-morse-input');
     // 送信モード(TX)で初心者モードOFFなら打鍵中の短点・長点は非表示(音だけで判断)
-    if (gameMode === 'TX' && !beginnerMode) {
+    if (gameMode === 'TX' && (morseBoardMode || !beginnerMode)) {
         box.style.display = 'none';
         document.getElementById('tx-input-render').innerHTML = '';
         return;
@@ -1039,6 +1048,10 @@ function paddleUp(isDash) {
 
 function onTxKeyDown(e) {
     if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
+    if (gameMode === 'TX' && morseBoardMode) {
+        handleMorseBoardKey(e);
+        return;
+    }
     if (e.code === dotKey) {
         e.preventDefault();
         if (!dotHeld) { dotHeld = true; startKeyerLoop(); }
@@ -1046,6 +1059,17 @@ function onTxKeyDown(e) {
         e.preventDefault();
         if (!dashHeld) { dashHeld = true; startKeyerLoop(); }
     }
+}
+
+// Morse Boardはデコード済みの文字を通常のキーボード入力として送信する。
+// 短点・長点へ変換せず、入力された文字をそのまま現在の出題と照合する。
+function handleMorseBoardKey(e) {
+    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (!e.key || e.key.length !== 1) return;
+    const decoded = e.key.toUpperCase();
+    if (!MORSE_CODE[decoded]) return;
+    e.preventDefault();
+    evaluateTxChar(decoded);
 }
 
 function onTxKeyUp(e) {
@@ -1074,11 +1098,15 @@ function playSidetone(isDash) {
 function decodeTxChar() {
     txCharTimer = null;
     const decoded  = MORSE_REVERSE[txMorseInput] || null;
-    const expected = txWord[txCharIndex];
-    const txArea   = document.getElementById('tx-area');
     txMorseInput = '';
     renderTxInput();
     lastSentSym = null;
+    evaluateTxChar(decoded);
+}
+
+function evaluateTxChar(decoded) {
+    const expected = txWord[txCharIndex];
+    const txArea   = document.getElementById('tx-area');
     if (decoded === expected) {
         txCharIndex++;
         score++;
@@ -1548,4 +1576,3 @@ updateTxModeDesc();
 <style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(0,100,55,0.25);}nav#menu-panel a:hover{background:rgba(0,100,55,0.15);padding-left:6px;transition:padding 0.15s;}</style>
 </body>
 </html>
-
