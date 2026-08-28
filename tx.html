@@ -321,11 +321,26 @@
             letter-spacing: 0.5px;
             line-height: 1.5;
         }
+        .game-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        #game-key-assign-mini {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            letter-spacing: 1px;
+        }
         .signal-indicators {
             display: flex;
             gap: 5px;
             justify-content: flex-end;
-            margin-bottom: 8px;
             align-items: center;
         }
         .sig-label { font-size: 0.58rem; color: var(--primary-dim); opacity: 1.0; letter-spacing: 1px; margin-right: 4px; }
@@ -570,12 +585,15 @@
 
     <!-- ═══ GAME SCREEN ═══ -->
     <div id="game-screen" class="hidden">
-        <div class="signal-indicators">
-            <span class="sig-label">SIG</span>
-            <div class="sig-dot" id="sig1"></div>
-            <div class="sig-dot" id="sig2"></div>
-            <div class="sig-dot active" id="sig3"></div>
-            <div class="sig-dot active blink-active" id="sig4"></div>
+        <div class="game-top-row">
+            <div id="game-key-assign-mini"></div>
+            <div class="signal-indicators">
+                <span class="sig-label">SIG</span>
+                <div class="sig-dot" id="sig1"></div>
+                <div class="sig-dot" id="sig2"></div>
+                <div class="sig-dot active" id="sig3"></div>
+                <div class="sig-dot active blink-active" id="sig4"></div>
+            </div>
         </div>
         <div class="stats">
             <div class="stat-item">
@@ -848,6 +866,30 @@ function renderKeyCap(label) {
     return `<span style="display:inline-block; width:38px; height:34px; line-height:30px; border:2.5px solid var(--primary); border-radius:6px; background:rgba(0,192,96,0.14); font-weight:bold; font-size:1.1rem; text-align:center; box-shadow:0 0 8px rgba(0,192,96,0.35); vertical-align:middle;">${label}</span>`;
 }
 
+// プレイ画面用の小型キーキャップ表示（枠のサイズを変えないよう、ロビー画面のものより控えめなサイズ）
+function renderKeyCapMini(label) {
+    const isSpace = (label === 'SPACE');
+    const base = 'display:inline-block; border:1.5px solid var(--primary); border-radius:4px; background:rgba(0,192,96,0.14); font-weight:bold; text-align:center; line-height:1; vertical-align:middle;';
+    if (isSpace) {
+        return `<span style="${base} min-width:32px; padding:3px 6px; font-size:0.58rem;">${label}</span>`;
+    }
+    return `<span style="${base} width:17px; height:17px; line-height:14px; font-size:0.6rem;">${label}</span>`;
+}
+
+// 送信モードのプレイ画面上部に、短点・長点の現在のキー割り当てを小さく常時表示する
+function updateGameKeyAssignMini() {
+    const el = document.getElementById('game-key-assign-mini');
+    if (!el) return;
+    if (morseBoardMode) {
+        el.style.display = 'none';
+        return;
+    }
+    el.style.display = 'flex';
+    el.innerHTML =
+        `<span>・</span>${renderKeyCapMini(getKeyLabel(dotKey))}` +
+        `<span style="margin-left:3px;">－</span>${renderKeyCapMini(getKeyLabel(dashKey))}`;
+}
+
 // 送信モードのロビー画面右側に、短点・長点の現在のキー割り当てを一目でわかるよう表示する
 function updateKeyAssignDisplay() {
     const el = document.getElementById('key-assign-display');
@@ -922,6 +964,7 @@ function unlockAndPrepare() {
     audioCtx.onstatechange = () => { if (audioCtx.state === 'suspended') audioCtx.resume(); };
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
+    updateGameKeyAssignMini();
     initScope();
     startScopeAnimation();
     doResume.then(() => { setTimeout(startGame, 300); })
