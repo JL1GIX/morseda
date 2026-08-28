@@ -328,7 +328,7 @@
             margin-bottom: 10px;
             align-items: center;
         }
-        #game-key-assign-row {
+        #game-key-assign-row, #free-key-assign-row {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -646,6 +646,7 @@
                 <option value="30">30 WPM</option>
             </select>
         </div>
+        <div id="free-key-assign-row"></div>
         <div id="free-input-block" style="position:relative;">
             <div class="free-section-label">INPUT</div>
             <div id="free-morse-render"></div>
@@ -857,9 +858,9 @@ function renderKeyCap(label) {
     return `<span style="display:inline-block; width:38px; height:34px; line-height:30px; border:2.5px solid var(--primary); border-radius:6px; background:rgba(0,192,96,0.14); font-weight:bold; font-size:1.1rem; text-align:center; box-shadow:0 0 8px rgba(0,192,96,0.35); vertical-align:middle;">${label}</span>`;
 }
 
-// 送信モードのプレイ画面、TIME表示の上に短点・長点の現在のキー割り当てを横並びで常時表示する
-function updateGameKeyAssignRow() {
-    const el = document.getElementById('game-key-assign-row');
+// 送信モード/フリー入力モードのプレイ画面に、短点・長点の現在のキー割り当てを横並びで常時表示する
+function updateKeyAssignRow(elementId) {
+    const el = document.getElementById(elementId);
     if (!el) return;
     if (morseBoardMode) {
         el.style.display = 'none';
@@ -945,7 +946,7 @@ function unlockAndPrepare() {
     audioCtx.onstatechange = () => { if (audioCtx.state === 'suspended') audioCtx.resume(); };
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
-    updateGameKeyAssignRow();
+    updateKeyAssignRow('game-key-assign-row');
     initScope();
     startScopeAnimation();
     doResume.then(() => { setTimeout(startGame, 300); })
@@ -1215,6 +1216,7 @@ function startFreeMode() {
     audioCtx.onstatechange = () => { if (audioCtx.state === 'suspended') audioCtx.resume(); };
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('free-screen').classList.remove('hidden');
+    updateKeyAssignRow('free-key-assign-row');
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     if (isTouch) document.getElementById('free-paddle-area').classList.add('visible');
     doResume.then(() => { setTimeout(launchFreeMode, 300); })
