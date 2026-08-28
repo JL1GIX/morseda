@@ -516,8 +516,9 @@
             <!-- モード説明 + キー設定ボタン -->
             <div style="display:flex;align-items:flex-start;gap:10px;margin:15px 0;">
                 <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:0;flex:1;"></p>
-                <div id="key-customize-wrap" style="flex-shrink:0;padding-top:3px;">
+                <div id="key-customize-wrap" style="flex-shrink:0;padding-top:3px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
                     <button id="key-customize-btn" onclick="openKeyCustomize()">⌨ キー設定</button>
+                    <div id="key-assign-display" style="font-size:0.68rem; line-height:1.7; color:var(--primary-dim); text-align:right; letter-spacing:1px; white-space:nowrap; border:1px solid var(--border); border-radius:2px; padding:6px 10px; background:rgba(0,0,0,0.3);"></div>
                 </div>
             </div>
             <div class="settings-grid" style="margin:18px 0 18px;">
@@ -829,10 +830,27 @@ function updateTxModeDesc() {
     if (morseBoardModeCheck && morseBoardModeCheck.checked) {
         document.getElementById('mode-description').innerHTML =
             `コールサインとRSTが表示される。<br>Morse BoardをPCに接続し、表示された文字をパドルで入力。<br>キーボードとして入力された英数字を、そのまま解答として判定します。`;
+        updateKeyAssignDisplay();
         return;
     }
     document.getElementById('mode-description').innerHTML =
         `コールサインとRSTが表示される。<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
+    updateKeyAssignDisplay();
+}
+
+// 送信モードのロビー画面右側に、短点・長点の現在のキー割り当てを一目でわかるよう表示する
+function updateKeyAssignDisplay() {
+    const el = document.getElementById('key-assign-display');
+    if (!el) return;
+    const morseBoardModeCheck = document.getElementById('morse-board-mode-check');
+    if (morseBoardModeCheck && morseBoardModeCheck.checked) {
+        el.style.display = 'none';
+        return;
+    }
+    el.style.display = '';
+    el.innerHTML =
+        `<span style="color:var(--primary);font-weight:bold;">・ 短点</span> = <strong style="color:var(--primary);">${getKeyLabel(dotKey)}</strong><br>` +
+        `<span style="color:var(--primary);font-weight:bold;">－ 長点</span> = <strong style="color:var(--primary);">${getKeyLabel(dashKey)}</strong>`;
 }
 
 // ── Callsign / RST ─────────────────────────────────────────────────────────────
