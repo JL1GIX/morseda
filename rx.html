@@ -582,6 +582,9 @@ const MORSE_CODE = {
     '6':'-....','7':'--...','8':'---..','9':'----.',
     '/':'-..-.', // ポータブル
 };
+// コンテストナンバー・コールサインの「カットナンバー」表記: 1→A(・－)、0→O(－－－)。
+// 初心者モード以外では、実際に送出するモールス符号をこちらに置き換える(正解の文字自体は1・0のまま)。
+const CUT_NUMBER = { '1': 'A', '0': 'O' };
 // ── State ──────────────────────────────────────────────────────────────────────
 let audioCtx = null, masterGain = null;
 let timeLeft, initialSeconds, score = 0, currentWord = '', isPlaying = false;
@@ -782,7 +785,9 @@ function playMorse(text) {
     let offset = 0;
     const charEntries = [];
     text.split('').forEach(char => {
-        const code = MORSE_CODE[char];
+        // 非初心者モードでは1・0をカットナンバー(A/O)で送出する(正解の判定は元の文字のまま)
+        const playChar = (!beginnerMode && CUT_NUMBER[char]) ? CUT_NUMBER[char] : char;
+        const code = MORSE_CODE[playChar];
         if (!code) return;
         const charStartOffset = offset;
         code.split('').forEach(symbol => {

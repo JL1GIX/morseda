@@ -1041,7 +1041,8 @@ function updateTxBeginnerDisplay() {
     if (!beginnerMode) return;
     const ch = txWord[txCharIndex];
     if (!ch) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
-    const code = MORSE_CODE[CUT_NUMBER[ch] || ch];
+    // 初心者モードでは1・0も本来の符号のまま表示する（カットナンバーは非初心者向け）
+    const code = MORSE_CODE[ch];
     if (!code) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
     beginnerDisplay.classList.add('tx-beginner');
     beginnerDisplay.innerHTML = code.split('').map(sym =>
@@ -1185,8 +1186,8 @@ function decodeTxChar() {
 function evaluateTxChar(decoded) {
     const expected = txWord[txCharIndex];
     const txArea   = document.getElementById('tx-area');
-    // コンテストナンバーはカットナンバー（1→A、0→O）でも、本来の1・0の符号でも正解とする
-    const isCorrect = (decoded === expected) || (CUT_NUMBER[expected] && decoded === CUT_NUMBER[expected]);
+    // 非初心者モードではカットナンバー（1→A、0→O）も正解とする。本来の1・0の符号は常に正解。
+    const isCorrect = (decoded === expected) || (!beginnerMode && CUT_NUMBER[expected] && decoded === CUT_NUMBER[expected]);
     if (isCorrect) {
         txCharIndex++;
         score++;
