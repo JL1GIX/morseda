@@ -848,8 +848,14 @@ function updateTxModeDesc() {
         updateKeyAssignDisplay();
         return;
     }
-    document.getElementById('mode-description').innerHTML =
-        `コールサインとRSTが表示される。<br>スマホ・タブレットは画面の「トン/ツー」をタップして送信。<br>キーボードでも操作可（右記参照）。<br>長押しで連続、両方同時押しで交互（アイアンビック）。離すと自動判定。`;
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (isTouchDevice) {
+        document.getElementById('mode-description').innerHTML =
+            `コールサインとRSTが表示される。<br>スマホ・タブレットは画面の「トン/ツー」をタップして送信。<br>キーボードでも操作可（右記参照）。<br>長押しで連続、両方同時押しで交互（アイアンビック）。離すと自動判定。`;
+    } else {
+        document.getElementById('mode-description').innerHTML =
+            `コールサインとRSTが表示される。<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
+    }
     updateKeyAssignDisplay();
 }
 
