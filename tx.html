@@ -248,20 +248,20 @@
         .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.85; }
         .quit-btn:hover { opacity: 1; }
         /* 初心者モードのプレイ画面は要素が増えて縦に長くなるため、全体を一回り小さくしてQUITボタンの見切れを防ぐ */
-        #game-screen.beginner-compact .signal-indicators { margin-bottom: 6px; }
-        #game-screen.beginner-compact #game-key-assign-row { margin-bottom: 8px; gap: 12px; }
-        #game-screen.beginner-compact .stats { padding: 6px 12px; margin-bottom: 8px; }
-        #game-screen.beginner-compact .stat-value { font-size: 0.95rem; }
-        #game-screen.beginner-compact .stat-label { font-size: 0.64rem; }
-        #game-screen.beginner-compact #scope-container { margin-bottom: 8px; }
-        #game-screen.beginner-compact #scope-canvas { height: 110px; }
-        #game-screen.beginner-compact #beginner-display.tx-beginner { min-height: 2.8rem; gap: 10px; margin-bottom: 8px; padding: 6px 12px; }
-        #game-screen.beginner-compact .msym-dot-lg { width: 16px; height: 16px; }
-        #game-screen.beginner-compact .msym-dash-lg { width: 42px; height: 16px; }
-        #game-screen.beginner-compact #tx-word-display { font-size: 1.5rem; min-height: 3.6rem; padding: 10px; letter-spacing: 5px; }
-        #game-screen.beginner-compact #tx-morse-input { min-height: 2.6rem; margin-top: 6px; padding: 6px 11px; gap: 10px; }
-        #game-screen.beginner-compact #status-msg { margin-top: 7px; font-size: 0.78rem; }
-        #game-screen.beginner-compact .quit-btn { margin-top: 10px; }
+        #game-screen.beginner-compact .signal-indicators { margin-bottom: 7px; }
+        #game-screen.beginner-compact #game-key-assign-row { margin-bottom: 9px; gap: 13px; }
+        #game-screen.beginner-compact .stats { padding: 7px 13px; margin-bottom: 9px; }
+        #game-screen.beginner-compact .stat-value { font-size: 1rem; }
+        #game-screen.beginner-compact .stat-label { font-size: 0.66rem; }
+        #game-screen.beginner-compact #scope-container { margin-bottom: 9px; }
+        #game-screen.beginner-compact #scope-canvas { height: 125px; }
+        #game-screen.beginner-compact #beginner-display.tx-beginner { min-height: 3.1rem; gap: 11px; margin-bottom: 9px; padding: 7px 13px; }
+        #game-screen.beginner-compact .msym-dot-lg { width: 18px; height: 18px; }
+        #game-screen.beginner-compact .msym-dash-lg { width: 47px; height: 18px; }
+        #game-screen.beginner-compact #tx-word-display { font-size: 1.6rem; min-height: 3.9rem; padding: 11px; letter-spacing: 5px; }
+        #game-screen.beginner-compact #tx-morse-input { min-height: 2.9rem; margin-top: 7px; padding: 7px 12px; gap: 11px; }
+        #game-screen.beginner-compact #status-msg { margin-top: 8px; font-size: 0.8rem; }
+        #game-screen.beginner-compact .quit-btn { margin-top: 11px; }
         select {
             background: rgba(0,0,0,0.85);
             color: var(--primary);
@@ -1057,8 +1057,8 @@ function updateTxBeginnerDisplay() {
     if (!beginnerMode) return;
     const ch = txWord[txCharIndex];
     if (!ch) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
-    // 初心者モードでは1・0も本来の符号のまま表示する（カットナンバーは非初心者向け）
-    const code = MORSE_CODE[ch];
+    // 送信モードでは初心者・非初心者を問わず、1・0はカットナンバー(A/O)で表示する
+    const code = MORSE_CODE[CUT_NUMBER[ch] || ch];
     if (!code) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
     beginnerDisplay.classList.add('tx-beginner');
     beginnerDisplay.innerHTML = code.split('').map(sym =>
@@ -1202,8 +1202,8 @@ function decodeTxChar() {
 function evaluateTxChar(decoded) {
     const expected = txWord[txCharIndex];
     const txArea   = document.getElementById('tx-area');
-    // 非初心者モードではカットナンバー（1→A、0→O）も正解とする。本来の1・0の符号は常に正解。
-    const isCorrect = (decoded === expected) || (!beginnerMode && CUT_NUMBER[expected] && decoded === CUT_NUMBER[expected]);
+    // 送信モードでは初心者・非初心者を問わずカットナンバー（1→A、0→O）が正解。本来の1・0の符号も常に正解。
+    const isCorrect = (decoded === expected) || (CUT_NUMBER[expected] && decoded === CUT_NUMBER[expected]);
     if (isCorrect) {
         txCharIndex++;
         score++;
