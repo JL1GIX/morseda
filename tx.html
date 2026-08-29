@@ -289,6 +289,7 @@
             gap: 10px;
             margin: 18px 0;
         }
+        .settings-grid.morse-board-settings #time-setting-item { grid-column: 1 / -1; }
         .setting-item {
             background: rgba(0,0,0,0.45);
             border: 1px solid var(--border);
@@ -551,7 +552,7 @@
                 </div>
             </div>
             <div class="settings-grid" style="margin:18px 0 18px;">
-                <div class="setting-item">
+                <div class="setting-item" id="time-setting-item">
                     <span class="setting-label">⏱ 制限時間</span>
                     <select id="time-select">
                         <option value="60">1分間</option>
@@ -559,7 +560,7 @@
                         <option value="300">5分間</option>
                     </select>
                 </div>
-                <div class="setting-item">
+                <div class="setting-item" id="wpm-setting-item">
                     <span class="setting-label">📡 モールス速度</span>
                     <select id="wpm-select">
                         <option value="20">20 WPM</option>
@@ -888,7 +889,12 @@ function saveKeyCustomize() {
 }
 function updateTxModeDesc() {
     const morseBoardModeCheck = document.getElementById('morse-board-mode-check');
-    if (morseBoardModeCheck && morseBoardModeCheck.checked) {
+    const isMorseBoard = Boolean(morseBoardModeCheck && morseBoardModeCheck.checked);
+    const wpmSettingItem = document.getElementById('wpm-setting-item');
+    if (wpmSettingItem) wpmSettingItem.classList.toggle('hidden', isMorseBoard);
+    const settingsGrid = wpmSettingItem && wpmSettingItem.parentElement;
+    if (settingsGrid) settingsGrid.classList.toggle('morse-board-settings', isMorseBoard);
+    if (isMorseBoard) {
         document.getElementById('mode-description').innerHTML =
             `コールサインとRSTが表示される。<br>Morse BoardをPCに接続し、表示された文字をパドルで入力。<br>キーボードとして入力された英数字を、そのまま解答として判定します。`;
         updateKeyAssignDisplay();
