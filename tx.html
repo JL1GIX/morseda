@@ -730,6 +730,9 @@ const MORSE_CODE = {
 };
 const MORSE_REVERSE = {};
 Object.entries(MORSE_CODE).forEach(([ch, code]) => { MORSE_REVERSE[code] = ch; });
+// コンテストナンバーの「カットナンバー」表記: 1→A(・－)、0→O(－－－)。
+// 送信モードでは基本この短い符号で送出させ、本来の1・0の符号(.----/-----)でも正解とする。
+const CUT_NUMBER = { '1': 'A', '0': 'O' };
 
 // ── State ──────────────────────────────────────────────────────────────────────
 let audioCtx = null, masterGain = null;
@@ -1032,7 +1035,7 @@ function updateTxBeginnerDisplay() {
     if (!beginnerMode) return;
     const ch = txWord[txCharIndex];
     if (!ch) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
-    const code = MORSE_CODE[ch];
+    const code = MORSE_CODE[CUT_NUMBER[ch] || ch];
     if (!code) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
     beginnerDisplay.classList.add('tx-beginner');
     beginnerDisplay.innerHTML = code.split('').map(sym =>
@@ -1176,7 +1179,9 @@ function decodeTxChar() {
 function evaluateTxChar(decoded) {
     const expected = txWord[txCharIndex];
     const txArea   = document.getElementById('tx-area');
-    if (decoded === expected) {
+    // コンテストナンバーはカットナンバー（1→A、0→O）でも、本来の1・0の符号でも正解とする
+    const isCorrect = (decoded === expected) || (CUT_NUMBER[expected] && decoded === CUT_NUMBER[expected]);
+    if (isCorrect) {
         txCharIndex++;
         score++;
         document.getElementById('score').innerText = score;
