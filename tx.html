@@ -1298,8 +1298,7 @@ function evaluateTxChar(decoded) {
         setTimeout(() => txArea.classList.remove('flash-correct'), 400);
         document.getElementById('status-msg').innerText = `✓ ${expected}`;
         if (txCharIndex >= txWord.length) {
-            document.getElementById('status-msg').innerText = '✓ WORD OK';
-            setTimeout(() => { if (!isPlaying) return; nextTxWord(); }, 600);
+            nextTxWord();
         } else {
             updateTxDisplay();
             if (beginnerMode) updateTxBeginnerDisplay();
