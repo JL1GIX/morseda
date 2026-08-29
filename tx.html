@@ -247,6 +247,21 @@
         }
         .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.85; }
         .quit-btn:hover { opacity: 1; }
+        /* 初心者モードのプレイ画面は要素が増えて縦に長くなるため、全体を一回り小さくしてQUITボタンの見切れを防ぐ */
+        #game-screen.beginner-compact .signal-indicators { margin-bottom: 4px; }
+        #game-screen.beginner-compact #game-key-assign-row { margin-bottom: 6px; gap: 10px; }
+        #game-screen.beginner-compact .stats { padding: 5px 10px; margin-bottom: 6px; }
+        #game-screen.beginner-compact .stat-value { font-size: 0.9rem; }
+        #game-screen.beginner-compact .stat-label { font-size: 0.6rem; }
+        #game-screen.beginner-compact #scope-container { margin-bottom: 6px; }
+        #game-screen.beginner-compact #scope-canvas { height: 90px; }
+        #game-screen.beginner-compact #beginner-display.tx-beginner { min-height: 2.2rem; gap: 8px; margin-bottom: 6px; padding: 5px 10px; }
+        #game-screen.beginner-compact .msym-dot-lg { width: 13px; height: 13px; }
+        #game-screen.beginner-compact .msym-dash-lg { width: 34px; height: 13px; }
+        #game-screen.beginner-compact #tx-word-display { font-size: 1.3rem; min-height: 3rem; padding: 8px; letter-spacing: 4px; }
+        #game-screen.beginner-compact #tx-morse-input { min-height: 2.2rem; margin-top: 5px; padding: 5px 10px; gap: 8px; }
+        #game-screen.beginner-compact #status-msg { margin-top: 5px; font-size: 0.75rem; }
+        #game-screen.beginner-compact .quit-btn { margin-top: 8px; }
         select {
             background: rgba(0,0,0,0.85);
             color: var(--primary);
@@ -942,6 +957,7 @@ function unlockAndPrepare() {
     morseBoardMode = document.getElementById('morse-board-mode-check').checked;
     document.getElementById('wpm-display').innerText = morseBoardMode ? 'KEY' : wpmVal;
     beginnerMode = document.getElementById('beginner-mode-check').checked;
+    document.getElementById('game-screen').classList.toggle('beginner-compact', beginnerMode);
     if (beginnerMode) {
         beginnerDisplay.classList.remove('hidden');
     } else {
