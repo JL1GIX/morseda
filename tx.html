@@ -37,6 +37,10 @@
             --scope-bg: #050f08;
         }
         html, body { scrollbar-gutter: stable; }
+        html.game-active, body.game-active {
+            overscroll-behavior: none;
+            overflow-anchor: none;
+        }
         * { box-sizing: border-box; }
         body {
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
@@ -788,6 +792,33 @@ const beginnerDisplay = document.getElementById('beginner-display');
 // Free mode
 let freeTextBuffer = '';
 
+// ゲーム中は外部キーボードの Space / 矢印キーなどによるページ移動を無効化する。
+// capture 段階で処理し、モバイルブラウザの既定動作より先に preventDefault する。
+const VIEWPORT_SCROLL_KEYS = new Set([
+    'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    'PageUp', 'PageDown', 'Home', 'End', ' ', 'Spacebar'
+]);
+
+function preventGameplayViewportMovement(e) {
+    if (!document.documentElement.classList.contains('game-active')) return;
+    const target = e.target;
+    if (target instanceof Element && (target.matches('input, select, textarea') || target.isContentEditable)) return;
+    if (VIEWPORT_SCROLL_KEYS.has(e.code) || VIEWPORT_SCROLL_KEYS.has(e.key)) {
+        e.preventDefault();
+    }
+}
+
+function setGameplayViewportLock(active) {
+    document.documentElement.classList.toggle('game-active', active);
+    document.body.classList.toggle('game-active', active);
+    if (active && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+    }
+}
+
+document.addEventListener('keydown', preventGameplayViewportMovement, { capture: true, passive: false });
+document.addEventListener('keyup', preventGameplayViewportMovement, { capture: true, passive: false });
+
 // ── Key label helper ───────────────────────────────────────────────────────────
 function getKeyLabel(code) {
     if (code === 'Space') return 'SPACE';
@@ -983,6 +1014,7 @@ function unlockAndPrepare() {
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
     updateKeyAssignRow('game-key-assign-row');
+    setGameplayViewportLock(true);
     initScope();
     startScopeAnimation();
     doResume.then(() => { setTimeout(startGame, 300); })
@@ -1168,8 +1200,13 @@ function handleMorseBoardKey(e) {
 }
 
 function onTxKeyUp(e) {
-    if (e.code === dotKey)       dotHeld  = false;
-    else if (e.code === dashKey) dashHeld = false;
+    if (e.code === dotKey) {
+        e.preventDefault();
+        dotHeld = false;
+    } else if (e.code === dashKey) {
+        e.preventDefault();
+        dashHeld = false;
+    }
 }
 
 function playSidetone(isDash) {
@@ -1256,6 +1293,7 @@ function startFreeMode() {
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('free-screen').classList.remove('hidden');
     updateKeyAssignRow('free-key-assign-row');
+    setGameplayViewportLock(true);
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     if (isTouch) document.getElementById('free-paddle-area').classList.add('visible');
     doResume.then(() => { setTimeout(launchFreeMode, 300); })
@@ -1327,6 +1365,7 @@ function resetFreeMode() {
 
 function quitFreeMode() {
     isPlaying = false;
+    setGameplayViewportLock(false);
     gameMode = 'TX';
     document.removeEventListener('keydown', onTxKeyDown);
     document.removeEventListener('keyup',   onTxKeyUp);
@@ -1514,6 +1553,7 @@ function startScopeAnimation() {
 // ── End / Quit ─────────────────────────────────────────────────────────────────
 function quitGame() {
     isPlaying = false; scopeRunning = false;
+    setGameplayViewportLock(false);
     clearInterval(timerId); killCurrentAudio();
     cleanupTx();
     score = 0;
@@ -1532,6 +1572,7 @@ function retryGame() {
 
 function endGame() {
     isPlaying = false; scopeRunning = false;
+    setGameplayViewportLock(false);
     clearInterval(timerId); killCurrentAudio();
     cleanupTx();
     const minutes = Math.round(initialSeconds / 60);
