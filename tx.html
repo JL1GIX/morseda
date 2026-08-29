@@ -394,18 +394,34 @@
         .tx-paddle-label { display: block; font-size: 0.68rem; letter-spacing: 3px; opacity: 0.9; }
         /* TX word display */
         #tx-word-display {
-            font-size: 2.1rem;
+            font-size: 3.5rem;
+            font-weight: 700;
             letter-spacing: 6px;
             min-height: 7rem;
             border: 1px solid var(--primary-dim);
             border-top: 2px solid var(--primary);
-            padding: 12px;
+            padding: 10px 2px;
             background: rgba(0, 15, 8, 0.95);
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 2px;
             position: relative;
+        }
+        #tx-target-text { display: inline-block; white-space: nowrap; }
+        #tx-target-text .tx-char-done {
+            color: var(--success);
+            opacity: 0.78;
+        }
+        #tx-target-text .tx-char-current {
+            color: #fff;
+            opacity: 1;
+            text-shadow: 0 0 6px var(--primary), 0 0 18px var(--primary);
+        }
+        #tx-target-text .tx-char-next {
+            color: var(--primary);
+            opacity: 0.82;
+            text-shadow: 0 0 8px rgba(0, 208, 106, 0.35);
         }
         #tx-word-display::before {
             content: '';
@@ -1085,11 +1101,37 @@ function nextTxWord() {
 function updateTxDisplay() {
     const target = document.getElementById('tx-target-text');
     target.innerHTML = txWord.map((ch, i) => {
-        if (i < txCharIndex) return `<span style="color:var(--success);opacity:0.55;">${ch}</span>`;
-        else if (i === txCharIndex) return `<span style="color:#fff;text-shadow:0 0 15px var(--primary);">${ch}</span>`;
-        else return `<span style="opacity:0.3;">${ch}</span>`;
+        if (i < txCharIndex) return `<span class="tx-char-done">${ch}</span>`;
+        if (i === txCharIndex) return `<span class="tx-char-current">${ch}</span>`;
+        return `<span class="tx-char-next">${ch}</span>`;
     }).join('');
+    fitTxTargetText();
 }
+
+// PC・スマホとも基本は同じ3.5remで表示し、枠からはみ出す場合だけ縮小する。
+function fitTxTargetText() {
+    const target = document.getElementById('tx-target-text');
+    const display = document.getElementById('tx-word-display');
+    if (!target || !display || !target.textContent) return;
+
+    target.style.fontSize = '3.5rem';
+    const availableWidth = Math.max(0, display.clientWidth - 8);
+    if (target.scrollWidth <= availableWidth) return;
+
+    let lower = 16;
+    let upper = parseFloat(getComputedStyle(target).fontSize);
+    for (let i = 0; i < 9; i++) {
+        const middle = (lower + upper) / 2;
+        target.style.fontSize = `${middle}px`;
+        if (target.scrollWidth <= availableWidth) lower = middle;
+        else upper = middle;
+    }
+    target.style.fontSize = `${lower}px`;
+}
+
+window.addEventListener('resize', () => {
+    if (isPlaying && gameMode === 'TX') fitTxTargetText();
+});
 
 function updateTxBeginnerDisplay() {
     if (!beginnerMode) return;
