@@ -654,7 +654,7 @@
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
             </div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
-                <button class="start-key-hint" onclick="unlockAndPrepare()"><span class="start-keycap">A</span>キーでスタート</button>
+                <button class="start-key-hint" onclick="unlockAndPrepare()"><span class="start-keycap">A</span><span id="start-hint-label">キーでスタート</span></button>
                 <button onclick="location.href='https://jl1gix.com'" style="font-size:0.72rem;padding:6px 16px;opacity:0.5;margin-top:10px;">◀ 戻る</button>
             </div>
         </div>
@@ -710,6 +710,7 @@
         </div>
         <div id="status-msg">READY...</div>
         <button class="quit-btn" onclick="quitGame()">■ QUIT (中断)</button>
+        <div class="result-key-hint" id="gameplay-key-hint">（Escキー）</div>
     </div>
 
     <!-- ═══ FREE INPUT SCREEN ═══ -->
@@ -898,8 +899,9 @@ document.addEventListener('keydown', (e) => {
     const typing = isTypingContext(e.target);
 
     // ロビー画面: Aキー（Morse BoardでAを打鍵した場合も同じキー入力として届く）でスタート
-    // ※テキスト入力中（英字なので）は無視する
-    if (!typing && !_capturingFor) {
+    // ※テキスト入力中（英字なので）、およびキー設定モーダル表示中は無視する
+    const kcModalOpen = document.getElementById('key-customize-modal')?.classList.contains('open');
+    if (!typing && !_capturingFor && !kcModalOpen) {
         const startScreen = document.getElementById('start-screen');
         if (startScreen && !startScreen.classList.contains('hidden') && e.key.toUpperCase() === 'A') {
             e.preventDefault();
@@ -1011,6 +1013,8 @@ function updateTxModeDesc() {
     if (wpmSettingItem) wpmSettingItem.classList.toggle('hidden', isMorseBoard);
     const settingsGrid = wpmSettingItem && wpmSettingItem.parentElement;
     if (settingsGrid) settingsGrid.classList.toggle('morse-board-settings', isMorseBoard);
+    const startHintLabel = document.getElementById('start-hint-label');
+    if (startHintLabel) startHintLabel.textContent = isMorseBoard ? '（・　ー）打鍵でスタート' : 'キーでスタート';
     if (isMorseBoard) {
         document.getElementById('mode-description').innerHTML =
             `コールサインとRSTが表示される。<br>Morse BoardをPCに接続し、表示された文字をパドルで入力。<br>キーボードとして入力された英数字を、そのまま解答として判定します。`;
@@ -1110,6 +1114,8 @@ function unlockAndPrepare() {
     TX_DOT_TIME = 1.2 / wpmVal;
     morseBoardMode = document.getElementById('morse-board-mode-check').checked;
     document.getElementById('wpm-display').innerText = morseBoardMode ? 'KEY' : wpmVal;
+    const gameplayKeyHint = document.getElementById('gameplay-key-hint');
+    if (gameplayKeyHint) gameplayKeyHint.textContent = morseBoardMode ? 'ピリオド（・－・－・－）' : '（Escキー）';
     beginnerMode = document.getElementById('beginner-mode-check').checked;
     document.getElementById('game-screen').classList.toggle('beginner-compact', beginnerMode);
     if (beginnerMode) {
