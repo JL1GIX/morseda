@@ -798,6 +798,7 @@ let gameMode = 'TX'; // 'TX' | 'FREE'
 // TX mode state
 let txWord = [], txCharIndex = 0, txMorseInput = '';
 let nextTxType = 'CALLSIGN';
+let txWordIsCallsign = true; // 現在のtxWordがコールサインかどうか（カットナンバーはコンテストナンバーのみに適用）
 let txCharTimer = null;
 let TX_CHAR_GAP = 280;
 let TX_DOT_TIME = 1.2 / 25; // 25 WPM デフォルト、設定で 20-30 から選択可能
@@ -1124,8 +1125,9 @@ function startTxGame() {
 }
 
 function nextTxWord() {
-    const raw = (nextTxType === 'CALLSIGN') ? generateCallsign() : generateRST();
-    nextTxType = (nextTxType === 'CALLSIGN') ? 'RST' : 'CALLSIGN';
+    txWordIsCallsign = (nextTxType === 'CALLSIGN');
+    const raw = txWordIsCallsign ? generateCallsign() : generateRST();
+    nextTxType = txWordIsCallsign ? 'RST' : 'CALLSIGN';
     txWord = raw.split('');
     txCharIndex = 0; txMorseInput = '';
     renderTxInput();
@@ -1323,10 +1325,9 @@ function decodeTxChar() {
 function evaluateTxChar(decoded) {
     const expected = txWord[txCharIndex];
     const txArea   = document.getElementById('tx-area');
-    // ポータブル「/」直後の数字は本来の1・0の符号のみ正解（カットナンバーは不可）。
-    // それ以外の1・0は本来の符号に加え、カットナンバー（1→A、0→O/T）も正解とする。
-    const isPortableDigit = txCharIndex > 0 && txWord[txCharIndex - 1] === '/';
-    const cutAlts = (!isPortableDigit && CUT_NUMBER_ACCEPT[expected]) || [];
+    // コールサインの1・0は本来の符号のみ正解（カットナンバー不可）。
+    // コンテストナンバーの1・0は本来の符号に加え、カットナンバー（1→A、0→O/T）も正解とする。
+    const cutAlts = (!txWordIsCallsign && CUT_NUMBER_ACCEPT[expected]) || [];
     const isCorrect = (decoded === expected) || cutAlts.includes(decoded);
     if (isCorrect) {
         txCharIndex++;

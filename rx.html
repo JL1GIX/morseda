@@ -591,6 +591,7 @@ let audioCtx = null, masterGain = null;
 let timeLeft, initialSeconds, score = 0, currentWord = '', isPlaying = false;
 let timerId, audioLoopId, activeOscillators = [];
 let isWaitingNext = false, nextType = 'CALLSIGN';
+let currentWordIsCallsign = true; // 現在のcurrentWordがコールサインかどうか（カットナンバーはコンテストナンバーのみに適用）
 let DOT_TIME = 1.2 / 30; // 30 WPM default
 let beginnerMode = false;
 const gameMode = 'RX';
@@ -768,8 +769,9 @@ function tick() {
 }
 
 function nextWord() {
-    currentWord = (nextType === 'CALLSIGN') ? generateCallsign() : generateRST();
-    nextType = (nextType === 'CALLSIGN') ? 'RST' : 'CALLSIGN';
+    currentWordIsCallsign = (nextType === 'CALLSIGN');
+    currentWord = currentWordIsCallsign ? generateCallsign() : generateRST();
+    nextType = currentWordIsCallsign ? 'RST' : 'CALLSIGN';
     playMorseLoop();
 }
 
@@ -786,10 +788,9 @@ function playMorse(text) {
     let offset = 0;
     const charEntries = [];
     text.split('').forEach((char, idx) => {
-        // 非初心者モードでは1・0をカットナンバー(A/O)で送出する(正解の判定は元の文字のまま)。
-        // ただしポータブル「/」直後の数字は常に本来の符号のまま。
-        const isPortableDigit = idx > 0 && text[idx - 1] === '/';
-        const playChar = (!beginnerMode && !isPortableDigit && CUT_NUMBER[char]) ? CUT_NUMBER[char] : char;
+        // 非初心者モードのコンテストナンバーのみ、1・0をカットナンバー(A/O)で送出する
+        // (正解の判定は元の文字のまま)。コールサインの1・0は常に本来の符号のまま。
+        const playChar = (!beginnerMode && !currentWordIsCallsign && CUT_NUMBER[char]) ? CUT_NUMBER[char] : char;
         const code = MORSE_CODE[playChar];
         if (!code) return;
         const charStartOffset = offset;
