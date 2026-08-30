@@ -782,9 +782,10 @@ const MORSE_CODE = {
 };
 const MORSE_REVERSE = {};
 Object.entries(MORSE_CODE).forEach(([ch, code]) => { MORSE_REVERSE[code] = ch; });
-// コンテストナンバーの「カットナンバー」表記: 1→A(・－)、0→O(－－－)。
-// 送信モードでは基本この短い符号で送出させ、本来の1・0の符号(.----/-----)でも正解とする。
-const CUT_NUMBER = { '1': 'A', '0': 'O' };
+// コンテストナンバーの「カットナンバー」表記: 1→A(・－)、0→O(－－－)/T(－)。
+// 送信モードでは本来の1・0の符号に加えて、これらのカットナンバーでも正解とする
+// （ただしポータブル「/」直後の数字は本来の1・0の符号のみ正解）。表示は常に本来の符号。
+const CUT_NUMBER_ACCEPT = { '1': ['A'], '0': ['O', 'T'] };
 
 // ── State ──────────────────────────────────────────────────────────────────────
 let audioCtx = null, masterGain = null;
@@ -1172,8 +1173,8 @@ function updateTxBeginnerDisplay() {
     if (!beginnerMode) return;
     const ch = txWord[txCharIndex];
     if (!ch) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
-    // 送信モードでは初心者・非初心者を問わず、1・0はカットナンバー(A/O)で表示する
-    const code = MORSE_CODE[CUT_NUMBER[ch] || ch];
+    // 表示は常に本来の1・0の符号のまま（カットナンバーは正解判定でのみ別解として許容）
+    const code = MORSE_CODE[ch];
     if (!code) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
     beginnerDisplay.classList.add('tx-beginner');
     beginnerDisplay.innerHTML = code.split('').map(sym =>
@@ -1322,8 +1323,11 @@ function decodeTxChar() {
 function evaluateTxChar(decoded) {
     const expected = txWord[txCharIndex];
     const txArea   = document.getElementById('tx-area');
-    // 送信モードでは初心者・非初心者を問わずカットナンバー（1→A、0→O）が正解。本来の1・0の符号も常に正解。
-    const isCorrect = (decoded === expected) || (CUT_NUMBER[expected] && decoded === CUT_NUMBER[expected]);
+    // ポータブル「/」直後の数字は本来の1・0の符号のみ正解（カットナンバーは不可）。
+    // それ以外の1・0は本来の符号に加え、カットナンバー（1→A、0→O/T）も正解とする。
+    const isPortableDigit = txCharIndex > 0 && txWord[txCharIndex - 1] === '/';
+    const cutAlts = (!isPortableDigit && CUT_NUMBER_ACCEPT[expected]) || [];
+    const isCorrect = (decoded === expected) || cutAlts.includes(decoded);
     if (isCorrect) {
         txCharIndex++;
         score++;

@@ -584,6 +584,7 @@ const MORSE_CODE = {
 };
 // コンテストナンバー・コールサインの「カットナンバー」表記: 1→A(・－)、0→O(－－－)。
 // 初心者モード以外では、実際に送出するモールス符号をこちらに置き換える(正解の文字自体は1・0のまま)。
+// ただしポータブル「/」直後の数字は常に本来の1・0の符号のまま送出する。
 const CUT_NUMBER = { '1': 'A', '0': 'O' };
 // ── State ──────────────────────────────────────────────────────────────────────
 let audioCtx = null, masterGain = null;
@@ -784,9 +785,11 @@ function playMorse(text) {
     const startMs   = Date.now() + 100;
     let offset = 0;
     const charEntries = [];
-    text.split('').forEach(char => {
-        // 非初心者モードでは1・0をカットナンバー(A/O)で送出する(正解の判定は元の文字のまま)
-        const playChar = (!beginnerMode && CUT_NUMBER[char]) ? CUT_NUMBER[char] : char;
+    text.split('').forEach((char, idx) => {
+        // 非初心者モードでは1・0をカットナンバー(A/O)で送出する(正解の判定は元の文字のまま)。
+        // ただしポータブル「/」直後の数字は常に本来の符号のまま。
+        const isPortableDigit = idx > 0 && text[idx - 1] === '/';
+        const playChar = (!beginnerMode && !isPortableDigit && CUT_NUMBER[char]) ? CUT_NUMBER[char] : char;
         const code = MORSE_CODE[playChar];
         if (!code) return;
         const charStartOffset = offset;
