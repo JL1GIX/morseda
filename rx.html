@@ -294,6 +294,38 @@
         }
         .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.85; }
         .quit-btn:hover { opacity: 1; }
+        /* ロビー画面: キー押下でスタートできることを示すキーキャップ風ボタン */
+        .start-key-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05rem;
+            padding: 12px 28px;
+        }
+        .start-keycap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            background: rgba(0,192,96,0.16);
+            font-weight: bold;
+            font-size: 1.1rem;
+            animation: start-keycap-pulse 1.4s ease-in-out infinite;
+        }
+        @keyframes start-keycap-pulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(0,192,96,0.4); }
+            50%      { box-shadow: 0 0 18px rgba(0,192,96,0.95); }
+        }
+        /* リザルト画面: キー操作で戻れることを示す小さなヒント */
+        .result-key-hint {
+            font-size: 0.68rem;
+            color: var(--primary-dim);
+            opacity: 0.8;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
         select {
             background: rgba(0,0,0,0.85);
             color: var(--primary);
@@ -479,7 +511,7 @@
                 </div>
             </div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
-                <button onclick="unlockAndPrepare()">▶ ミッション開始</button>
+                <button class="start-key-hint" onclick="unlockAndPrepare()"><span class="start-keycap">A</span>キーでスタート</button>
                 <button onclick="location.href='https://jl1gix.com'" style="font-size:0.72rem;padding:6px 16px;opacity:0.5;margin-top:10px;">◀ 戻る</button>
             </div>
         </div>
@@ -553,6 +585,7 @@
             </div>
         </div>
         <button onclick="retryGame()" style="margin-top:16px;">▶ 再挑戦</button>
+        <div class="result-key-hint" id="result-key-hint">（Escキー）</div>
     </div>
 </div>
 
@@ -873,6 +906,44 @@ mobileInput.addEventListener('input', () => {
 });
 mobileInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); submitRxInput(); }
+});
+
+// ── キーボードショートカット: マウスなしでロビー/リザルト画面を操作 ─────────────
+function isTypingContext(target) {
+    return target instanceof Element && (target.matches('input, select, textarea') || target.isContentEditable);
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.repeat) return;
+    const typing = isTypingContext(e.target);
+
+    // ロビー画面: Aキーでスタート（Aは英字なのでテキスト入力中は無視）
+    if (!typing) {
+        const startScreen = document.getElementById('start-screen');
+        if (startScreen && !startScreen.classList.contains('hidden') && e.key.toUpperCase() === 'A') {
+            e.preventDefault();
+            unlockAndPrepare();
+            return;
+        }
+    }
+
+    // リザルト画面: Escキーでロビーへ戻る（制御キーなので入力中でも常に有効）
+    const resultScreen = document.getElementById('result-screen');
+    if (resultScreen && !resultScreen.classList.contains('hidden') && e.code === 'Escape') {
+        e.preventDefault();
+        retryGame();
+        return;
+    }
+
+    // プレイ中: Escキーで強制的にロビーへ戻る（入力欄にフォーカスがあっても常に有効）
+    if (e.code === 'Escape' && isPlaying) {
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen && !gameScreen.classList.contains('hidden')) {
+            e.preventDefault();
+            quitGame();
+            return;
+        }
+    }
 });
 
 // ── Beginner mode display ──────────────────────────────────────────────────────

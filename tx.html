@@ -251,6 +251,38 @@
         }
         .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.85; }
         .quit-btn:hover { opacity: 1; }
+        /* ロビー画面: キー押下でスタートできることを示すキーキャップ風ボタン */
+        .start-key-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05rem;
+            padding: 12px 28px;
+        }
+        .start-keycap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            background: rgba(0,192,96,0.16);
+            font-weight: bold;
+            font-size: 1.1rem;
+            animation: start-keycap-pulse 1.4s ease-in-out infinite;
+        }
+        @keyframes start-keycap-pulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(0,192,96,0.4); }
+            50%      { box-shadow: 0 0 18px rgba(0,192,96,0.95); }
+        }
+        /* リザルト画面: キー操作で戻れることを示す小さなヒント */
+        .result-key-hint {
+            font-size: 0.68rem;
+            color: var(--primary-dim);
+            opacity: 0.8;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
         /* 初心者モードのプレイ画面は要素が増えて縦に長くなるため、全体を一回り小さくしてQUITボタンの見切れを防ぐ */
         #game-screen.beginner-compact .signal-indicators { margin-bottom: 7px; }
         #game-screen.beginner-compact #game-key-assign-row { margin-bottom: 9px; gap: 13px; }
@@ -622,7 +654,7 @@
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 フリー入力モード</button>
             </div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
-                <button onclick="unlockAndPrepare()">▶ ミッション開始</button>
+                <button class="start-key-hint" onclick="unlockAndPrepare()"><span class="start-keycap">A</span>キーでスタート</button>
                 <button onclick="location.href='https://jl1gix.com'" style="font-size:0.72rem;padding:6px 16px;opacity:0.5;margin-top:10px;">◀ 戻る</button>
             </div>
         </div>
@@ -751,6 +783,7 @@
             </div>
         </div>
         <button onclick="retryGame()" style="margin-top:16px;">▶ 再挑戦</button>
+        <div class="result-key-hint" id="result-key-hint">（Escキー）</div>
     </div>
 </div>
 
@@ -854,6 +887,55 @@ function setGameplayViewportLock(active) {
 
 document.addEventListener('keydown', preventGameplayViewportMovement, { capture: true, passive: false });
 document.addEventListener('keyup', preventGameplayViewportMovement, { capture: true, passive: false });
+
+// ── キーボードショートカット: マウスなしでロビー/リザルト画面を操作 ─────────────
+function isTypingContext(target) {
+    return target instanceof Element && (target.matches('input, select, textarea') || target.isContentEditable);
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.repeat) return;
+    const typing = isTypingContext(e.target);
+
+    // ロビー画面: Aキー（Morse BoardでAを打鍵した場合も同じキー入力として届く）でスタート
+    // ※テキスト入力中（英字なので）は無視する
+    if (!typing && !_capturingFor) {
+        const startScreen = document.getElementById('start-screen');
+        if (startScreen && !startScreen.classList.contains('hidden') && e.key.toUpperCase() === 'A') {
+            e.preventDefault();
+            unlockAndPrepare();
+            return;
+        }
+    }
+
+    // リザルト画面: Escキーは常に、Morse Boardモードで遊んだ回はR打鍵でもロビーへ戻る
+    // ※Rは英字なのでテキスト入力中は無視するが、Escは制御キーなので入力中でも有効
+    const resultScreen = document.getElementById('result-screen');
+    if (resultScreen && !resultScreen.classList.contains('hidden')) {
+        if (e.code === 'Escape' || (!typing && morseBoardMode && e.key.toUpperCase() === 'R')) {
+            e.preventDefault();
+            retryGame();
+            return;
+        }
+    }
+
+    // プレイ中: Escキーで強制的にロビーへ戻る（送信モード・フリー入力モード共通）
+    // ※Escは制御キーなので、入力欄にフォーカスがあっても常に有効にする
+    if (e.code === 'Escape' && isPlaying) {
+        const gameScreen = document.getElementById('game-screen');
+        const freeScreen = document.getElementById('free-screen');
+        if (gameScreen && !gameScreen.classList.contains('hidden')) {
+            e.preventDefault();
+            quitGame();
+            return;
+        }
+        if (freeScreen && !freeScreen.classList.contains('hidden')) {
+            e.preventDefault();
+            quitFreeMode();
+            return;
+        }
+    }
+});
 
 // ── Key label helper ───────────────────────────────────────────────────────────
 function getKeyLabel(code) {
@@ -1281,6 +1363,11 @@ function handleMorseBoardKey(e) {
     if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
     if (!e.key || e.key.length !== 1) return;
     const decoded = e.key.toUpperCase();
+    // ピリオド（・－・－・－）打鍵でプレイ中のロビーへの強制送還コマンドとする
+    if (decoded === '.') {
+        if (isPlaying) { e.preventDefault(); quitGame(); }
+        return;
+    }
     if (!MORSE_CODE[decoded]) return;
     e.preventDefault();
     evaluateTxChar(decoded);
@@ -1668,6 +1755,8 @@ function endGame() {
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
         `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min`;
+    const resultKeyHint = document.getElementById('result-key-hint');
+    if (resultKeyHint) resultKeyHint.textContent = morseBoardMode ? '（Escキー / R打鍵）' : '（Escキー）';
     document.getElementById('nickname-input').value = '';
     const btn = document.getElementById('submit-score-btn');
     btn.disabled = false;
