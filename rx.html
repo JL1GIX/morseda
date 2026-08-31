@@ -936,10 +936,26 @@ document.addEventListener('keydown', (e) => {
 
     // リザルト画面: Escキーでロビーへ戻る（制御キーなので入力中でも常に有効）
     const resultScreen = document.getElementById('result-screen');
-    if (resultScreen && !resultScreen.classList.contains('hidden') && e.code === 'Escape') {
-        e.preventDefault();
-        retryGame();
-        return;
+    if (resultScreen && !resultScreen.classList.contains('hidden')) {
+        // 「/」キーでニックネーム入力欄へフォーカス、フォーカス済みなら再度「/」でEnterと同様に確定
+        if (e.key === '/') {
+            const nicknameInput = document.getElementById('nickname-input');
+            const regArea = document.getElementById('score-reg-area');
+            if (nicknameInput && regArea && regArea.style.display !== 'none') {
+                e.preventDefault();
+                if (document.activeElement === nicknameInput) {
+                    setNickname();
+                } else {
+                    nicknameInput.focus();
+                }
+                return;
+            }
+        }
+        if (e.code === 'Escape') {
+            e.preventDefault();
+            retryGame();
+            return;
+        }
     }
 
     // プレイ中: Escキーで強制的にロビーへ戻る（入力欄にフォーカスがあっても常に有効）
