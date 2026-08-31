@@ -689,7 +689,13 @@ function unlockAndPrepare() {
     DOT_TIME = wpmToDotTime(wpmVal);
     document.getElementById('wpm-display').innerText = wpmVal;
     beginnerMode = document.getElementById('beginner-mode-check').checked;
-    if (beginnerMode) beginnerDisplay.classList.remove('hidden');
+    if (beginnerMode) {
+        beginnerDisplay.classList.remove('hidden');
+    } else {
+        // 前回のプレイで残った初心者表示（長点短点）を消す
+        beginnerDisplay.classList.add('hidden');
+        beginnerDisplay.innerHTML = '';
+    }
     if (!audioCtx) {
         const AC = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AC();
