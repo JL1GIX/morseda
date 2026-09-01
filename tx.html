@@ -915,15 +915,16 @@ document.addEventListener('keydown', (e) => {
     // ※Rは英字なのでテキスト入力中は無視するが、Escは制御キーなので入力中でも有効
     const resultScreen = document.getElementById('result-screen');
     if (resultScreen && !resultScreen.classList.contains('hidden')) {
-        // 「/」キー（Morse Boardで/を打鍵した場合も同じキー入力として届く）でニックネーム入力欄へフォーカス、
-        // フォーカス済みの状態で再度「/」が押されたらEnterと同様に確定する
+        // 「/」キー（Morse Boardで/を打鍵した場合も同じキー入力として届く）でニックネーム入力欄へフォーカス。
+        // フォーカス済みの状態で再度「/」が押された場合、Morse Boardモードのみ Enter と同様に確定する
+        // （非Morse Boardモードでは確定は「設定する」ボタンかEnterキーのみ）。
         if (e.key === '/') {
             const nicknameInput = document.getElementById('nickname-input');
             const regArea = document.getElementById('score-reg-area');
             if (nicknameInput && regArea && regArea.style.display !== 'none') {
                 e.preventDefault();
                 if (document.activeElement === nicknameInput) {
-                    setNickname();
+                    if (morseBoardMode) setNickname();
                 } else {
                     nicknameInput.focus();
                 }

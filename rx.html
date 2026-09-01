@@ -952,15 +952,14 @@ document.addEventListener('keydown', (e) => {
     // リザルト画面: Escキーでロビーへ戻る（制御キーなので入力中でも常に有効）
     const resultScreen = document.getElementById('result-screen');
     if (resultScreen && !resultScreen.classList.contains('hidden')) {
-        // 「/」キーでニックネーム入力欄へフォーカス、フォーカス済みなら再度「/」でEnterと同様に確定
+        // 「/」キーでニックネーム入力欄へフォーカス（受信モードにMorse Boardはないため、
+        // 確定は常に「設定する」ボタンかEnterキーのみ。再度「/」を押しても何もしない）
         if (e.key === '/') {
             const nicknameInput = document.getElementById('nickname-input');
             const regArea = document.getElementById('score-reg-area');
             if (nicknameInput && regArea && regArea.style.display !== 'none') {
                 e.preventDefault();
-                if (document.activeElement === nicknameInput) {
-                    setNickname();
-                } else {
+                if (document.activeElement !== nicknameInput) {
                     nicknameInput.focus();
                 }
                 return;
