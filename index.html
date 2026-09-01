@@ -147,6 +147,21 @@
             box-shadow: 0 0 15px rgba(0,123,67,0.35);
             color: #fff;
         }
+        .home-link-btn {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 22px;
+            background: rgba(0,123,67,0.08);
+            transition: all 0.2s;
+        }
+        .home-link-btn:hover {
+            border-color: var(--primary);
+            background: rgba(0,123,67,0.18);
+            box-shadow: 0 0 12px rgba(0,123,67,0.3);
+        }
         @media (max-width: 700px) {
             body { justify-content: flex-start; padding: 8px 0; }
             #game-container { padding: 12px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; }
@@ -161,6 +176,13 @@
                 flex: 1 1 0 !important;
             }
             .mode-btn-row button > span { font-size: 1.55rem !important; margin-bottom: 4px !important; }
+            /* ホームのスペクトラムスコープ: 横に長すぎるのでカットして、縦幅はボタンの上下にはみ出す程度に */
+            #home-scope-canvas {
+                width: 88% !important;
+                max-width: 340px !important;
+                height: 170px !important;
+                object-fit: cover !important;
+            }
         }
     </style>
     <script type="application/ld+json">
@@ -224,9 +246,9 @@
                 <span style="display:block;font-size:2rem;margin-bottom:6px;">📡</span>送信モード
             </button>
         </div>
-        <div style="display:flex;justify-content:center;gap:24px;font-size:0.85rem;letter-spacing:2px;opacity:0.7;flex-wrap:wrap;margin-top:12px;">
-            <a href="ranking.html" style="color:var(--primary-dim);text-decoration:none;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='1'">🏆 ランキング</a>
-            <a href="morse-table.html" style="color:var(--primary-dim);text-decoration:none;">モールス符号表</a>
+        <div style="display:flex;justify-content:center;gap:16px;font-size:0.85rem;letter-spacing:2px;flex-wrap:wrap;margin-top:16px;">
+            <a href="ranking.html" class="home-link-btn">🏆 ランキング</a>
+            <a href="morse-table.html" class="home-link-btn">🔤 モールス符号表</a>
         </div>
     </div>
 </div>
