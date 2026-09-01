@@ -883,7 +883,12 @@ function submitRxInput() {
     const finalInput = mobileInput.value.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
     displayFrame.classList.remove('flash-correct', 'flash-error');
     void displayFrame.offsetWidth;
-    if (normalizeRstPrefix(finalInput) === normalizeRstPrefix(currentWord) && currentWord !== '') {
+    // 599/5NNどちらでも正解にするのは非初心者モードのみ（常に5NN音のため）。
+    // 初心者モードは常に599の音なので、5NNと入力されたら不正解とする。
+    const inputMatches = beginnerMode
+        ? (finalInput === currentWord)
+        : (normalizeRstPrefix(finalInput) === normalizeRstPrefix(currentWord));
+    if (inputMatches && currentWord !== '') {
         mobileInput.value = '';
         score += currentWord.length;
         document.getElementById('score').innerText = score;
