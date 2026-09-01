@@ -117,7 +117,7 @@
     <p>「▶ ミッション開始」をクリックすると、コールサインと RST レポートが交互に音声で流れます。</p>
     <ul>
         <li><strong>コールサイン例</strong>：JL1GIX、7K1ABC、8J1RL/1</li>
-        <li><strong>RST 例</strong>:5NN108(599 + 都道府県コード 108 = 千葉)</li>
+        <li><strong>RST 例</strong>：599108H（599 + 都道府県コード108 + サフィックス文字）。先頭の「599」は非初心者モードでは慣例的に「5NN」の音で流れますが、入力は599・5NNどちらでも正解になります（初心者モードは常に599の音で、599の入力のみ正解）</li>
     </ul>
     <p>聞き取った内容を画面下部の入力欄に打ち込み、Enter で判定します。正解なら次の問題へ、間違えたら赤くフラッシュして同じ問題が続きます。</p>
 
@@ -151,6 +151,9 @@
 
     <h3>初心者モード</h3>
     <p>受信モード同様、ON にすると次に打つべき文字のモールス符号が画面に表示されます。まだ完全に符号を覚えていない段階での学習に有効です。</p>
+
+    <h3>コンテストナンバー（RST）の打鍵</h3>
+    <p>お題のRSTは「5NN108H」のように先頭が「5NN」表記で出題され、正解も5NNの打鍵のみです。またコンテストナンバーの数字は、1を「1」または「A」、0を「0」または「O」または「T」、9を「9」または「N」のどちらで打っても正解になります（カットナンバー）。ただしコールサインの数字は常に本来の数字の打鍵のみが正解です。</p>
 
     <h2>5. フリー入力モード(送信モード内)</h2>
     <p>送信モードの設定画面から「📝 フリー入力モード」を選ぶと、自由に文字を打って音を確認できるモードに入れます。</p>
@@ -198,7 +201,7 @@
 </div>
 
 <footer>
-    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 18px;">
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 20px;">
         <a href="https://jl1gix.com" style="color:#007b43; text-decoration:none;">トップ</a>
 <a href="how-to-use.html" style="color:#007b43; text-decoration:none;">使い方</a>
 <a href="morse-table.html" style="color:#007b43; text-decoration:none;">モールス符号表</a>
