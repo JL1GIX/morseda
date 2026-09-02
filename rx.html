@@ -1210,7 +1210,9 @@ function endGame() {
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
         `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min`;
-    document.getElementById('nickname-input').value = '';
+    const nicknameInputEl = document.getElementById('nickname-input');
+    nicknameInputEl.value = '';
+    nicknameInputEl.disabled = false; // 前回のプレイで設定済みになっていても、次のプレイでは再入力できるようにする
     const btn = document.getElementById('submit-score-btn');
     btn.disabled = false;
     btn.textContent = '✏️ 名前を設定';
