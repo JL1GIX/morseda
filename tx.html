@@ -902,11 +902,18 @@ document.addEventListener('keydown', (e) => {
     // ロビー画面: Aキー（Morse BoardでAを打鍵した場合も同じキー入力として届く）でスタート
     // ※テキスト入力中（英字なので）、およびキー設定モーダル表示中は無視する
     const kcModalOpen = document.getElementById('key-customize-modal')?.classList.contains('open');
-    if (!typing && !_capturingFor && !kcModalOpen) {
-        const startScreen = document.getElementById('start-screen');
-        if (startScreen && !startScreen.classList.contains('hidden') && e.key.toUpperCase() === 'A') {
+    const startScreen = document.getElementById('start-screen');
+    const onLobbyScreen = startScreen && !startScreen.classList.contains('hidden');
+    if (onLobbyScreen && !kcModalOpen) {
+        if (!typing && !_capturingFor && e.key.toUpperCase() === 'A') {
             e.preventDefault();
             unlockAndPrepare();
+            return;
+        }
+        // ロビー画面: Escキーでモールス打のトップ画面へ（制御キーなので入力中でも有効）
+        if (e.code === 'Escape') {
+            e.preventDefault();
+            location.href = 'https://jl1gix.com';
             return;
         }
     }

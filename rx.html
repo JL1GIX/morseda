@@ -965,12 +965,19 @@ document.addEventListener('keydown', (e) => {
     if (e.repeat) return;
     const typing = isTypingContext(e.target);
 
-    // ロビー画面: Aキーでスタート（Aは英字なのでテキスト入力中は無視）
-    if (!typing) {
-        const startScreen = document.getElementById('start-screen');
-        if (startScreen && !startScreen.classList.contains('hidden') && e.key.toUpperCase() === 'A') {
+    // ロビー画面: Aキーでスタート（Aは英字なのでテキスト入力中は無視）、
+    // Escキーでモールス打のトップ画面へ（制御キーなので入力中でも有効）
+    const startScreen = document.getElementById('start-screen');
+    const onLobbyScreen = startScreen && !startScreen.classList.contains('hidden');
+    if (onLobbyScreen) {
+        if (!typing && e.key.toUpperCase() === 'A') {
             e.preventDefault();
             unlockAndPrepare();
+            return;
+        }
+        if (e.code === 'Escape') {
+            e.preventDefault();
+            location.href = 'https://jl1gix.com';
             return;
         }
     }
