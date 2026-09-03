@@ -421,6 +421,21 @@
             to   { opacity: 1; box-shadow: 0 0 8px var(--primary); }
         }
         #status-msg { font-size: 0.82rem; opacity: 1.0; margin-top: 10px; letter-spacing: 2px; }
+        #game-start-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            color: #fff;
+            font-size: clamp(3.5rem, 16vw, 9rem);
+            font-weight: 700;
+            letter-spacing: clamp(6px, 2vw, 20px);
+            text-align: center;
+            text-shadow: 0 0 12px var(--primary), 0 0 45px var(--primary), 0 0 90px rgba(0, 208, 106, 0.7);
+        }
         #result-screen h2 { letter-spacing: 6px; font-size: 1.4rem; text-shadow: 0 0 20px rgba(0,123,67,1.0), 0 0 50px rgba(0,123,67,0.4); }
         #final-result-text {
             font-size: clamp(1.1rem, 5.5vw, 2rem); color: var(--success);
@@ -525,6 +540,7 @@
 
     <!-- ═══ GAME SCREEN ═══ -->
     <div id="game-screen" class="hidden">
+        <div id="game-start-overlay" class="hidden" role="status" aria-live="assertive">START</div>
         <div class="signal-indicators">
             <span class="sig-label">SIG</span>
             <div class="sig-dot" id="sig1"></div>
@@ -635,6 +651,7 @@ let isWaitingNext = false, nextType = 'CALLSIGN';
 let currentWordIsCallsign = true; // 現在のcurrentWordがコールサインかどうか（カットナンバーはコンテストナンバーのみに適用）
 let DOT_TIME = 1.2 / 30; // 30 WPM default
 let beginnerMode = false;
+let gameStartTimer = null;
 const gameMode = 'RX';
 // Scope state
 let scopeRunning = false;
@@ -713,14 +730,23 @@ function unlockAndPrepare() {
     audioCtx.onstatechange = () => { if (audioCtx.state === 'suspended') audioCtx.resume(); };
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
+    document.getElementById('game-start-overlay').classList.remove('hidden');
     mobileInput.focus();
     initScope();
     startScopeAnimation();
-    doResume.then(() => { setTimeout(startGame, 300); })
-            .catch(() => { setTimeout(startGame, 300); });
+    const startReadyAt = performance.now() + 1000;
+    const beginAfterPreparation = () => {
+        const remaining = Math.max(0, startReadyAt - performance.now());
+        gameStartTimer = setTimeout(() => {
+            gameStartTimer = null;
+            if (!document.getElementById('game-screen').classList.contains('hidden')) startGame();
+        }, remaining);
+    };
+    doResume.then(beginAfterPreparation).catch(beginAfterPreparation);
 }
 
 function startGame() {
+    document.getElementById('game-start-overlay').classList.add('hidden');
     initialSeconds = parseInt(document.getElementById('time-select').value);
     timeLeft = initialSeconds;
     score = 0; isPlaying = true;
@@ -1193,6 +1219,8 @@ function startScopeAnimation() {
 // ── End / Quit ─────────────────────────────────────────────────────────────────
 function quitGame() {
     isPlaying = false; scopeRunning = false;
+    document.getElementById('game-start-overlay').classList.add('hidden');
+    if (gameStartTimer) { clearTimeout(gameStartTimer); gameStartTimer = null; }
     clearInterval(timerId); killCurrentAudio();
     score = 0;
     document.getElementById('game-screen').classList.add('hidden');
