@@ -141,9 +141,36 @@
             padding: 8px 15px;
             border-radius: 2px;
         }
-        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
         .stat-label { color: var(--primary-dim); font-size: 0.68rem; letter-spacing: 2px; opacity: 1.0; }
         .stat-value { color: var(--primary); font-size: 1.05rem; font-weight: bold; text-shadow: 0 0 10px rgba(0,123,67,0.9), 0 0 20px rgba(0,123,67,0.4); }
+        /* 単語を制限時間内に打ち切った際の「+1秒」ボーナス演出 */
+        .time-bonus-pop {
+            position: absolute;
+            left: 50%;
+            top: -6px;
+            transform: translate(-50%, 0);
+            color: var(--success);
+            font-size: 0.78rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px var(--success), 0 0 18px rgba(0,238,119,0.7);
+            pointer-events: none;
+            white-space: nowrap;
+            animation: time-bonus-float 0.9s ease-out forwards;
+            z-index: 3;
+        }
+        @keyframes time-bonus-float {
+            0%   { opacity: 0; transform: translate(-50%, 6px) scale(0.85); }
+            15%  { opacity: 1; transform: translate(-50%, -2px) scale(1.08); }
+            75%  { opacity: 1; transform: translate(-50%, -22px) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -34px) scale(0.95); }
+        }
+        @keyframes time-bonus-glow {
+            0%, 100% { text-shadow: 0 0 10px rgba(0,123,67,0.9), 0 0 20px rgba(0,123,67,0.4); color: var(--primary); }
+            50%      { text-shadow: 0 0 16px var(--success), 0 0 34px rgba(0,238,119,0.85); color: var(--success); }
+        }
+        .time-bonus-flash { animation: time-bonus-glow 0.5s ease-in-out; }
         #scope-container {
             position: relative;
             background: var(--scope-bg);
@@ -877,6 +904,7 @@ let gameMode = 'TX'; // 'TX' | 'FREE'
 let txWord = [], txCharIndex = 0, txMorseInput = '';
 let txCharTimer = null;
 let wordTimeoutTimer = null; // お題単語ごとの制限時間タイマー
+let wordDeadlineAt = 0; // 現在の単語の制限時間の締切時刻（performance.now()基準、時間延長ボーナス判定用）
 let wordsCompleted = 0, wordsMissed = 0;
 let TX_CHAR_GAP = 280;
 let TX_DOT_TIME = 1.2 / 25; // 25 WPM デフォルト、設定で 20-30 から選択可能
@@ -1201,6 +1229,7 @@ function startWordTimer(word) {
     const fill  = document.getElementById('word-timer-fill');
     if (!track || !fill) return;
     const limitMs = getWordTimeLimitMs(word);
+    wordDeadlineAt = performance.now() + limitMs;
     fill.style.transition = 'none';
     fill.style.transform = 'scaleX(1)';
     void track.offsetWidth; // reflow
@@ -1544,6 +1573,13 @@ function evaluateTxChar(decoded) {
         document.getElementById('status-msg').innerText = `✓ ${expected}`;
         if (txCharIndex >= txWord.length) {
             wordsCompleted++;
+            // 単語ごとの制限時間内に打ち切れた場合、全体の制限時間を1秒延長する
+            if (performance.now() <= wordDeadlineAt) {
+                timeLeft++;
+                const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+                document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                showTimeBonusEffect();
+            }
             nextTxWord();
         } else {
             updateTxDisplay();
@@ -1555,6 +1591,24 @@ function evaluateTxChar(decoded) {
         setTimeout(() => txArea.classList.remove('flash-error'), 400);
         document.getElementById('status-msg').innerText = `✗ RETRY: ${expected}`;
     }
+}
+
+// 時間延長ボーナスの視覚エフェクト（TIME表示のそばに「+1s」がふわっと浮かび、TIME自体もグロー点滅する）
+function showTimeBonusEffect() {
+    const timerEl = document.getElementById('timer');
+    if (!timerEl) return;
+    const timerStat = timerEl.closest('.stat-item');
+    if (timerStat) {
+        const pop = document.createElement('span');
+        pop.className = 'time-bonus-pop';
+        pop.textContent = '+1s';
+        timerStat.appendChild(pop);
+        pop.addEventListener('animationend', () => pop.remove());
+    }
+    timerEl.classList.remove('time-bonus-flash');
+    void timerEl.offsetWidth; // reflow（連続ボーナス時にアニメーションを再始動させる）
+    timerEl.classList.add('time-bonus-flash');
+    setTimeout(() => timerEl.classList.remove('time-bonus-flash'), 500);
 }
 
 function cleanupTx() {
