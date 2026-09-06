@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>モールス打 - Contest Edition | 送信モード</title>
-    <meta name="description" content="アマチュア無線コンテストのCW交信を想定したモールス符号送信練習。キーボードでモールス符号を打ち、スコアをランキングに登録できます。">
-    <meta property="og:title" content="モールス打 - Contest Edition">
-    <meta property="og:description" content="アマチュア無線コンテストのCW交信を想定したモールス符号練習ツール。受信・送信の両モードに対応。スコアをランキングに登録して他のユーザーと競おう。">
-    <meta property="og:url" content="https://jl1gix.com/tx.html">
+    <title>モールス打 - Contest Edition | お遊びモード</title>
+    <meta name="description" content="身近な英単語をお題に、制限時間内にモールス符号でキーイングする「お遊びモード」。送信モードのパドル操作そのままに、気軽にモールス符号を楽しめます。">
+    <meta property="og:title" content="モールス打 - Contest Edition | お遊びモード">
+    <meta property="og:description" content="身近な英単語をお題に、制限時間内にモールス符号でキーイングする「お遊びモード」。送信モードのパドル操作そのままに、気軽にモールス符号を楽しめます。">
+    <meta property="og:url" content="https://jl1gix.com/asobi.html">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://jl1gix.com/ogp.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://jl1gix.com/ogp.png">
-    <meta name="twitter:title" content="モールス打 - Contest Edition">
-    <meta name="twitter:description" content="アマチュア無線コンテストのCW交信を想定したモールス符号練習ツール。受信・送信の両モードに対応。">
+    <meta name="twitter:title" content="モールス打 - Contest Edition | お遊びモード">
+    <meta name="twitter:description" content="身近な英単語をお題に、制限時間内にモールス符号でキーイングする「お遊びモード」。">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="canonical" href="https://jl1gix.com/tx.html">
+    <link rel="canonical" href="https://jl1gix.com/asobi.html">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:site_name" content="モールス打">
     <meta name="twitter:site" content="@JL1GIX">
@@ -297,6 +297,7 @@
         #game-screen.beginner-compact #tx-word-display { font-size: 1.75rem; min-height: 4.8rem; padding: 12px; letter-spacing: 5px; }
         #game-screen.beginner-compact #tx-morse-input { min-height: 3.2rem; margin-top: 7px; padding: 7px 12px; gap: 11px; }
         #game-screen.beginner-compact #status-msg { margin-top: 8px; font-size: 0.8rem; }
+        #game-screen.beginner-compact #word-timer-track { height: 24px; margin-top: 7px; }
         #game-screen.beginner-compact .quit-btn { margin-top: 11px; }
         select {
             background: rgba(0,0,0,0.85);
@@ -397,6 +398,34 @@
             to   { opacity: 1; box-shadow: 0 0 8px var(--primary); }
         }
         #status-msg { font-size: 0.82rem; opacity: 1.0; margin-top: 10px; letter-spacing: 2px; }
+        /* お遊びモード: 単語ごとの制限時間を表す「回転寿司」風タイムバー */
+        #word-timer-track {
+            position: relative;
+            width: 100%;
+            max-width: 460px;
+            height: 30px;
+            margin: 10px auto 0;
+            background: rgba(0,40,20,0.4);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        #word-timer-fill {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            background: linear-gradient(to right, rgba(0,208,106,0.3), rgba(231,76,60,0.5));
+            transform-origin: right center;
+            transform: scaleX(0);
+        }
+        #word-timer-sushi {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translate(-50%, -50%);
+            font-size: 1.3rem;
+            filter: drop-shadow(0 0 4px rgba(0,0,0,0.6));
+        }
         #game-start-overlay {
             position: fixed;
             inset: 0;
@@ -606,7 +635,7 @@
     <div class="header-bar">
         <h1><a href="https://jl1gix.com" style="color:inherit; text-decoration:none;">モールス打</a></h1>
     </div>
-    <div class="subtitle">▸ AMATEUR RADIO CONTEST TRAINER ◂</div>
+    <div class="subtitle">▸ FUN WORD KEYING GAME ◂</div>
 
     <!-- ═══ START SCREEN ═══ -->
     <div id="start-screen">
@@ -713,6 +742,10 @@
             <div id="tx-word-display"><span id="tx-target-text"></span></div>
             <div id="tx-morse-input"><span id="tx-input-render"></span></div>
         </div>
+        <div id="word-timer-track">
+            <div id="word-timer-fill"></div>
+            <div id="word-timer-sushi">🍣</div>
+        </div>
         <div id="status-msg">READY...</div>
         <button class="quit-btn" onclick="quitGame()">■ QUIT (中断)</button>
         <div class="result-key-hint" id="gameplay-key-hint">（Escキー）</div>
@@ -775,19 +808,6 @@
                 </button>
             </div>
         </div>
-        <div id="score-reg-area" style="margin-top:18px; border-top:1px solid var(--border); padding-top:14px;">
-            <div id="score-reg-result" style="margin-bottom:12px; font-size:0.85rem; line-height:2; color:var(--primary);"></div>
-            <div id="score-reg-form" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; align-items:center;">
-                <input type="text" id="nickname-input" placeholder="ニックネーム（英大文字・10文字まで）" maxlength="10"
-                    autocomplete="off" autocapitalize="characters" spellcheck="false"
-                    oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase()"
-                    onkeydown="if(event.key==='Enter'){event.preventDefault();setNickname();}"
-                    style="background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:2px;
-                           color:var(--primary); font-family:inherit; font-size:0.82rem;
-                           padding:8px 12px; width:230px; letter-spacing:1px; outline:none;">
-                <button onclick="setNickname()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">✏️ 名前を設定</button>
-            </div>
-        </div>
         <button onclick="retryGame()" style="margin-top:16px;">▶ 再挑戦</button>
         <div class="result-key-hint" id="result-key-hint">（Escキー）</div>
     </div>
@@ -818,10 +838,6 @@ const MORSE_CODE = {
 };
 const MORSE_REVERSE = {};
 Object.entries(MORSE_CODE).forEach(([ch, code]) => { MORSE_REVERSE[code] = ch; });
-// コンテストナンバーの「カットナンバー」表記: 1→A(・－)、0→O(－－－)/T(－)。
-// 送信モードでは本来の数字の符号に加えて、これらのカットナンバーでも正解とする
-// （コールサイン打鍵時は対象外。コンテストナンバーのみ）。表示は常に本来の符号。
-const CUT_NUMBER_ACCEPT = { '1': ['A'], '0': ['O', 'T'], '9': ['N'] };
 
 // ── State ──────────────────────────────────────────────────────────────────────
 let audioCtx = null, masterGain = null;
@@ -833,9 +849,9 @@ let morseBoardMode = false;
 let gameMode = 'TX'; // 'TX' | 'FREE'
 // TX mode state
 let txWord = [], txCharIndex = 0, txMorseInput = '';
-let nextTxType = 'CALLSIGN';
-let txWordIsCallsign = true; // 現在のtxWordがコールサインかどうか（カットナンバーはコンテストナンバーのみに適用）
 let txCharTimer = null;
+let wordTimeoutTimer = null; // お題単語ごとの制限時間タイマー
+let wordsCompleted = 0, wordsMissed = 0;
 let TX_CHAR_GAP = 280;
 let TX_DOT_TIME = 1.2 / 25; // 25 WPM デフォルト、設定で 20-30 から選択可能
 // Iambic keyer state
@@ -922,22 +938,6 @@ document.addEventListener('keydown', (e) => {
     // ※Rは英字なのでテキスト入力中は無視するが、Escは制御キーなので入力中でも有効
     const resultScreen = document.getElementById('result-screen');
     if (resultScreen && !resultScreen.classList.contains('hidden')) {
-        // 「/」キー（Morse Boardで/を打鍵した場合も同じキー入力として届く）でニックネーム入力欄へフォーカス。
-        // フォーカス済みの状態で再度「/」が押された場合、Morse Boardモードのみ Enter と同様に確定する
-        // （非Morse Boardモードでは確定は「設定する」ボタンかEnterキーのみ）。
-        if (e.key === '/') {
-            const nicknameInput = document.getElementById('nickname-input');
-            const regArea = document.getElementById('score-reg-area');
-            if (nicknameInput && regArea && regArea.style.display !== 'none') {
-                e.preventDefault();
-                if (document.activeElement === nicknameInput) {
-                    if (morseBoardMode) setNickname();
-                } else {
-                    nicknameInput.focus();
-                }
-                return;
-            }
-        }
         if (e.code === 'Escape' || (!typing && morseBoardMode && e.key.toUpperCase() === 'R')) {
             e.preventDefault();
             retryGame();
@@ -1041,17 +1041,17 @@ function updateTxModeDesc() {
     if (startHintLabel) startHintLabel.textContent = isMorseBoard ? '（・　ー）打鍵でスタート' : 'キーでスタート';
     if (isMorseBoard) {
         document.getElementById('mode-description').innerHTML =
-            `コールサインとRSTが表示される。<br>Morse BoardをPCに接続し、表示された文字をパドルで入力。<br>キーボードとして入力された英数字を、そのまま解答として判定します。`;
+            `身近な英単語が表示される。制限時間内にキーイングしないと🍣がゴールしてその単語はアウト！<br>Morse BoardをPCに接続し、表示された文字をパドルで入力。<br>キーボードとして入力された英数字を、そのまま解答として判定します。`;
         updateKeyAssignDisplay();
         return;
     }
     const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     if (isTouchDevice) {
         document.getElementById('mode-description').innerHTML =
-            `コールサインとRSTが表示される。<br>スマホ・タブレットは画面の「トン/ツー」をタップして送信。<br>キーボードでも操作可（右記参照）。<br>長押しで連続、両方同時押しで交互（アイアンビック）。離すと自動判定。`;
+            `身近な英単語が表示される。制限時間内にキーイングしないと🍣がゴールしてその単語はアウト！<br>スマホ・タブレットは画面の「トン/ツー」をタップして送信。<br>キーボードでも操作可（右記参照）。<br>長押しで連続、両方同時押しで交互（アイアンビック）。離すと自動判定。`;
     } else {
         document.getElementById('mode-description').innerHTML =
-            `コールサインとRSTが表示される。<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
+            `身近な英単語が表示される。制限時間内にキーイングしないと🍣がゴールしてその単語はアウト！<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
     }
     updateKeyAssignDisplay();
 }
@@ -1110,25 +1110,80 @@ function updateKeyAssignDisplay() {
         </div>`;
 }
 
-// ── Callsign / RST ─────────────────────────────────────────────────────────────
-function generateCallsign() {
-    const rAZ = () => String.fromCharCode(65 + Math.floor(Math.random() * 26));
-    const r09 = () => Math.floor(Math.random() * 10).toString();
-    const rRange = (a, z) => String.fromCharCode(a.charCodeAt(0) + Math.floor(Math.random() * (z.charCodeAt(0) - a.charCodeAt(0) + 1)));
-    const r = Math.random();
-    const pfx = r < 0.90 ? 'J' : (r < 0.97 ? '7' : '8');
-    let second;
-    if (pfx === 'J') second = rRange('A', 'S');
-    else if (pfx === '7') second = rRange('J', 'N');
-    else second = (Math.random() < 0.5 ? 'J' : 'N');
-    const call = pfx + second + r09() + rAZ() + rAZ() + rAZ();
-    if (Math.random() < 0.3) return call + '/' + r09();
-    return call;
+// ── お題単語（身近な英単語） ─────────────────────────────────────────────────────
+const WORD_LIST = [
+    'CAT','DOG','SUN','RUN','PEN','CAR','BUS','MAP','BOX','KEY','TEA','CUP','BAG','HAT','EGG',
+    'RAIN','BIRD','FISH','MOON','STAR','TREE','BOOK','DESK','LAMP','DOOR','WALL','ROOM','GAME',
+    'PLAY','WORK','TIME','YEAR','HAND','FOOT','HEAD','EYES','HAIR','FACE','SHOE','WIND','SNOW',
+    'CLOUD','LIGHT','SMILE','HEART','MUSIC','DANCE','HOUSE','TABLE','CHAIR','PHONE','WATCH','CLOCK',
+    'APPLE','BREAD','MILK','RICE','MEAT','FRUIT','WATER','EARTH','FIRE','HAPPY','SLEEP','SMALL',
+    'GREEN','BLACK','WHITE','WHEEL','TRAIN','PLANE','SHIP','ROAD','PARK','SCHOOL','FRIEND','FAMILY',
+    'MORSE','RADIO','PADDLE','SIGNAL','ANTENNA','CONTEST'
+];
+let lastAsobiWord = '';
+function pickWord() {
+    if (WORD_LIST.length <= 1) return WORD_LIST[0];
+    let w;
+    do { w = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)]; } while (w === lastAsobiWord);
+    lastAsobiWord = w;
+    return w;
 }
-function generateRST() {
-    const areas = ['101','102','103','104','105','106','107','108','109','110','111','112','113','114'];
-    for (let i = 2; i <= 48; i++) areas.push(i.toString().padStart(2,'0'));
-    return '5NN' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
+
+// ── 単語ごとの制限時間（寿司打の「寿司が流れたらアウト」演出） ──────────────────────
+// 現在のWPMで単語を打つのに理想的にかかる時間(秒)を見積もる
+function estimateWordMorseSeconds(word) {
+    let units = 0;
+    for (let i = 0; i < word.length; i++) {
+        const code = MORSE_CODE[word[i]];
+        if (!code) continue;
+        for (let j = 0; j < code.length; j++) {
+            units += (code[j] === '.') ? 1 : 3;
+            if (j < code.length - 1) units += 1; // 同一文字内の要素間ギャップ
+        }
+        if (i < word.length - 1) units += 3; // 文字間ギャップ
+    }
+    return units * TX_DOT_TIME;
+}
+// 単語の制限時間(ミリ秒)。理想時間の3.5倍(初心者は4.5倍)＋余裕を持たせる
+function getWordTimeLimitMs(word) {
+    const idealSec = estimateWordMorseSeconds(word);
+    const multiplier = beginnerMode ? 4.5 : 3.5;
+    return Math.max(3500, idealSec * 1000 * multiplier + 800);
+}
+function clearWordTimer() {
+    if (wordTimeoutTimer) { clearTimeout(wordTimeoutTimer); wordTimeoutTimer = null; }
+}
+function startWordTimer(word) {
+    clearWordTimer();
+    const track = document.getElementById('word-timer-track');
+    const sushi = document.getElementById('word-timer-sushi');
+    const fill  = document.getElementById('word-timer-fill');
+    if (!track || !sushi || !fill) return;
+    const limitMs = getWordTimeLimitMs(word);
+    sushi.style.transition = 'none';
+    fill.style.transition = 'none';
+    sushi.style.left = '0%';
+    fill.style.transform = 'scaleX(0)';
+    void track.offsetWidth; // reflow
+    sushi.style.transition = `left ${limitMs}ms linear`;
+    fill.style.transition = `transform ${limitMs}ms linear`;
+    requestAnimationFrame(() => {
+        sushi.style.left = '100%';
+        fill.style.transform = 'scaleX(1)';
+    });
+    wordTimeoutTimer = setTimeout(handleWordTimeout, limitMs);
+}
+function handleWordTimeout() {
+    wordTimeoutTimer = null;
+    wordsMissed++;
+    const txArea = document.getElementById('tx-area');
+    if (txArea) {
+        txArea.classList.remove('flash-correct');
+        txArea.classList.add('flash-error');
+        setTimeout(() => txArea.classList.remove('flash-error'), 400);
+    }
+    document.getElementById('status-msg').innerText = `🍣 TIME UP: ${txWord.join('')}`;
+    nextTxWord();
 }
 
 // ── Audio unlock + prepare ─────────────────────────────────────────────────────
@@ -1197,6 +1252,7 @@ function startGame() {
     initialSeconds = parseInt(document.getElementById('time-select').value);
     timeLeft = initialSeconds;
     score = 0; isPlaying = true;
+    wordsCompleted = 0; wordsMissed = 0;
     document.getElementById('score').innerText = 0;
     masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
     timerId = setInterval(tick, 1000);
@@ -1222,7 +1278,6 @@ function tick() {
 function startTxGame() {
     txCharIndex = 0; txMorseInput = ''; txCharTimer = null;
     dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
-    nextTxType = 'CALLSIGN';
     // 前回プレイの短点・長点表示をクリア
     const _txMorseBox = document.getElementById('tx-morse-input');
     const _txMorseRender = document.getElementById('tx-input-render');
@@ -1238,15 +1293,14 @@ function startTxGame() {
 }
 
 function nextTxWord() {
-    txWordIsCallsign = (nextTxType === 'CALLSIGN');
-    const raw = txWordIsCallsign ? generateCallsign() : generateRST();
-    nextTxType = txWordIsCallsign ? 'RST' : 'CALLSIGN';
+    const raw = pickWord();
     txWord = raw.split('');
     txCharIndex = 0; txMorseInput = '';
     renderTxInput();
     updateTxDisplay();
     if (beginnerMode) updateTxBeginnerDisplay();
     document.getElementById('status-msg').innerText = morseBoardMode ? 'MORSE BOARD READY...' : 'TRANSMIT...';
+    startWordTimer(raw);
 }
 
 function updateTxDisplay() {
@@ -1288,7 +1342,6 @@ function updateTxBeginnerDisplay() {
     if (!beginnerMode) return;
     const ch = txWord[txCharIndex];
     if (!ch) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
-    // 表示は常に本来の1・0の符号のまま（カットナンバーは正解判定でのみ別解として許容）
     const code = MORSE_CODE[ch];
     if (!code) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
     beginnerDisplay.classList.add('tx-beginner');
@@ -1443,10 +1496,7 @@ function decodeTxChar() {
 function evaluateTxChar(decoded) {
     const expected = txWord[txCharIndex];
     const txArea   = document.getElementById('tx-area');
-    // コールサインの1・0は本来の符号のみ正解（カットナンバー不可）。
-    // コンテストナンバーの1・0は本来の符号に加え、カットナンバー（1→A、0→O/T）も正解とする。
-    const cutAlts = (!txWordIsCallsign && CUT_NUMBER_ACCEPT[expected]) || [];
-    const isCorrect = (decoded === expected) || cutAlts.includes(decoded);
+    const isCorrect = (decoded === expected);
     if (isCorrect) {
         txCharIndex++;
         score++;
@@ -1456,6 +1506,7 @@ function evaluateTxChar(decoded) {
         setTimeout(() => txArea.classList.remove('flash-correct'), 400);
         document.getElementById('status-msg').innerText = `✓ ${expected}`;
         if (txCharIndex >= txWord.length) {
+            wordsCompleted++;
             nextTxWord();
         } else {
             updateTxDisplay();
@@ -1474,6 +1525,7 @@ function cleanupTx() {
     document.removeEventListener('keyup',   onTxKeyUp);
     dotHeld = false; dashHeld = false; keyerPending = false;
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
+    clearWordTimer();
     const pa = document.getElementById('tx-paddle-area');
     if (pa) pa.classList.add('hidden');
     beginnerDisplay.classList.remove('tx-beginner');
@@ -1784,99 +1836,21 @@ function endGame() {
     cleanupTx();
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
-        `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min`;
+        `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min（${wordsCompleted}単語クリア）`;
     const resultKeyHint = document.getElementById('result-key-hint');
     if (resultKeyHint) resultKeyHint.textContent = morseBoardMode ? '（Escキー / R打鍵）' : '（Escキー）';
-    const nicknameInputEl = document.getElementById('nickname-input');
-    nicknameInputEl.value = '';
-    nicknameInputEl.disabled = false; // 前回のプレイで設定済みになっていても、次のプレイでは再入力できるようにする
-    const btn = document.getElementById('submit-score-btn');
-    btn.disabled = false;
-    btn.textContent = '✏️ 名前を設定';
-    document.getElementById('score-reg-area').style.display = score > 0 ? '' : 'none';
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
-    if (score > 0) {
-        autoRegister();
-        setTimeout(() => {
-            const reg = document.getElementById('score-reg-area');
-            if (reg) reg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 300);
-    }
 }
 
 // ── SNS Share ──────────────────────────────────────────────────────────────────
 function getShareText() {
     const minutes = Math.round(initialSeconds / 60);
-    return `【モールス打】送信モード\n${minutes}分間で${score}文字\n#モールス打 #アマチュア無線 #CW #モールス信号\nhttps://jl1gix.com`;
+    return `【モールス打】お遊びモード\n${minutes}分間で${score}文字（${wordsCompleted}単語クリア）\n#モールス打 #アマチュア無線 #CW #モールス信号\nhttps://jl1gix.com`;
 }
 function shareX() {
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}`;
     window.open(url, '_blank', 'noopener,noreferrer');
-}
-
-// ── Score registration ─────────────────────────────────────────────────────────
-let _registeredId = null;
-async function autoRegister(retryCount = 0) {
-    if (retryCount === 0) _registeredId = null;
-    const minutes = Math.round(initialSeconds / 60);
-    const regResult = document.getElementById('score-reg-result');
-    if (retryCount === 0) {
-        regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中...</span>`;
-    }
-    if (!_registeredId) {
-        try {
-            const res = await fetch('https://api.jl1gix.com/api/scores', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nickname: 'noname', score, mode: 'TX', is_beginner: beginnerMode ? 1 : 0, minutes })
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            _registeredId = data.id;
-        } catch (e) {
-            if (retryCount < 2) {
-                regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中... (再試行 ${retryCount + 1}/2)</span>`;
-                setTimeout(() => autoRegister(retryCount + 1), (retryCount + 1) * 1000);
-            } else {
-                regResult.innerHTML =
-                    `<span style="color:var(--error); font-size:0.75rem;">登録に失敗しました　</span>` +
-                    `<button onclick="autoRegister(0)" style="font-size:0.7rem;padding:4px 12px;margin:0;margin-top:4px;">再試行</button>`;
-            }
-            return;
-        }
-    }
-    let pct = '－';
-    try {
-        const rankRes = await fetch(`https://api.jl1gix.com/api/scores/rank?score=${score}&mode=TX&minutes=${minutes}`);
-        const rankData = await rankRes.json();
-        if (rankData.percentile !== undefined) pct = rankData.percentile;
-    } catch (e) {}
-    regResult.innerHTML =
-        `<span style="color:var(--success);">✓ 登録完了！</span>　上位 <b>${pct}%</b>　` +
-        `<a href="ranking.html?mode=TX&time=${minutes}" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:4px 14px; font-size:0.75rem; letter-spacing:1px; border-radius:2px;">🏆 ランキング</a>`;
-}
-
-async function setNickname() {
-    const nickname = document.getElementById('nickname-input').value.replace(/[^A-Z0-9]/g, '');
-    if (!nickname) return;  // 未入力なら何もしない（初期登録のnonameのまま）
-    if (!_registeredId) return;
-    const btn = document.getElementById('submit-score-btn');
-    btn.disabled = true;
-    btn.textContent = '設定中...';
-    try {
-        await fetch(`https://api.jl1gix.com/api/scores/${_registeredId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nickname })
-        });
-        btn.textContent = '✓ 設定済み';
-        document.getElementById('nickname-input').disabled = true;
-    } catch (e) {
-        btn.disabled = false;
-        btn.textContent = '✏️ 名前を設定';
-        alert('設定に失敗しました。もう一度お試しください。');
-    }
 }
 
 // ── Initialize mode description on page load ───────────────────────────────────

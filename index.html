@@ -176,6 +176,8 @@
                 flex: 1 1 0 !important;
             }
             .mode-btn-row button > span { font-size: 1.55rem !important; margin-bottom: 4px !important; }
+            .fun-mode-btn { font-size: 0.85rem !important; padding: 10px 26px !important; }
+            .fun-mode-btn > span { font-size: 1.3rem !important; }
             /* ホームのスペクトラムスコープ: 横に長すぎるのでカットして、縦幅はボタンの上下にはみ出す程度に */
             #home-scope-canvas {
                 width: 88% !important;
@@ -244,6 +246,11 @@
             </button>
             <button onclick="location.href='tx.html'" style="font-size:1.25rem;padding:22px 48px;letter-spacing:3px;min-width:220px;">
                 <span style="display:block;font-size:2rem;margin-bottom:6px;">📡</span>送信モード
+            </button>
+        </div>
+        <div style="display:flex;justify-content:center;margin:0 0 8px;">
+            <button class="fun-mode-btn" onclick="location.href='asobi.html'" style="font-size:0.95rem;padding:12px 34px;letter-spacing:2px;">
+                <span style="display:block;font-size:1.5rem;margin-bottom:3px;">🎮</span>お遊びモード
             </button>
         </div>
         <div style="display:flex;justify-content:center;gap:16px;font-size:0.85rem;letter-spacing:2px;flex-wrap:wrap;margin-top:16px;">
@@ -514,6 +521,7 @@ document.addEventListener('keydown', (e) => {
     <a href="/" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 ホーム</a>
     <a href="/rx.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 受信モード</a>
     <a href="/tx.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 送信モード</a>
+    <a href="/asobi.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 お遊びモード</a>
     <a href="/ranking.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 ランキング</a>
     <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ 学習コンテンツ</h3>
     <a href="/how-to-use.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ 使い方</a>
