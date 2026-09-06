@@ -297,7 +297,8 @@
         #game-screen.beginner-compact #tx-word-display { font-size: 1.75rem; min-height: 4.8rem; padding: 12px; letter-spacing: 5px; }
         #game-screen.beginner-compact #tx-morse-input { min-height: 3.2rem; margin-top: 7px; padding: 7px 12px; gap: 11px; }
         #game-screen.beginner-compact #status-msg { margin-top: 8px; font-size: 0.8rem; }
-        #game-screen.beginner-compact #word-timer-track { height: 24px; margin-top: 7px; }
+        #game-screen.beginner-compact #word-timer-track { padding: 4px 8px; margin-top: 7px; }
+        #game-screen.beginner-compact #word-timer-bar-wrap { height: 11px; }
         #game-screen.beginner-compact .quit-btn { margin-top: 11px; }
         select {
             background: rgba(0,0,0,0.85);
@@ -398,33 +399,43 @@
             to   { opacity: 1; box-shadow: 0 0 8px var(--primary); }
         }
         #status-msg { font-size: 0.82rem; opacity: 1.0; margin-top: 10px; letter-spacing: 2px; }
-        /* お遊びモード: 単語ごとの制限時間を表す「回転寿司」風タイムバー */
+        /* お遊びモード: 単語ごとの制限時間を表す「Sメーター」風シグナルバー */
         #word-timer-track {
-            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             width: 100%;
             max-width: 460px;
-            height: 30px;
             margin: 10px auto 0;
-            background: rgba(0,40,20,0.4);
+            padding: 5px 10px;
+            background: rgba(0,20,10,0.5);
             border: 1px solid var(--border);
-            border-radius: 15px;
+            border-radius: 3px;
+        }
+        #word-timer-label {
+            font-size: 0.62rem;
+            letter-spacing: 1px;
+            color: var(--primary-dim);
+            flex-shrink: 0;
+            opacity: 0.9;
+        }
+        #word-timer-bar-wrap {
+            position: relative;
+            flex: 1;
+            height: 14px;
+            border: 1px solid var(--border);
+            border-radius: 2px;
             overflow: hidden;
+            background:
+                repeating-linear-gradient(to right, rgba(0,208,106,0.25) 0, rgba(0,208,106,0.25) 1px, transparent 1px, transparent 12%),
+                rgba(0,0,0,0.35);
         }
         #word-timer-fill {
             position: absolute;
             inset: 0;
-            width: 100%;
-            background: linear-gradient(to right, rgba(0,208,106,0.3), rgba(231,76,60,0.5));
-            transform-origin: right center;
-            transform: scaleX(0);
-        }
-        #word-timer-sushi {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            transform: translate(-50%, -50%);
-            font-size: 1.3rem;
-            filter: drop-shadow(0 0 4px rgba(0,0,0,0.6));
+            background: linear-gradient(to right, var(--success), #e8d000 60%, var(--error) 88%);
+            transform-origin: left center;
+            transform: scaleX(1);
         }
         #game-start-overlay {
             position: fixed;
@@ -743,8 +754,10 @@
             <div id="tx-morse-input"><span id="tx-input-render"></span></div>
         </div>
         <div id="word-timer-track">
-            <div id="word-timer-fill"></div>
-            <div id="word-timer-sushi">🍣</div>
+            <span id="word-timer-label">📡 SIGNAL</span>
+            <div id="word-timer-bar-wrap">
+                <div id="word-timer-fill"></div>
+            </div>
         </div>
         <div id="status-msg">READY...</div>
         <button class="quit-btn" onclick="quitGame()">■ QUIT (中断)</button>
@@ -1041,17 +1054,17 @@ function updateTxModeDesc() {
     if (startHintLabel) startHintLabel.textContent = isMorseBoard ? '（・　ー）打鍵でスタート' : 'キーでスタート';
     if (isMorseBoard) {
         document.getElementById('mode-description').innerHTML =
-            `身近な英単語が表示される。制限時間内にキーイングしないと🍣がゴールしてその単語はアウト！<br>Morse BoardをPCに接続し、表示された文字をパドルで入力。<br>キーボードとして入力された英数字を、そのまま解答として判定します。`;
+            `身近な英単語が表示される。制限時間内にキーイングしないとシグナルが途切れ(QSB)その単語はアウト！<br>Morse BoardをPCに接続し、表示された文字をパドルで入力。<br>キーボードとして入力された英数字を、そのまま解答として判定します。`;
         updateKeyAssignDisplay();
         return;
     }
     const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     if (isTouchDevice) {
         document.getElementById('mode-description').innerHTML =
-            `身近な英単語が表示される。制限時間内にキーイングしないと🍣がゴールしてその単語はアウト！<br>スマホ・タブレットは画面の「トン/ツー」をタップして送信。<br>キーボードでも操作可（右記参照）。<br>長押しで連続、両方同時押しで交互（アイアンビック）。離すと自動判定。`;
+            `身近な英単語が表示される。制限時間内にキーイングしないとシグナルが途切れ(QSB)その単語はアウト！<br>スマホ・タブレットは画面の「トン/ツー」をタップして送信。<br>キーボードでも操作可（右記参照）。<br>長押しで連続、両方同時押しで交互（アイアンビック）。離すと自動判定。`;
     } else {
         document.getElementById('mode-description').innerHTML =
-            `身近な英単語が表示される。制限時間内にキーイングしないと🍣がゴールしてその単語はアウト！<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
+            `身近な英単語が表示される。制限時間内にキーイングしないとシグナルが途切れ(QSB)その単語はアウト！<br>${getKeyLabel(dotKey)}キー長押し＝連続短点（・・・）、${getKeyLabel(dashKey)}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`;
     }
     updateKeyAssignDisplay();
 }
@@ -1129,7 +1142,7 @@ function pickWord() {
     return w;
 }
 
-// ── 単語ごとの制限時間（寿司打の「寿司が流れたらアウト」演出） ──────────────────────
+// ── 単語ごとの制限時間（Sメーター風シグナルバーが尽きるとアウト） ──────────────────────
 // 現在のWPMで単語を打つのに理想的にかかる時間(秒)を見積もる
 function estimateWordMorseSeconds(word) {
     let units = 0;
@@ -1156,20 +1169,15 @@ function clearWordTimer() {
 function startWordTimer(word) {
     clearWordTimer();
     const track = document.getElementById('word-timer-track');
-    const sushi = document.getElementById('word-timer-sushi');
     const fill  = document.getElementById('word-timer-fill');
-    if (!track || !sushi || !fill) return;
+    if (!track || !fill) return;
     const limitMs = getWordTimeLimitMs(word);
-    sushi.style.transition = 'none';
     fill.style.transition = 'none';
-    sushi.style.left = '0%';
-    fill.style.transform = 'scaleX(0)';
+    fill.style.transform = 'scaleX(1)';
     void track.offsetWidth; // reflow
-    sushi.style.transition = `left ${limitMs}ms linear`;
     fill.style.transition = `transform ${limitMs}ms linear`;
     requestAnimationFrame(() => {
-        sushi.style.left = '100%';
-        fill.style.transform = 'scaleX(1)';
+        fill.style.transform = 'scaleX(0)';
     });
     wordTimeoutTimer = setTimeout(handleWordTimeout, limitMs);
 }
@@ -1182,7 +1190,7 @@ function handleWordTimeout() {
         txArea.classList.add('flash-error');
         setTimeout(() => txArea.classList.remove('flash-error'), 400);
     }
-    document.getElementById('status-msg').innerText = `🍣 TIME UP: ${txWord.join('')}`;
+    document.getElementById('status-msg').innerText = `📉 QSB (ロストシグナル): ${txWord.join('')}`;
     nextTxWord();
 }
 
