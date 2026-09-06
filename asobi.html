@@ -821,6 +821,19 @@
                 </button>
             </div>
         </div>
+        <div id="score-reg-area" style="margin-top:18px; border-top:1px solid var(--border); padding-top:14px;">
+            <div id="score-reg-result" style="margin-bottom:12px; font-size:0.85rem; line-height:2; color:var(--primary);"></div>
+            <div id="score-reg-form" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="nickname-input" placeholder="ニックネーム（英大文字・10文字まで）" maxlength="10"
+                    autocomplete="off" autocapitalize="characters" spellcheck="false"
+                    oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase()"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();setNickname();}"
+                    style="background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:2px;
+                           color:var(--primary); font-family:inherit; font-size:0.82rem;
+                           padding:8px 12px; width:230px; letter-spacing:1px; outline:none;">
+                <button onclick="setNickname()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">✏️ 名前を設定</button>
+            </div>
+        </div>
         <button onclick="retryGame()" style="margin-top:16px;">▶ 再挑戦</button>
         <div class="result-key-hint" id="result-key-hint">（Escキー）</div>
     </div>
@@ -951,6 +964,22 @@ document.addEventListener('keydown', (e) => {
     // ※Rは英字なのでテキスト入力中は無視するが、Escは制御キーなので入力中でも有効
     const resultScreen = document.getElementById('result-screen');
     if (resultScreen && !resultScreen.classList.contains('hidden')) {
+        // 「/」キー（Morse Boardで/を打鍵した場合も同じキー入力として届く）でニックネーム入力欄へフォーカス。
+        // フォーカス済みの状態で再度「/」が押された場合、Morse Boardモードのみ Enter と同様に確定する
+        // （非Morse Boardモードでは確定は「設定する」ボタンかEnterキーのみ）。
+        if (e.key === '/') {
+            const nicknameInput = document.getElementById('nickname-input');
+            const regArea = document.getElementById('score-reg-area');
+            if (nicknameInput && regArea && regArea.style.display !== 'none') {
+                e.preventDefault();
+                if (document.activeElement === nicknameInput) {
+                    if (morseBoardMode) setNickname();
+                } else {
+                    nicknameInput.focus();
+                }
+                return;
+            }
+        }
         if (e.code === 'Escape' || (!typing && morseBoardMode && e.key.toUpperCase() === 'R')) {
             e.preventDefault();
             retryGame();
@@ -1847,8 +1876,22 @@ function endGame() {
         `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min（${wordsCompleted}単語クリア）`;
     const resultKeyHint = document.getElementById('result-key-hint');
     if (resultKeyHint) resultKeyHint.textContent = morseBoardMode ? '（Escキー / R打鍵）' : '（Escキー）';
+    const nicknameInputEl = document.getElementById('nickname-input');
+    nicknameInputEl.value = '';
+    nicknameInputEl.disabled = false; // 前回のプレイで設定済みになっていても、次のプレイでは再入力できるようにする
+    const btn = document.getElementById('submit-score-btn');
+    btn.disabled = false;
+    btn.textContent = '✏️ 名前を設定';
+    document.getElementById('score-reg-area').style.display = score > 0 ? '' : 'none';
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
+    if (score > 0) {
+        autoRegister();
+        setTimeout(() => {
+            const reg = document.getElementById('score-reg-area');
+            if (reg) reg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 300);
+    }
 }
 
 // ── SNS Share ──────────────────────────────────────────────────────────────────
@@ -1859,6 +1902,70 @@ function getShareText() {
 function shareX() {
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}`;
     window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+// ── Score registration ─────────────────────────────────────────────────────────
+let _registeredId = null;
+async function autoRegister(retryCount = 0) {
+    if (retryCount === 0) _registeredId = null;
+    const minutes = Math.round(initialSeconds / 60);
+    const regResult = document.getElementById('score-reg-result');
+    if (retryCount === 0) {
+        regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中...</span>`;
+    }
+    if (!_registeredId) {
+        try {
+            const res = await fetch('https://api.jl1gix.com/api/scores', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nickname: 'noname', score, mode: 'ASOBI', is_beginner: beginnerMode ? 1 : 0, minutes })
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            _registeredId = data.id;
+        } catch (e) {
+            if (retryCount < 2) {
+                regResult.innerHTML = `<span style="color:var(--primary-dim);font-size:0.75rem;">登録中... (再試行 ${retryCount + 1}/2)</span>`;
+                setTimeout(() => autoRegister(retryCount + 1), (retryCount + 1) * 1000);
+            } else {
+                regResult.innerHTML =
+                    `<span style="color:var(--error); font-size:0.75rem;">登録に失敗しました　</span>` +
+                    `<button onclick="autoRegister(0)" style="font-size:0.7rem;padding:4px 12px;margin:0;margin-top:4px;">再試行</button>`;
+            }
+            return;
+        }
+    }
+    let pct = '－';
+    try {
+        const rankRes = await fetch(`https://api.jl1gix.com/api/scores/rank?score=${score}&mode=ASOBI&minutes=${minutes}`);
+        const rankData = await rankRes.json();
+        if (rankData.percentile !== undefined) pct = rankData.percentile;
+    } catch (e) {}
+    regResult.innerHTML =
+        `<span style="color:var(--success);">✓ 登録完了！</span>　上位 <b>${pct}%</b>　` +
+        `<a href="ranking.html?mode=ASOBI&time=${minutes}" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:4px 14px; font-size:0.75rem; letter-spacing:1px; border-radius:2px;">🏆 ランキング</a>`;
+}
+
+async function setNickname() {
+    const nickname = document.getElementById('nickname-input').value.replace(/[^A-Z0-9]/g, '');
+    if (!nickname) return;  // 未入力なら何もしない（初期登録のnonameのまま）
+    if (!_registeredId) return;
+    const btn = document.getElementById('submit-score-btn');
+    btn.disabled = true;
+    btn.textContent = '設定中...';
+    try {
+        await fetch(`https://api.jl1gix.com/api/scores/${_registeredId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nickname })
+        });
+        btn.textContent = '✓ 設定済み';
+        document.getElementById('nickname-input').disabled = true;
+    } catch (e) {
+        btn.disabled = false;
+        btn.textContent = '✏️ 名前を設定';
+        alert('設定に失敗しました。もう一度お試しください。');
+    }
 }
 
 // ── Initialize mode description on page load ───────────────────────────────────
