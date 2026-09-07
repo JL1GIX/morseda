@@ -904,7 +904,7 @@ let gameMode = 'TX'; // 'TX' | 'FREE'
 let txWord = [], txCharIndex = 0, txMorseInput = '';
 let txCharTimer = null;
 let wordTimeoutTimer = null; // お題単語ごとの制限時間タイマー
-let wordDeadlineAt = 0; // 現在の単語の制限時間の締切時刻（performance.now()基準、時間延長ボーナス判定用）
+let txWordHasMistake = false; // 現在の単語で誤入力(ミス)が一度でもあったか（時間延長ボーナス判定用）
 let wordsCompleted = 0, wordsMissed = 0;
 let TX_CHAR_GAP = 280;
 let TX_DOT_TIME = 1.2 / 25; // 25 WPM デフォルト、設定で 20-30 から選択可能
@@ -1229,7 +1229,6 @@ function startWordTimer(word) {
     const fill  = document.getElementById('word-timer-fill');
     if (!track || !fill) return;
     const limitMs = getWordTimeLimitMs(word);
-    wordDeadlineAt = performance.now() + limitMs;
     fill.style.transition = 'none';
     fill.style.transform = 'scaleX(1)';
     void track.offsetWidth; // reflow
@@ -1362,6 +1361,7 @@ function nextTxWord() {
     const raw = pickWord();
     txWord = raw.split('');
     txCharIndex = 0; txMorseInput = '';
+    txWordHasMistake = false;
     renderTxInput();
     updateTxDisplay();
     if (beginnerMode) updateTxBeginnerDisplay();
@@ -1573,8 +1573,8 @@ function evaluateTxChar(decoded) {
         document.getElementById('status-msg').innerText = `✓ ${expected}`;
         if (txCharIndex >= txWord.length) {
             wordsCompleted++;
-            // 単語ごとの制限時間内に打ち切れた場合、全体の制限時間を1秒延長する
-            if (performance.now() <= wordDeadlineAt) {
+            // その単語をノーミス（誤入力ゼロ）で打ち切れた場合、全体の制限時間を1秒延長する
+            if (!txWordHasMistake) {
                 timeLeft++;
                 const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
                 document.getElementById('timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
@@ -1586,6 +1586,7 @@ function evaluateTxChar(decoded) {
             if (beginnerMode) updateTxBeginnerDisplay();
         }
     } else {
+        txWordHasMistake = true;
         txArea.classList.remove('flash-correct');
         txArea.classList.add('flash-error');
         setTimeout(() => txArea.classList.remove('flash-error'), 400);
