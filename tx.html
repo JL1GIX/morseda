@@ -780,8 +780,8 @@
             <div id="score-reg-form" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; align-items:center;">
                 <input type="text" id="nickname-input" placeholder="ニックネーム（英大文字・10文字まで）" maxlength="10"
                     autocomplete="off" autocapitalize="characters" spellcheck="false"
-                    oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase()"
-                    onkeydown="if(event.key==='Enter'){event.preventDefault();setNickname();}"
+                    oninput="if(!event.isComposing){this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();}"
+                    onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();setNickname();}"
                     style="background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:2px;
                            color:var(--primary); font-family:inherit; font-size:0.82rem;
                            padding:8px 12px; width:230px; letter-spacing:1px; outline:none;">
