@@ -498,7 +498,7 @@
     else window.addEventListener('DOMContentLoaded', () => setHomeVis(true));
 })();
 
-// ── キーボードショートカット: T=送信モード、R=受信モード ────────────────────────
+// ── キーボードショートカット: T=送信モード、R=受信モード、G=お遊びモード ────────────
 document.addEventListener('keydown', (e) => {
     if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
     if (document.activeElement instanceof Element &&
@@ -510,6 +510,9 @@ document.addEventListener('keydown', (e) => {
     } else if (key === 'R') {
         e.preventDefault();
         location.href = 'rx.html';
+    } else if (key === 'G') {
+        e.preventDefault();
+        location.href = 'asobi.html';
     }
 });
 </script>
