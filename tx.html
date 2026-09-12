@@ -766,6 +766,10 @@
     <div id="result-screen" class="hidden">
         <h2>MISSION END</h2>
         <p id="final-result-text" style="margin: 20px 0;"></p>
+        <div id="tx-mistake-area" class="hidden" style="margin:0 auto 20px; padding:12px 14px; border:1px solid var(--border); border-radius:6px; background:rgba(0,0,0,0.25); max-width:380px;">
+            <div style="font-size:0.65rem; letter-spacing:2px; color:var(--primary-dim); margin-bottom:8px;">▸ ミスが多かった文字 ◂</div>
+            <div id="tx-mistake-list" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
+        </div>
         <div class="share-area">
             <div class="share-label">▸ SHARE YOUR RESULT ◂</div>
             <div class="share-buttons">
@@ -836,6 +840,7 @@ let txWord = [], txCharIndex = 0, txMorseInput = '';
 let nextTxType = 'CALLSIGN';
 let txWordIsCallsign = true; // 現在のtxWordがコールサインかどうか（カットナンバーはコンテストナンバーのみに適用）
 let txCharTimer = null;
+let txMistakeCounts = {}; // 文字ごとの打ち間違え回数（リザルト画面の「ミスが多かった文字」表示用）
 let TX_CHAR_GAP = 280;
 let TX_DOT_TIME = 1.2 / 25; // 25 WPM デフォルト、設定で 20-30 から選択可能
 // Iambic keyer state
@@ -1223,6 +1228,7 @@ function startTxGame() {
     txCharIndex = 0; txMorseInput = ''; txCharTimer = null;
     dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
     nextTxType = 'CALLSIGN';
+    txMistakeCounts = {};
     // 前回プレイの短点・長点表示をクリア
     const _txMorseBox = document.getElementById('tx-morse-input');
     const _txMorseRender = document.getElementById('tx-input-render');
@@ -1462,6 +1468,7 @@ function evaluateTxChar(decoded) {
             if (beginnerMode) updateTxBeginnerDisplay();
         }
     } else {
+        txMistakeCounts[expected] = (txMistakeCounts[expected] || 0) + 1;
         txArea.classList.remove('flash-correct');
         txArea.classList.add('flash-error');
         setTimeout(() => txArea.classList.remove('flash-error'), 400);
@@ -1777,6 +1784,25 @@ function retryGame() {
     updateTxModeDesc();
 }
 
+// ミスが多かった文字を多い順に並べてリザルト画面に表示する
+function renderMistakeBreakdown() {
+    const area = document.getElementById('tx-mistake-area');
+    const list = document.getElementById('tx-mistake-list');
+    if (!area || !list) return;
+    const entries = Object.entries(txMistakeCounts).sort((a, b) => b[1] - a[1]);
+    if (entries.length === 0) {
+        area.classList.add('hidden');
+        list.innerHTML = '';
+        return;
+    }
+    const top = entries.slice(0, 8); // 表示件数は上位8件まで
+    list.innerHTML = top.map(([ch, count]) =>
+        `<span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border:1px solid var(--border); border-radius:3px; background:rgba(0,0,0,0.35); font-size:0.85rem;">` +
+        `<b style="color:var(--error);">${ch}</b><span style="color:var(--primary-dim); font-size:0.7rem;">×${count}</span></span>`
+    ).join('');
+    area.classList.remove('hidden');
+}
+
 function endGame() {
     isPlaying = false; scopeRunning = false;
     setGameplayViewportLock(false);
@@ -1785,6 +1811,7 @@ function endGame() {
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
         `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min`;
+    renderMistakeBreakdown();
     const resultKeyHint = document.getElementById('result-key-hint');
     if (resultKeyHint) resultKeyHint.textContent = morseBoardMode ? '（Escキー / R打鍵）' : '（Escキー）';
     const nicknameInputEl = document.getElementById('nickname-input');
