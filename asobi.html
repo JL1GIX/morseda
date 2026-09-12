@@ -839,6 +839,10 @@
     <div id="result-screen" class="hidden">
         <h2>MISSION END</h2>
         <p id="final-result-text" style="margin: 20px 0;"></p>
+        <div id="asobi-mistake-area" class="hidden" style="margin:0 auto 20px; padding:12px 14px; border:1px solid var(--border); border-radius:6px; background:rgba(0,0,0,0.25); max-width:380px;">
+            <div style="font-size:0.65rem; letter-spacing:2px; color:var(--primary-dim); margin-bottom:8px;">▸ ミスが多かった文字 ◂</div>
+            <div id="asobi-mistake-list" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
+        </div>
         <div class="share-area">
             <div class="share-label">▸ SHARE YOUR RESULT ◂</div>
             <div class="share-buttons">
@@ -905,6 +909,7 @@ let txWord = [], txCharIndex = 0, txMorseInput = '';
 let txCharTimer = null;
 let wordTimeoutTimer = null; // お題単語ごとの制限時間タイマー
 let txWordHasMistake = false; // 現在の単語で誤入力(ミス)が一度でもあったか（時間延長ボーナス判定用）
+let asobiMistakeCounts = {}; // 文字ごとの打ち間違え回数（リザルト画面の「ミスが多かった文字」表示用）
 let wordsCompleted = 0, wordsMissed = 0;
 let TX_CHAR_GAP = 280;
 let TX_DOT_TIME = 1.2 / 25; // 25 WPM デフォルト、設定で 20-30 から選択可能
@@ -1188,7 +1193,16 @@ const WORD_LIST = [
     'CLOUD','LIGHT','SMILE','HEART','MUSIC','DANCE','HOUSE','TABLE','CHAIR','PHONE','WATCH','CLOCK',
     'APPLE','BREAD','MILK','RICE','MEAT','FRUIT','WATER','EARTH','FIRE','HAPPY','SLEEP','SMALL',
     'GREEN','BLACK','WHITE','WHEEL','TRAIN','PLANE','SHIP','ROAD','PARK','SCHOOL','FRIEND','FAMILY',
-    'MORSE','RADIO','PADDLE','SIGNAL','ANTENNA','CONTEST'
+    'MORSE','RADIO','PADDLE','SIGNAL','ANTENNA','CONTEST',
+    // 2026-09 追加分（お遊びモードの単語バリエーション増加）
+    'SKY','ICE','TOY','JAM','OWL','BEE','ANT','COW','PIG','FOX','BAT','ARM','LEG',
+    'EAR','LIP','JOB','ZOO','BOY','WEB','SEA','TOP','BED','CAP','JAR','VAN','WOLF',
+    'DEER','DUCK','GOAT','LION','BEAR','FROG','CRAB','CAKE','SOUP','CORN','MEAL','SALT','SOAP',
+    'WOOD','ROCK','LAKE','HILL','LEAF','GOLD','GATE','GIFT','COIN','FLAG','RING','BELL','DRUM',
+    'HORN','WIRE','CODE','BAND','DIAL','TUNE','BEAM','WAVE','VOLT','UNIT','TEST','TEAM','GOAL',
+    'RACE','OCEAN','RIVER','STORM','BEACH','FIELD','GRASS','STONE','GLASS','PAPER','PLANT','POWER','SOUND',
+    'VOICE','SPACE','BRAVE','QUIET','SHARP','QUICK','FRESH','SWEET','YOUNG','THANK','SORRY','TODAY','NIGHT',
+    'CANDY','JUICE','MONEY','PARTY','PIZZA','PLATE','SPOON','KNIFE','TOWEL'
 ];
 let lastAsobiWord = '';
 function pickWord() {
@@ -1343,6 +1357,7 @@ function tick() {
 function startTxGame() {
     txCharIndex = 0; txMorseInput = ''; txCharTimer = null;
     dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
+    asobiMistakeCounts = {};
     // 前回プレイの短点・長点表示をクリア
     const _txMorseBox = document.getElementById('tx-morse-input');
     const _txMorseRender = document.getElementById('tx-input-render');
@@ -1587,6 +1602,7 @@ function evaluateTxChar(decoded) {
         }
     } else {
         txWordHasMistake = true;
+        asobiMistakeCounts[expected] = (asobiMistakeCounts[expected] || 0) + 1;
         txArea.classList.remove('flash-correct');
         txArea.classList.add('flash-error');
         setTimeout(() => txArea.classList.remove('flash-error'), 400);
@@ -1899,6 +1915,25 @@ function startScopeAnimation() {
     draw();
 }
 
+// ミスが多かった文字を多い順に並べてリザルト画面に表示する
+function renderMistakeBreakdown() {
+    const area = document.getElementById('asobi-mistake-area');
+    const list = document.getElementById('asobi-mistake-list');
+    if (!area || !list) return;
+    const entries = Object.entries(asobiMistakeCounts).sort((a, b) => b[1] - a[1]);
+    if (entries.length === 0) {
+        area.classList.add('hidden');
+        list.innerHTML = '';
+        return;
+    }
+    const top = entries.slice(0, 8); // 表示件数は上位8件まで
+    list.innerHTML = top.map(([ch, count]) =>
+        `<span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border:1px solid var(--border); border-radius:3px; background:rgba(0,0,0,0.35); font-size:0.85rem;">` +
+        `<b style="color:var(--error);">${ch}</b><span style="color:var(--primary-dim); font-size:0.7rem;">×${count}</span></span>`
+    ).join('');
+    area.classList.remove('hidden');
+}
+
 // ── End / Quit ─────────────────────────────────────────────────────────────────
 function quitGame() {
     isPlaying = false; scopeRunning = false;
@@ -1929,6 +1964,7 @@ function endGame() {
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
         `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min（${wordsCompleted}単語クリア）`;
+    renderMistakeBreakdown();
     const resultKeyHint = document.getElementById('result-key-hint');
     if (resultKeyHint) resultKeyHint.textContent = morseBoardMode ? '（Escキー / R打鍵）' : '（Escキー）';
     const nicknameInputEl = document.getElementById('nickname-input');
