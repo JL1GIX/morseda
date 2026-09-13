@@ -19,6 +19,9 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="canonical" href="https://jl1gix.com/">
+    <link rel="alternate" hreflang="ja" href="https://jl1gix.com/">
+    <link rel="alternate" hreflang="en" href="https://jl1gix.com/index-en.html">
+    <link rel="alternate" hreflang="x-default" href="https://jl1gix.com/">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:site_name" content="モールス打">
     <meta name="twitter:site" content="@JL1GIX">
@@ -281,243 +284,10 @@
     <div style="margin-top:8px; font-size:0.62rem; opacity:0.7; letter-spacing:1px;">Inspired by <a href="https://sushida.net/" target="_blank" rel="noopener noreferrer" style="color:#007b43; text-decoration:underline; text-underline-offset:2px;">寿司打</a></div>
 </footer>
 
-<script>
-// ── ホーム画面：スペクトラムスコープ（JL1GIX 20WPM）────────────────────────────
-(function() {
-    const H_DIT = 1200 / 20;
-    const H_MORSE = { J:'.---', L:'.-..', 1:'.----', G:'--.', I:'..', X:'-..-' };
-
-    function buildCycle(text) {
-        const ev = [];
-        let t = 0;
-        [...text].forEach((ch, ci) => {
-            const code = H_MORSE[ch] || '';
-            [...code].forEach((s) => {
-                const dur = s === '.' ? H_DIT : H_DIT * 3;
-                ev.push({ on: t, off: t + dur });
-                t += dur + H_DIT;
-            });
-            if (ci < text.length - 1) t += H_DIT * 2;
-        });
-        t += H_DIT * 4;
-        return { ev, total: t };
-    }
-    const { ev: CY_EV, total: CY_MS } = buildCycle('JL1GIX');
-
-    const SW = 1160, SPEC_H = 100, FALL_H = 60, SH = SPEC_H + FALL_H;
-    const CW_X = SW / 2;
-    const PX_HZ = SW / 3000;
-    const FX1 = CW_X - 250 * PX_HZ, FX2 = CW_X + 250 * PX_HZ;
-
-    const sc = document.createElement('canvas');
-    sc.id = 'home-scope-canvas';
-    sc.width = SW; sc.height = SH;
-    sc.style.cssText = [
-        'position:absolute',
-        'top:50%', 'left:50%',
-        'transform:translate(-50%,-50%)',
-        'width:96%', 'max-width:' + SW + 'px', 'height:auto',
-        'z-index:-1',
-        'opacity:0', 'transition:opacity 1.2s',
-        'pointer-events:none',
-        'border-radius:2px',
-        'border:1px solid rgba(0,123,67,0.18)',
-    ].join(';');
-
-    const modeSelEl = document.getElementById('mode-select');
-    modeSelEl.style.position = 'relative';
-    modeSelEl.style.zIndex = '0';
-    modeSelEl.insertBefore(sc, modeSelEl.firstChild);
-
-    const PHANTOM = [
-        { offset:-1380, amp: 0.42, period: 2400, duty: 0.32 },
-        { offset:-1120, amp: 0.48, period: 3300, duty: 0.40 },
-        { offset: -880, amp: 0.52, period: 3100, duty: 0.42 },
-        { offset: -640, amp: 0.36, period: 1800, duty: 0.28 },
-        { offset: -450, amp: 0.38, period: 2200, duty: 0.35 },
-        { offset: -220, amp: 0.30, period: 2600, duty: 0.33 },
-        { offset:  260, amp: 0.34, period: 2100, duty: 0.36 },
-        { offset:  430, amp: 0.46, period: 2750, duty: 0.38 },
-        { offset:  680, amp: 0.32, period: 1950, duty: 0.30 },
-        { offset:  860, amp: 0.34, period: 1900, duty: 0.30 },
-        { offset: 1150, amp: 0.44, period: 2900, duty: 0.38 },
-        { offset: 1400, amp: 0.38, period: 2500, duty: 0.34 },
-    ];
-    const phantomStr = new Float32Array(PHANTOM.length).fill(0);
-
-    let hActive = false, animId, cycStart;
-    let wfRows = [], smoothSpec = new Float32Array(SW).fill(0);
-    let tStr = 0, fN = 0;
-    let fallImg = null;
-
-    function isToneOn() {
-        const t = (Date.now() - cycStart) % CY_MS;
-        return CY_EV.some(e => t >= e.on && t <= e.off);
-    }
-    function isPhantomOn(idx) {
-        const p = PHANTOM[idx];
-        const t = (Date.now() + idx * 1373) % p.period;
-        return t < p.period * p.duty;
-    }
-    function addPeak(s, cx, amp) {
-        const sig2 = 2 * 3.5 * 3.5;
-        const peak = amp + Math.random() * 0.06;
-        for (let x = Math.max(0, ~~cx - 28); x < Math.min(SW, ~~cx + 28); x++) {
-            const d = x - cx;
-            s[x] = Math.max(s[x], peak * Math.exp(-(d * d) / sig2));
-        }
-    }
-    function genSpec(mainActive) {
-        const s = new Float32Array(SW);
-        for (let x = 0; x < SW; x++) {
-            s[x] = 0.04 + Math.random() * 0.055;
-            if (Math.random() < 0.004) s[x] += Math.random() * 0.12;
-        }
-        if (mainActive) addPeak(s, CW_X, 0.78);
-        PHANTOM.forEach((p, i) => {
-            if (phantomStr[i] > 0.05) addPeak(s, CW_X + p.offset * PX_HZ, p.amp * phantomStr[i]);
-        });
-        return s;
-    }
-    function wfCol(v) {
-        if (v < 0.10) { const t = v/0.10; return [0, ~~(8+t*22), ~~(18+t*28)]; }
-        if (v < 0.30) { const t = (v-0.10)/0.20; return [0, ~~(30+t*80), ~~(46-t*26)]; }
-        if (v < 0.58) { const t = (v-0.30)/0.28; return [~~(t*40), ~~(110+t*105), ~~(20-t*18)]; }
-        if (v < 0.82) { const t = (v-0.58)/0.24; return [~~(40+t*185), ~~(215+t*40), 2]; }
-        const t = Math.min(1,(v-0.82)/0.18); return [~~(225+t*30), 255, ~~(t*210)];
-    }
-    function drawFrame() {
-        if (!hActive) return;
-        animId = requestAnimationFrame(drawFrame);
-        const ctx = sc.getContext('2d');
-        tStr = isToneOn() ? Math.min(1, tStr + 0.14) : Math.max(0, tStr - 0.09);
-        PHANTOM.forEach((p, i) => {
-            phantomStr[i] = isPhantomOn(i) ? Math.min(1, phantomStr[i] + 0.10) : Math.max(0, phantomStr[i] - 0.07);
-        });
-        const inst = genSpec(tStr > 0.25);
-        for (let x = 0; x < SW; x++) smoothSpec[x] = smoothSpec[x] * 0.60 + inst[x] * 0.40;
-        if (++fN % 3 === 0) {
-            wfRows.unshift(smoothSpec.slice());
-            if (wfRows.length > FALL_H) wfRows.pop();
-        }
-        ctx.fillStyle = '#010d05';
-        ctx.fillRect(0, 0, SW, SPEC_H);
-        ctx.lineWidth = 0.5;
-        for (let i = 1; i <= 4; i++) {
-            const y = SPEC_H - (i / 4.5) * (SPEC_H - 14) - 4;
-            ctx.strokeStyle = i === 2 ? 'rgba(0,110,55,0.35)' : 'rgba(0,85,40,0.2)';
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(SW, y); ctx.stroke();
-        }
-        [-1000, -500, 0, 500, 1000].forEach(f => {
-            const x = CW_X + f * PX_HZ;
-            ctx.strokeStyle = f === 0 ? 'rgba(0,140,65,0.35)' : 'rgba(0,90,45,0.22)';
-            ctx.lineWidth = f === 0 ? 0.8 : 0.5;
-            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, SPEC_H); ctx.stroke();
-        });
-        ctx.fillStyle = 'rgba(0,123,67,0.10)';
-        ctx.fillRect(FX1, 0, FX2 - FX1, SPEC_H);
-        ctx.strokeStyle = 'rgba(0,160,80,0.38)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(FX1, 0); ctx.lineTo(FX1, SPEC_H);
-        ctx.moveTo(FX2, 0); ctx.lineTo(FX2, SPEC_H);
-        ctx.stroke();
-        const sTop = SPEC_H - 10;
-        const fa = 0.22 + tStr * 0.38;
-        const g = ctx.createLinearGradient(0, 0, 0, SPEC_H);
-        g.addColorStop(0,    `rgba(20,230,110,${fa})`);
-        g.addColorStop(0.45, `rgba(0,150,65,${fa * 0.55})`);
-        g.addColorStop(1,    'rgba(0,40,18,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.moveTo(0, SPEC_H);
-        for (let x = 0; x < SW; x++) ctx.lineTo(x, SPEC_H - smoothSpec[x] * sTop);
-        ctx.lineTo(SW - 1, SPEC_H); ctx.closePath(); ctx.fill();
-        ctx.strokeStyle = `rgba(0,195,85,${0.65 + tStr * 0.35})`;
-        ctx.lineWidth = 1.6;
-        ctx.shadowColor = `rgba(0,180,80,${tStr * 0.85})`;
-        ctx.shadowBlur = 2 + tStr * 10;
-        ctx.beginPath();
-        for (let x = 0; x < SW; x++) {
-            const y = SPEC_H - smoothSpec[x] * sTop;
-            x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-        if (tStr > 0.2) {
-            const py = SPEC_H - smoothSpec[~~CW_X] * sTop;
-            ctx.strokeStyle = `rgba(0,210,95,${tStr * 0.3})`;
-            ctx.lineWidth = 1; ctx.setLineDash([3, 4]);
-            ctx.beginPath(); ctx.moveTo(CW_X, py + 2); ctx.lineTo(CW_X, SPEC_H); ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.fillStyle = `rgba(140,255,170,${tStr * 0.95})`;
-            ctx.beginPath(); ctx.arc(CW_X, py, 2.8, 0, Math.PI * 2); ctx.fill();
-            ctx.strokeStyle = `rgba(0,230,100,${tStr * 0.5})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.arc(CW_X, py, 5, 0, Math.PI * 2); ctx.stroke();
-        }
-        ctx.strokeStyle = 'rgba(0,110,55,0.6)';
-        ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(0, SPEC_H); ctx.lineTo(SW, SPEC_H); ctx.stroke();
-        const d = fallImg.data;
-        for (let row = 0; row < Math.min(wfRows.length, FALL_H); row++) {
-            const rData = wfRows[row];
-            const base = row * SW * 4;
-            for (let x = 0; x < SW; x++) {
-                const [r, gc, b] = wfCol(rData[x]);
-                const i = base + x * 4;
-                d[i] = r; d[i+1] = gc; d[i+2] = b; d[i+3] = 255;
-            }
-        }
-        ctx.putImageData(fallImg, 0, SPEC_H);
-        ctx.fillStyle = 'rgba(0,123,67,0.07)';
-        ctx.fillRect(FX1, SPEC_H, FX2 - FX1, FALL_H);
-        ctx.strokeStyle = 'rgba(0,150,75,0.22)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(FX1, SPEC_H); ctx.lineTo(FX1, SPEC_H + FALL_H);
-        ctx.moveTo(FX2, SPEC_H); ctx.lineTo(FX2, SPEC_H + FALL_H);
-        ctx.stroke();
-    }
-    function setHomeVis(v) {
-        hActive = v;
-        sc.style.opacity = v ? '0.42' : '0';
-        if (v) {
-            cycStart = Date.now();
-            fN = 0; tStr = 0;
-            wfRows = [];
-            for (let i = 0; i < FALL_H; i++) wfRows.push(new Float32Array(SW).fill(0));
-            smoothSpec = new Float32Array(SW).fill(0);
-            if (!fallImg) fallImg = sc.getContext('2d').createImageData(SW, FALL_H);
-            cancelAnimationFrame(animId);
-            drawFrame();
-        } else {
-            cancelAnimationFrame(animId);
-        }
-    }
-    if (document.readyState !== 'loading') setHomeVis(true);
-    else window.addEventListener('DOMContentLoaded', () => setHomeVis(true));
-})();
-
-// ── キーボードショートカット: T=送信モード、R=受信モード、G=お遊びモード ────────────
-document.addEventListener('keydown', (e) => {
-    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (document.activeElement instanceof Element &&
-        (document.activeElement.matches('input, select, textarea') || document.activeElement.isContentEditable)) return;
-    const key = e.key.toUpperCase();
-    if (key === 'T') {
-        e.preventDefault();
-        location.href = 'tx.html';
-    } else if (key === 'R') {
-        e.preventDefault();
-        location.href = 'rx.html';
-    } else if (key === 'G') {
-        e.preventDefault();
-        location.href = 'asobi.html';
-    }
-});
-</script>
+<script src="/index.js"></script>
 <!-- ハンバーガーメニュー -->
 <button id="menu-btn" aria-label="メニューを開く" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);">☰</button>
+<select id="lang-select" aria-label="言語を選択 / Select language" onchange="if(this.value==='en') location.href='/index-en.html';" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:6px 10px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);"><option value="ja">🌐 日本語</option><option value="en">🌐 English</option></select>
 <div id="menu-overlay" onclick="document.getElementById('menu-panel').classList.remove('open');this.classList.remove('open');" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:998;"></div>
 <nav id="menu-panel" aria-label="サイト内メニュー" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#0e1f16;border-right:1px solid #1e5c38;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(0,0,0,0.6);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
     <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ ゲーム</h3>
@@ -534,6 +304,6 @@ document.addEventListener('keydown', (e) => {
     <a href="/privacy.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 プライバシー</a>
     <a href="/contact.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ お問い合わせ</a>
 </nav>
-<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(0,100,55,0.25);}nav#menu-panel a:hover{background:rgba(0,100,55,0.15);padding-left:6px;transition:padding 0.15s;}</style>
+<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(0,100,55,0.25);}nav#menu-panel a:hover{background:rgba(0,100,55,0.15);padding-left:6px;transition:padding 0.15s;}#lang-select:hover{background:rgba(0,100,55,0.25);}#lang-select option{background:#0e1f16;color:#00c060;}</style>
 </body>
 </html>
