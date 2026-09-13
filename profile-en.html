@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>About - Morseda</title>
+    <meta name="description" content="Profile of JL1GIX, the creator of Morseda, and the story behind the site. A self-made Morse code training tool for casual CW practice in the browser.">
+    <meta property="og:title" content="About - Morseda">
+    <meta property="og:description" content="Profile of JL1GIX, the creator of Morseda, and the story behind the site.">
+    <meta property="og:url" content="https://jl1gix.com/profile-en.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="About - Morseda">
+    <meta name="twitter:description" content="Profile of JL1GIX, the creator of Morseda, and the story behind the site.">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="canonical" href="https://jl1gix.com/profile-en.html">
+    <link rel="alternate" hreflang="ja" href="https://jl1gix.com/profile.html">
+    <link rel="alternate" hreflang="en" href="https://jl1gix.com/profile-en.html">
+    <link rel="alternate" hreflang="x-default" href="https://jl1gix.com/profile.html">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="モールス打">
+    <meta name="twitter:site" content="@JL1GIX">
+    <meta name="twitter:creator" content="@JL1GIX">
+    <meta name="author" content="JL1GIX">
+    <meta name="theme-color" content="#080f0b">
+        <style>
+        :root {
+            --primary: #00c060;
+            --primary-dim: #00a050;
+            --bg: #080f0b;
+            --panel: #0e1f16;
+            --border: #1e5c38;
+            --error: #e74c3c;
+            --success: #00ee77;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 10px 40px;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .container {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--primary);
+            padding: 24px;
+            border-radius: 4px;
+            box-shadow:
+                0 0 50px rgba(0,100,55,0.35),
+                0 0 100px rgba(0,80,40,0.12),
+                inset 0 1px 0 rgba(0,123,67,0.18);
+            width: 95%;
+            max-width: 860px;
+            position: relative;
+        }
+        .container::before {
+            content: '◈';
+            position: absolute;
+            top: 8px; left: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        .container::after {
+            content: '◈';
+            position: absolute;
+            top: 8px; right: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .header-bar::before {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary-dim));
+        }
+        .header-bar::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to left, transparent, var(--primary-dim));
+        }
+        h1 {
+            margin: 0;
+            letter-spacing: 6px;
+            font-size: 1.7rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5);
+        }
+        .subtitle {
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            letter-spacing: 4px;
+            margin-bottom: 28px;
+            opacity: 0.9;
+            text-align: center;
+        }
+        h2 {
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+            padding-left: 12px;
+            margin: 28px 0 14px;
+            text-shadow: 0 0 10px rgba(0,192,96,0.4);
+        }
+        h2:first-of-type { margin-top: 0; }
+        p {
+            font-size: 0.84rem;
+            line-height: 2.0;
+            color: rgba(0,210,105,0.95);
+            margin: 0 0 14px;
+            letter-spacing: 0.5px;
+        }
+        .profile-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 18px 20px;
+            margin: 14px 0;
+        }
+        .profile-callsign {
+            font-size: 1.6rem;
+            letter-spacing: 6px;
+            color: var(--success);
+            text-shadow: 0 0 15px rgba(0,238,119,0.6);
+            margin-bottom: 12px;
+        }
+        .profile-item {
+            font-size: 0.8rem;
+            color: rgba(0,192,96,0.8);
+            line-height: 2;
+            letter-spacing: 1px;
+        }
+        .profile-label {
+            color: var(--primary-dim);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            margin-right: 10px;
+        }
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 24px 0;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 24px;
+            color: var(--primary-dim);
+            text-decoration: none;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            opacity: 0.55;
+            transition: opacity 0.15s;
+        }
+        .back-btn:hover { opacity: 1; color: var(--primary); }
+        footer {
+            margin-top: 44px;
+            padding: 22px 0 6px;
+            border-top: 1px solid #1e5c38;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            opacity: 0.55;
+            width: 95%;
+            max-width: 860px;
+            flex-wrap: wrap;
+        }
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "JL1GIX",
+      "alternateName": "熊谷",
+      "url": "https://jl1gix.com/profile-en.html",
+      "description": "Amateur radio operator (callsign: JL1GIX, First-Class Amateur Radio Operator license). Developer and operator of Morseda.",
+      "knowsAbout": ["Morse code", "Amateur radio", "CW communication"],
+      "sameAs": ["https://x.com/JL1GIX"]
+    }
+    </script>
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-bar">
+        <h1><a href="https://jl1gix.com/index-en.html" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
+    <div class="subtitle">▸ ABOUT ◂</div>
+
+    <h2>▸ Administrator Profile</h2>
+    <div class="profile-box">
+        <div class="profile-callsign">JL1GIX</div>
+        <div class="profile-item">
+            <span class="profile-label">License</span>First-Class Amateur Radio Operator<br>
+            <span class="profile-label">On air since</span>2025<br>
+            <span class="profile-label">SNS</span><a href="https://x.com/JL1GIX" target="_blank" rel="noopener noreferrer" style="color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:5px; vertical-align:middle;"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.402 6.231H2.744l7.73-8.835L2.25 2.25h6.832l4.258 5.632 4.905-5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> @JL1GIX</a>
+        </div>
+    </div>
+
+    <h2>▸ Why I Made This Site</h2>
+    <p>It started with wanting a casual way to practice Morse code right in a web browser. But when I actually went looking, I couldn't find anything that felt right. So I decided to just build it myself — that's how Morseda began.</p>
+    <p>It started as a simple receiving practice tool, but as I used it myself I kept adding features whenever I felt the need — "I want to use this on my phone too," "I want to practice sending as well," "I want to compare scores with others on a ranking." It's still being updated little by little.</p>
+
+    <hr class="section-divider">
+
+    <h2>▸ Design Philosophy</h2>
+    <p>The thing I cared about most while building Morseda was making it usable by beginners without confusion. I kept the UI simple so that someone who just started practicing CW can jump straight into practice without fiddling with complicated settings.</p>
+    <p>Beginner Mode shows the Morse code for the character currently being sent, in real time, right on screen. So the moment you think "I heard that, but what code was it?" you can check immediately, letting you memorize the codes while practicing at the same time. Callsigns and RST reports are generated in the same format used in real contests, so you get practice that feels like the real thing.</p>
+    <p>It's also optimized for touch so it works comfortably on smartphones, letting you casually practice Morse code during a commute or any spare moment.</p>
+
+    <h2>▸ What's Next</h2>
+    <p>Since I'm still learning CW myself, I plan to keep adding whatever features I wish existed as I practice. I'd be happy if this helps anyone else who wants to practice contest CW the same way.</p>
+    <p>Feel free to send comments or requests through the <a href="/contact-en.html" style="color:var(--primary); text-decoration:none;">Contact</a> page.</p>
+
+    <div style="text-align:center;">
+        <a href="https://jl1gix.com/index-en.html" class="back-btn">◀ Back to Top</a>
+    </div>
+</div>
+
+<footer>
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 20px;">
+        <a href="https://jl1gix.com/index-en.html" style="color:#007b43; text-decoration:none;">Top</a>
+        <a href="/ranking-en.html" style="color:#007b43; text-decoration:none;">Ranking</a>
+<a href="/how-to-use-en.html" style="color:#007b43; text-decoration:none;">How to Use</a>
+        <a href="/morse-table-en.html" style="color:#007b43; text-decoration:none;">Morse Code Table</a>
+<a href="/profile-en.html" style="color:#007b43; text-decoration:none;">About</a>
+        <a href="/privacy-en.html" style="color:#007b43; text-decoration:none;">Privacy</a>
+        <a href="/contact-en.html" style="color:#007b43; text-decoration:none;">Contact</a>
+    </div>
+</footer>
+<!-- ハンバーガーメニュー -->
+<button id="menu-btn" aria-label="Open menu" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);">☰</button>
+<a id="lang-switch-btn" href="/profile.html" aria-label="Switch to Japanese" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:6px 12px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);text-decoration:none;display:inline-block;">🌐 JA</a>
+<div id="menu-overlay" onclick="document.getElementById('menu-panel').classList.remove('open');this.classList.remove('open');" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:998;"></div>
+<nav id="menu-panel" aria-label="Site menu" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#0e1f16;border-right:1px solid #1e5c38;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(0,0,0,0.6);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Game</h3>
+    <a href="/index-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 Home</a>
+    <a href="/rx-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 Receive Mode</a>
+    <a href="/tx-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 Transmit Mode</a>
+    <a href="/asobi-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 Fun Mode</a>
+    <a href="/ranking-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 Ranking</a>
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Learning</h3>
+    <a href="/how-to-use-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ How to Use</a>
+    <a href="/morse-table-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 Morse Code Table</a>
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Other</h3>
+    <a href="/profile-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 About</a>
+    <a href="/privacy-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 Privacy</a>
+    <a href="/contact-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ Contact</a>
+</nav>
+<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(0,100,55,0.25);}nav#menu-panel a:hover{background:rgba(0,100,55,0.15);padding-left:6px;transition:padding 0.15s;}#lang-switch-btn:hover{background:rgba(0,100,55,0.25);}</style>
+</body>
+</html>
