@@ -1,0 +1,23 @@
+Add English mode (-en.html flat naming) across the entire site
+
+- Add an English version of every page, named "<page>-en.html" and
+  placed alongside the Japanese version in the same folder (no /en/
+  subfolder): index-en.html, tx-en.html, rx-en.html, asobi-en.html,
+  ranking-en.html, profile-en.html, contact-en.html, how-to-use-en.html,
+  morse-table-en.html, privacy-en.html.
+- Home page (index.html / index-en.html) gets a language dropdown
+  (top-right) with "日本語 / English" options; selecting English jumps
+  straight to index-en.html and vice versa.
+- Every other page gets a small fixed language-toggle button in the
+  same spot, linking to its counterpart page.
+- Externalize shared game logic (index.js, tx.js, rx.js, asobi.js) so
+  both language versions of those pages load the same script; dynamic
+  UI text in tx/rx/asobi switches via a small I18N dictionary keyed on
+  <html lang>. Simpler static pages keep their JS duplicated.
+- Add hreflang alternate links (ja/en/x-default) to every page.
+- Update sitemap.xml with all 20 ja/en URLs and hreflang annotations.
+- Update PROJECT_MEMO.md with the new "-en.html" naming convention and
+  a note on the current Cowork/device workflow.
+
+No changes to game content, practice material, or the existing mistake
+-analysis feature in tx.html/asobi.html — only UI text and navigation.
