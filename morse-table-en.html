@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="canonical" href="https://jl1gix.com/morse-table-en.html">
+    <link rel="alternate" hreflang="ja" href="https://jl1gix.com/morse-table.html">
+    <link rel="alternate" hreflang="en" href="https://jl1gix.com/morse-table-en.html">
+    <link rel="alternate" hreflang="x-default" href="https://jl1gix.com/morse-table.html">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="モールス打">
+    <meta name="twitter:site" content="@JL1GIX">
+    <meta name="twitter:creator" content="@JL1GIX">
+    <meta name="author" content="JL1GIX">
+    <meta name="theme-color" content="#080f0b">
+    <title>Morse Code Table - Morseda</title>
+    <meta name="description" content="A complete Morse code reference table for letters, numbers, and symbols. Useful for amateur radio CW practice.">
+    <meta property="og:title" content="Morse Code Table - Morseda">
+    <meta property="og:description" content="A complete Morse code reference table for letters, numbers, and symbols.">
+    <meta property="og:url" content="https://jl1gix.com/morse-table-en.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <style>
+        :root {
+            --primary: #00d06a;
+            --primary-dim: #00b85a;
+            --bg: #080f0b;
+            --panel: #0e1f16;
+            --border: #1e5c38;
+            --success: #00ee77;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 10px 40px;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .container {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--primary);
+            padding: 24px;
+            border-radius: 4px;
+            box-shadow:
+                0 0 50px rgba(0,100,55,0.35),
+                0 0 100px rgba(0,80,40,0.12),
+                inset 0 1px 0 rgba(0,123,67,0.18);
+            width: 95%;
+            max-width: 860px;
+            position: relative;
+        }
+        .container::before {
+            content: '◈';
+            position: absolute;
+            top: 8px; left: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        .container::after {
+            content: '◈';
+            position: absolute;
+            top: 8px; right: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .header-bar::before {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary-dim));
+        }
+        .header-bar::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to left, transparent, var(--primary-dim));
+        }
+        h1 {
+            margin: 0;
+            letter-spacing: 6px;
+            font-size: 1.7rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5);
+        }
+        .subtitle {
+            font-size: 0.65rem;
+            color: var(--primary-dim);
+            letter-spacing: 4px;
+            margin-bottom: 28px;
+            opacity: 1.0;
+            text-align: center;
+        }
+        h2 {
+            font-size: 0.82rem;
+            letter-spacing: 3px;
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+            padding-left: 12px;
+            margin: 28px 0 14px;
+        }
+        h2:first-of-type { margin-top: 0; }
+
+        /* ── 符号グリッド ── */
+        .morse-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .morse-cell {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(30,92,56,0.6);
+            border-radius: 3px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s, border-color 0.15s;
+            cursor: default;
+        }
+        .morse-cell:hover {
+            background: rgba(0,123,67,0.12);
+            border-color: var(--primary-dim);
+        }
+        .morse-char {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--success);
+            text-shadow: 0 0 10px rgba(0,238,119,0.5);
+            line-height: 1;
+        }
+        .morse-code {
+            font-size: 1.1rem;
+            color: var(--primary);
+            letter-spacing: 3px;
+            line-height: 1;
+        }
+        .morse-sym {
+            font-size: 0.65rem;
+            color: var(--primary-dim);
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        /* ── 記号セクション ── */
+        .morse-grid-sm {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 6px;
+        }
+
+        /* ── 凡例 ── */
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 0 0 20px;
+            font-size: 0.72rem;
+            color: var(--primary-dim);
+            letter-spacing: 1px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dot-demo {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 6px var(--primary);
+            flex-shrink: 0;
+        }
+        .dash-demo {
+            width: 28px; height: 10px;
+            border-radius: 5px;
+            background: var(--primary);
+            box-shadow: 0 0 6px var(--primary);
+            flex-shrink: 0;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 24px;
+            color: var(--primary-dim);
+            text-decoration: none;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            opacity: 0.55;
+            transition: opacity 0.15s;
+        }
+        .back-btn:hover { opacity: 1; color: var(--primary); }
+
+        footer {
+            margin-top: 44px;
+            padding: 22px 0 6px;
+            border-top: 1px solid #1e5c38;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            opacity: 0.55;
+            width: 95%;
+            max-width: 860px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-bar">
+        <h1><a href="https://jl1gix.com/index-en.html" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
+    <div class="subtitle">▸ MORSE CODE TABLE ◂</div>
+
+    <div class="legend">
+        <div class="legend-item"><div class="dot-demo"></div>= DIT (short mark)</div>
+        <div class="legend-item"><div class="dash-demo"></div>= DAH (long mark)</div>
+    </div>
+
+    <h2>▸ Alphabet</h2>
+    <div class="morse-grid" id="alpha-grid"></div>
+
+    <h2>▸ Numbers</h2>
+    <div class="morse-grid" id="num-grid"></div>
+
+    <h2>▸ Symbols</h2>
+    <div class="morse-grid-sm" id="sym-grid"></div>
+
+    <div style="text-align:center;">
+        <a href="https://jl1gix.com/index-en.html" class="back-btn">◀ Back to Top</a>
+    </div>
+</div>
+
+<footer>
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 20px;">
+        <a href="https://jl1gix.com/index-en.html" style="color:#007b43; text-decoration:none;">Top</a>
+        <a href="/ranking-en.html" style="color:#007b43; text-decoration:none;">Ranking</a>
+<a href="/how-to-use-en.html" style="color:#007b43; text-decoration:none;">How to Use</a>
+        <a href="/morse-table-en.html" style="color:#007b43; text-decoration:none;">Morse Code Table</a>
+<a href="/profile-en.html" style="color:#007b43; text-decoration:none;">About</a>
+        <a href="/privacy-en.html" style="color:#007b43; text-decoration:none;">Privacy</a>
+        <a href="/contact-en.html" style="color:#007b43; text-decoration:none;">Contact</a>
+    </div>
+</footer>
+
+<script>
+const ALPHA = {
+    'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---',
+    'K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-',
+    'U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..'
+};
+const NUMS = {
+    '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....',
+    '6':'-....','7':'--...','8':'---..','9':'----.'
+};
+const SYMS = {
+    '/':'-..-.','?':'..--..','!':'-.-.--',':':'---...','.':'.-.-.-','@':'.--.-.'
+};
+const SYM_NAMES = {
+    '/':'Slash (portable)','?':'Question mark','!':'Exclamation mark',
+    ':':'Colon','.':'Period','@':'At sign'
+};
+
+function codeToDisplay(code) {
+    return code.split('').map(s => s === '.' ? '・' : '―').join('');
+}
+
+function renderGrid(containerId, data, nameMap) {
+    const grid = document.getElementById(containerId);
+    Object.entries(data).forEach(([ch, code]) => {
+        const cell = document.createElement('div');
+        cell.className = 'morse-cell';
+        const display = codeToDisplay(code);
+        const nameLabel = nameMap ? `<div class="morse-sym">${nameMap[ch] || ''}</div>` : '';
+        cell.innerHTML = `
+            <div class="morse-char">${ch}</div>
+            <div class="morse-code">${display}</div>
+            ${nameLabel}
+        `;
+        grid.appendChild(cell);
+    });
+}
+
+renderGrid('alpha-grid', ALPHA, null);
+renderGrid('num-grid', NUMS, null);
+renderGrid('sym-grid', SYMS, SYM_NAMES);
+</script>
+<!-- ハンバーガーメニュー -->
+<button id="menu-btn" aria-label="Open menu" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);">☰</button>
+<a id="lang-switch-btn" href="/morse-table.html" aria-label="Switch to Japanese" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:6px 12px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);text-decoration:none;display:inline-block;">🌐 JA</a>
+<div id="menu-overlay" onclick="document.getElementById('menu-panel').classList.remove('open');this.classList.remove('open');" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:998;"></div>
+<nav id="menu-panel" aria-label="Site menu" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#0e1f16;border-right:1px solid #1e5c38;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(0,0,0,0.6);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Game</h3>
+    <a href="/index-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 Home</a>
+    <a href="/rx-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 Receive Mode</a>
+    <a href="/tx-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 Transmit Mode</a>
+    <a href="/asobi-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 Fun Mode</a>
+    <a href="/ranking-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 Ranking</a>
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Learning</h3>
+    <a href="/how-to-use-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ How to Use</a>
+    <a href="/morse-table-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 Morse Code Table</a>
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Other</h3>
+    <a href="/profile-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 About</a>
+    <a href="/privacy-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 Privacy</a>
+    <a href="/contact-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ Contact</a>
+</nav>
+<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(0,100,55,0.25);}nav#menu-panel a:hover{background:rgba(0,100,55,0.15);padding-left:6px;transition:padding 0.15s;}#lang-switch-btn:hover{background:rgba(0,100,55,0.25);}</style>
+</body>
+</html>
