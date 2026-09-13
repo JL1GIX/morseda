@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Morseda - Contest Edition | Fun Mode</title>
+    <meta name="description" content=""Fun Mode": key familiar English words in Morse code before time runs out. Same paddle controls as Transmit mode, for casually enjoying Morse code.">
+    <meta property="og:title" content="Morseda - Contest Edition | Fun Mode">
+    <meta property="og:description" content=""Fun Mode": key familiar English words in Morse code before time runs out. Same paddle controls as Transmit mode, for casually enjoying Morse code.">
+    <meta property="og:url" content="https://jl1gix.com/asobi-en.html">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://jl1gix.com/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://jl1gix.com/ogp.png">
+    <meta name="twitter:title" content="Morseda - Contest Edition | Fun Mode">
+    <meta name="twitter:description" content=""Fun Mode": key familiar English words in Morse code before time runs out.">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="canonical" href="https://jl1gix.com/asobi-en.html">
+    <link rel="alternate" hreflang="ja" href="https://jl1gix.com/asobi.html">
+    <link rel="alternate" hreflang="en" href="https://jl1gix.com/asobi-en.html">
+    <link rel="alternate" hreflang="x-default" href="https://jl1gix.com/asobi.html">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="モールス打">
+    <meta name="twitter:site" content="@JL1GIX">
+    <meta name="twitter:creator" content="@JL1GIX">
+    <meta name="author" content="JL1GIX">
+    <meta name="theme-color" content="#080f0b">
+        <style>
+        :root {
+            --primary: #00d06a;
+            --primary-dim: #00b85a;
+            --bg: #080f0b;
+            --panel: #0e1f16;
+            --border: #1e5c38;
+            --error: #e74c3c;
+            --success: #00ee77;
+            --scope-bg: #050f08;
+        }
+        html, body { scrollbar-gutter: stable; }
+        html.game-active, body.game-active {
+            overscroll-behavior: none;
+            overflow-anchor: none;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            touch-action: manipulation;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+        #game-container {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--primary);
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 50px rgba(0,100,55,0.35), 0 0 100px rgba(0,80,40,0.12), inset 0 1px 0 rgba(0,123,67,0.18);
+            width: 95%;
+            max-width: 960px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            margin: 8px 0 28px;
+        }
+        #game-container::before {
+            content: '◈';
+            position: absolute;
+            top: 8px; left: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        #game-container::after {
+            content: '◈';
+            position: absolute;
+            top: 8px; right: 12px;
+            font-size: 0.6rem;
+            color: var(--primary-dim);
+            opacity: 0.4;
+        }
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .header-bar::before {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary-dim));
+        }
+        .header-bar::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to left, transparent, var(--primary-dim));
+        }
+        h1 {
+            margin: 0;
+            letter-spacing: 8px;
+            font-size: 2rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5), 0 0 80px rgba(0,123,67,0.2);
+        }
+        .subtitle {
+            font-size: 0.8rem;
+            color: var(--primary-dim);
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+            opacity: 1.0;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.5);
+            padding: 8px 15px;
+            border-radius: 2px;
+        }
+        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
+        .stat-label { color: var(--primary-dim); font-size: 0.68rem; letter-spacing: 2px; opacity: 1.0; }
+        .stat-value { color: var(--primary); font-size: 1.05rem; font-weight: bold; text-shadow: 0 0 10px rgba(0,123,67,0.9), 0 0 20px rgba(0,123,67,0.4); }
+        /* 単語を制限時間内に打ち切った際の「+1秒」ボーナス演出 */
+        .time-bonus-pop {
+            position: absolute;
+            left: 50%;
+            top: -6px;
+            transform: translate(-50%, 0);
+            color: var(--success);
+            font-size: 0.78rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px var(--success), 0 0 18px rgba(0,238,119,0.7);
+            pointer-events: none;
+            white-space: nowrap;
+            animation: time-bonus-float 0.9s ease-out forwards;
+            z-index: 3;
+        }
+        @keyframes time-bonus-float {
+            0%   { opacity: 0; transform: translate(-50%, 6px) scale(0.85); }
+            15%  { opacity: 1; transform: translate(-50%, -2px) scale(1.08); }
+            75%  { opacity: 1; transform: translate(-50%, -22px) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -34px) scale(0.95); }
+        }
+        @keyframes time-bonus-glow {
+            0%, 100% { text-shadow: 0 0 10px rgba(0,123,67,0.9), 0 0 20px rgba(0,123,67,0.4); color: var(--primary); }
+            50%      { text-shadow: 0 0 16px var(--success), 0 0 34px rgba(0,238,119,0.85); color: var(--success); }
+        }
+        .time-bonus-flash { animation: time-bonus-glow 0.5s ease-in-out; }
+        #scope-container {
+            position: relative;
+            background: var(--scope-bg);
+            border: 1px solid #2a6040;
+            border-radius: 2px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        #scope-label {
+            position: absolute;
+            top: 5px; left: 8px;
+            font-size: 0.58rem;
+            color: var(--primary-dim);
+            opacity: 1.0;
+            letter-spacing: 2px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        #scope-freq {
+            position: absolute;
+            top: 5px; right: 8px;
+            font-size: 0.58rem;
+            color: var(--primary-dim);
+            opacity: 1.0;
+            letter-spacing: 1px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        #scope-container::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.5) 100%), linear-gradient(to right, rgba(0,0,0,0.3) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.3) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        #scope-canvas { display: block; width: 100%; height: 120px; }
+        #beginner-display {
+            min-height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(0,123,67,0.25);
+            border-radius: 2px;
+        }
+        #beginner-display.tx-beginner { min-height: 3.8rem; gap: 14px; }
+        .msym-dot-lg {
+            display: inline-block;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 12px var(--primary), 0 0 28px rgba(0,192,96,0.5);
+            flex-shrink: 0;
+            animation: msym-in 0.07s ease-out;
+        }
+        .msym-dash-lg {
+            display: inline-block;
+            width: 58px; height: 22px;
+            border-radius: 11px;
+            background: var(--primary);
+            box-shadow: 0 0 12px var(--primary), 0 0 28px rgba(0,192,96,0.5);
+            flex-shrink: 0;
+            animation: msym-in 0.07s ease-out;
+        }
+        @keyframes msym-in {
+            from { opacity: 0; transform: scaleX(0.2); }
+            to   { opacity: 1; transform: scaleX(1); }
+        }
+        .flash-error { animation: error-flash 0.4s ease-in-out; }
+        @keyframes error-flash {
+            0%, 100% { border-top-color: var(--primary); border-color: var(--primary-dim); }
+            50% { border-color: var(--error); border-top-color: var(--error); box-shadow: 0 0 30px var(--error), inset 0 0 20px rgba(231,76,60,0.1); }
+        }
+        .flash-correct { animation: correct-flash 0.4s ease-in-out; }
+        @keyframes correct-flash {
+            0%, 100% { border-top-color: var(--primary); border-color: var(--primary-dim); }
+            50% { border-color: var(--success); border-top-color: var(--success); box-shadow: 0 0 30px var(--success), inset 0 0 20px rgba(0,255,133,0.08); }
+        }
+        .cursor { display: inline-block; width: 2px; height: 32px; background: var(--primary); animation: blink 1s infinite; margin-left: 5px; box-shadow: 0 0 12px var(--primary), 0 0 25px rgba(0,123,67,0.5); }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        button {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 10px 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s;
+            margin-top: 10px;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            letter-spacing: 2px;
+            font-family: inherit;
+        }
+        button:hover {
+            background: rgba(0,123,67,0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0,123,67,0.35);
+            color: #fff;
+        }
+        .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.85; }
+        .quit-btn:hover { opacity: 1; }
+        /* ロビー画面: キー押下でスタートできることを示すキーキャップ風ボタン */
+        .start-key-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05rem;
+            padding: 12px 28px;
+        }
+        .start-keycap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            background: rgba(0,192,96,0.16);
+            font-weight: bold;
+            font-size: 1.1rem;
+            animation: start-keycap-pulse 1.4s ease-in-out infinite;
+        }
+        @keyframes start-keycap-pulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(0,192,96,0.4); }
+            50%      { box-shadow: 0 0 18px rgba(0,192,96,0.95); }
+        }
+        /* リザルト画面: キー操作で戻れることを示す小さなヒント */
+        .result-key-hint {
+            font-size: 0.68rem;
+            color: var(--primary-dim);
+            opacity: 0.8;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+        /* 初心者モードのプレイ画面は要素が増えて縦に長くなるため、全体を一回り小さくしてQUITボタンの見切れを防ぐ */
+        #game-screen.beginner-compact .signal-indicators { margin-bottom: 7px; }
+        #game-screen.beginner-compact #game-key-assign-row { margin-bottom: 9px; gap: 13px; }
+        #game-screen.beginner-compact .stats { padding: 7px 13px; margin-bottom: 9px; }
+        #game-screen.beginner-compact .stat-value { font-size: 1rem; }
+        #game-screen.beginner-compact .stat-label { font-size: 0.66rem; }
+        #game-screen.beginner-compact #scope-container { margin-bottom: 9px; }
+        #game-screen.beginner-compact #scope-canvas { height: 100px; }
+        #game-screen.beginner-compact #beginner-display.tx-beginner { min-height: 3.5rem; gap: 11px; margin-bottom: 9px; padding: 7px 13px; }
+        #game-screen.beginner-compact .msym-dot-lg { width: 18px; height: 18px; }
+        #game-screen.beginner-compact .msym-dash-lg { width: 47px; height: 18px; }
+        #game-screen.beginner-compact #tx-word-display { font-size: 1.75rem; min-height: 4.8rem; padding: 12px; letter-spacing: 5px; }
+        #game-screen.beginner-compact #tx-morse-input { min-height: 3.2rem; margin-top: 7px; padding: 7px 12px; gap: 11px; }
+        #game-screen.beginner-compact #status-msg { margin-top: 8px; font-size: 0.8rem; }
+        #game-screen.beginner-compact #word-timer-track { padding: 4px 8px; margin-top: 7px; }
+        #game-screen.beginner-compact #word-timer-bar-wrap { height: 11px; }
+        #game-screen.beginner-compact .quit-btn { margin-top: 11px; }
+        select {
+            background: rgba(0,0,0,0.85);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            font-size: 0.9rem;
+            padding: 8px 30px 8px 10px;
+            border-radius: 2px;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23007b43' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+        select:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(0,123,67,0.3); }
+        .hidden { display: none !important; }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 18px 0;
+        }
+        .settings-grid.morse-board-settings #time-setting-item { grid-column: 1 / -1; }
+        .setting-item {
+            background: rgba(0,0,0,0.45);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 2px;
+            text-align: left;
+        }
+        .setting-label {
+            font-size: 0.68rem;
+            color: var(--primary);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: block;
+            opacity: 1.0;
+        }
+        .checkbox-item {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .checkbox-item input[type="checkbox"] {
+            appearance: none;
+            width: 18px; height: 18px;
+            border: 1px solid var(--primary-dim);
+            background: rgba(0,0,0,0.6);
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            border-radius: 1px;
+        }
+        .checkbox-item input[type="checkbox"]:checked {
+            background: rgba(0,123,67,0.2);
+            border-color: var(--primary);
+        }
+        .checkbox-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: -3px; left: 2px;
+            color: var(--primary);
+            font-size: 14px;
+            text-shadow: 0 0 6px var(--primary);
+        }
+        .checkbox-item label {
+            font-size: 0.78rem;
+            color: var(--primary);
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            line-height: 1.5;
+        }
+        .signal-indicators {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        #game-key-assign-row, #free-key-assign-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .sig-label { font-size: 0.58rem; color: var(--primary-dim); opacity: 1.0; letter-spacing: 1px; margin-right: 4px; }
+        .sig-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(0,70,35,0.4); border: 1px solid rgba(0,100,50,0.5); }
+        .sig-dot.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 6px var(--primary); }
+        .sig-dot.blink-active { animation: sig-blink 0.6s infinite alternate; }
+        @keyframes sig-blink {
+            from { opacity: 0.3; box-shadow: none; }
+            to   { opacity: 1; box-shadow: 0 0 8px var(--primary); }
+        }
+        #status-msg { font-size: 0.82rem; opacity: 1.0; margin-top: 10px; letter-spacing: 2px; }
+        /* お遊びモード: 単語ごとの制限時間を表す「Sメーター」風シグナルバー */
+        #word-timer-track {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            max-width: 460px;
+            margin: 10px auto 0;
+            padding: 5px 10px;
+            background: rgba(0,20,10,0.5);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+        }
+        #word-timer-label {
+            font-size: 0.62rem;
+            letter-spacing: 1px;
+            color: var(--primary-dim);
+            flex-shrink: 0;
+            opacity: 0.9;
+        }
+        #word-timer-bar-wrap {
+            position: relative;
+            flex: 1;
+            height: 14px;
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+            background:
+                repeating-linear-gradient(to right, rgba(0,208,106,0.25) 0, rgba(0,208,106,0.25) 1px, transparent 1px, transparent 12%),
+                rgba(0,0,0,0.35);
+        }
+        #word-timer-fill {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, var(--success), #e8d000 60%, var(--error) 88%);
+            transform-origin: left center;
+            transform: scaleX(1);
+        }
+        #game-start-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            color: #fff;
+            font-size: clamp(3.5rem, 16vw, 9rem);
+            font-weight: 700;
+            letter-spacing: clamp(6px, 2vw, 20px);
+            text-align: center;
+            text-shadow: 0 0 12px var(--primary), 0 0 45px var(--primary), 0 0 90px rgba(0, 208, 106, 0.7);
+        }
+        /* TX paddle buttons */
+        #tx-paddle-area { display: flex; gap: 12px; margin: 10px 0 4px; }
+        .tx-paddle-btn {
+            flex: 1;
+            padding: 20px 10px;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            border: 1px solid var(--primary);
+            background: rgba(0, 35, 18, 0.7);
+            color: var(--primary);
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            line-height: 1.5;
+            text-align: center;
+            margin-top: 0;
+            transition: background 0.1s, box-shadow 0.1s;
+        }
+        .tx-paddle-btn:active, .tx-paddle-btn.pressed {
+            background: rgba(0, 123, 67, 0.35);
+            box-shadow: 0 0 22px rgba(0, 123, 67, 0.55);
+            border-color: var(--success);
+        }
+        .tx-paddle-sym { display: block; font-size: 1.6rem; line-height: 1; margin-bottom: 4px; text-shadow: 0 0 10px rgba(0,123,67,0.8); }
+        .tx-paddle-label { display: block; font-size: 0.68rem; letter-spacing: 3px; opacity: 0.9; }
+        /* TX word display */
+        #tx-word-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 6px;
+            min-height: 7rem;
+            border: 1px solid var(--primary-dim);
+            border-top: 2px solid var(--primary);
+            padding: 10px 2px;
+            background: rgba(0, 15, 8, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            position: relative;
+        }
+        #tx-target-text { display: inline-block; white-space: nowrap; }
+        #tx-target-text .tx-char-done {
+            color: var(--success);
+            opacity: 0.78;
+        }
+        #tx-target-text .tx-char-current {
+            color: #fff;
+            opacity: 1;
+            text-shadow: 0 0 6px var(--primary), 0 0 18px var(--primary);
+        }
+        #tx-target-text .tx-char-next {
+            color: var(--primary);
+            opacity: 0.82;
+            text-shadow: 0 0 8px rgba(0, 208, 106, 0.35);
+        }
+        #tx-word-display::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px;
+            width: 10px; height: 10px;
+            border-top: 2px solid var(--success);
+            border-left: 2px solid var(--success);
+        }
+        #tx-word-display::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; right: -1px;
+            width: 10px; height: 10px;
+            border-bottom: 2px solid var(--success);
+            border-right: 2px solid var(--success);
+        }
+        #tx-morse-input {
+            min-height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(0, 192, 96, 0.25);
+            border-radius: 2px;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+        /* Result screen */
+        #result-screen h2 { letter-spacing: 6px; font-size: 1.4rem; text-shadow: 0 0 20px rgba(0,123,67,1.0), 0 0 50px rgba(0,123,67,0.4); }
+        #final-result-text {
+            font-size: clamp(1.1rem, 5.5vw, 2rem); color: var(--success);
+            text-shadow: 0 0 20px rgba(0,180,90,0.9), 0 0 50px rgba(0,180,90,0.4); white-space: nowrap;
+            display: inline-block; padding: 14px 28px; border: 2px solid var(--success);
+            border-radius: 10px; background: rgba(0,180,90,0.08);
+            box-shadow: 0 0 20px rgba(0,180,90,0.35), inset 0 0 20px rgba(0,180,90,0.08);
+        }
+        .share-area { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+        .share-label { font-size: 0.65rem; letter-spacing: 3px; color: var(--primary-dim); opacity: 1.0; margin-bottom: 12px; }
+        .share-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .share-btn {
+            display: flex; align-items: center; gap: 7px;
+            padding: 9px 16px; border-radius: 3px;
+            font-size: 0.78rem; font-family: inherit; cursor: pointer;
+            letter-spacing: 1px; border: none; transition: all 0.18s;
+            margin-top: 0; font-weight: bold; outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .share-btn-x { background: #000; color: #fff; border: 1px solid #444; }
+        .share-btn-x:hover { background: #111; box-shadow: 0 0 14px rgba(255,255,255,0.18); color: #fff; }
+        /* Free Input Mode */
+        #free-screen {
+            width: 100%; max-width: 560px; margin: 0 auto;
+            padding: 6px 0 10px; display: flex; flex-direction: column; gap: 12px;
+        }
+        #free-header {
+            text-align: center; letter-spacing: 6px; font-size: 0.7rem;
+            color: var(--primary-dim); padding-bottom: 8px; border-bottom: 1px solid var(--border);
+        }
+        #free-header span { color: var(--primary); font-size: 1.0rem; letter-spacing: 8px; }
+        #free-input-block { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 2px; padding: 10px 16px 12px; }
+        #free-input-block .free-section-label {
+            font-size: 0.58rem; color: var(--primary-dim); letter-spacing: 3px;
+            margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+        }
+        #free-input-block .free-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        #free-morse-render { min-height: 2.2rem; display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: wrap; }
+        #free-output-block { background: rgba(0,0,0,0.55); border: 1px solid var(--primary); border-radius: 2px; padding: 0; overflow: hidden; }
+        #free-output-block .free-section-label {
+            font-size: 0.58rem; color: var(--primary-dim); letter-spacing: 3px;
+            padding: 6px 14px 5px; border-bottom: 1px solid var(--border);
+            background: rgba(0,50,20,0.3); display: flex; align-items: center; gap: 6px;
+        }
+        #free-output-block .free-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        #free-text-display {
+            min-height: 100px; max-height: 200px; overflow-y: auto;
+            padding: 12px 16px 10px; font-size: 1.4rem; letter-spacing: 5px;
+            color: var(--primary); word-break: break-all; text-align: left;
+            line-height: 1.9; font-family: 'Courier New', monospace;
+        }
+        #free-controls { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        #free-controls .free-quit-btn { font-size: 0.72rem; padding: 7px 22px; letter-spacing: 2px; }
+        #free-controls .free-reset-btn {
+            font-size: 0.68rem; padding: 6px 16px; letter-spacing: 2px;
+            opacity: 0.55; background: transparent; border-color: var(--border); color: var(--primary-dim);
+        }
+        #free-controls .free-reset-btn:hover { opacity: 0.85; }
+        #free-paddle-area { display: none; gap: 20px; justify-content: center; margin-top: 2px; }
+        #free-paddle-area.visible { display: flex; }
+        /* Free mode link on settings */
+        #free-mode-link { display: block; text-align: center; margin-top: 6px; }
+        #free-mode-link button {
+            background: transparent; border: 1px solid var(--border); color: var(--primary-dim);
+            font-size: 0.75rem; padding: 6px 22px; letter-spacing: 2px;
+            opacity: 0.75; transition: opacity 0.2s, border-color 0.2s, color 0.2s;
+        }
+        #free-mode-link button:hover { opacity: 1; border-color: var(--primary); color: var(--primary); box-shadow: none; }
+        /* キー設定 */
+        #key-customize-btn {
+            background: transparent; border: 1px solid rgba(30,92,56,0.6);
+            color: rgba(0,192,96,0.75); font-size: 0.78rem;
+            padding: 5px 14px; letter-spacing: 1px; opacity: 1; margin-top: 0;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        #key-customize-btn:hover { border-color: var(--border); color: var(--primary-dim); background: transparent; box-shadow: none; }
+        /* Key Customize Modal */
+        #key-customize-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999; align-items: center; justify-content: center; }
+        #key-customize-modal.open { display: flex; }
+        .kc-box { background: #000f08; border: 1px solid var(--primary-dim); border-top: 2px solid var(--primary); padding: 26px 28px; width: min(340px, 88vw); }
+        .kc-title { font-size: 0.7rem; letter-spacing: 3px; color: var(--primary-dim); margin-bottom: 18px; text-align: center; }
+        .kc-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 0; }
+        .kc-label { font-size: 0.78rem; letter-spacing: 2px; color: var(--primary-dim); flex-shrink: 0; }
+        .kc-key-btn {
+            background: rgba(0,123,67,0.08); border: 1px solid var(--border);
+            color: var(--primary); font-family: inherit; font-size: 0.9rem;
+            letter-spacing: 2px; padding: 8px 0; width: 155px; cursor: pointer;
+            text-align: center; transition: border-color 0.15s, background 0.15s;
+        }
+        .kc-key-btn:hover { border-color: var(--primary-dim); }
+        .kc-key-btn.listening { border-color: var(--primary); background: rgba(0,123,67,0.22); animation: blink 0.5s infinite; }
+        #kc-error { font-size: 0.7rem; letter-spacing: 1px; color: var(--error); min-height: 1.1em; text-align: center; margin: 10px 0 2px; }
+        @media (max-width: 700px) {
+            body { justify-content: flex-start; padding: 8px 0; overflow-y: auto; }
+            #game-container { padding: 12px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; }
+            h1 { font-size: 1.55rem; letter-spacing: 5px; }
+            #scope-canvas { height: 90px; }
+        }
+    </style>
+</head>
+<body>
+<div id="game-container">
+    <div class="header-bar">
+        <h1><a href="https://jl1gix.com/index-en.html" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
+    <div class="subtitle">▸ FUN WORD KEYING GAME ◂</div>
+
+    <!-- ═══ START SCREEN ═══ -->
+    <div id="start-screen">
+        <div id="mode-settings" style="position:relative;">
+            <!-- モード説明 + キー設定ボタン -->
+            <div style="display:flex;align-items:flex-start;gap:10px;margin:15px 0;">
+                <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:0;flex:1;"></p>
+                <div id="key-customize-wrap" style="flex-shrink:0;padding-top:3px; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                    <button id="key-customize-btn" onclick="openKeyCustomize()">⌨ Key Settings</button>
+                    <div id="key-assign-display" style="font-size:0.6rem; line-height:1.4; color:var(--primary-dim); text-align:right; letter-spacing:1px; white-space:nowrap; border:1px solid var(--border); border-radius:4px; padding:6px 9px; background:rgba(0,0,0,0.3);"></div>
+                </div>
+            </div>
+            <div class="settings-grid" style="margin:18px 0 18px;">
+                <div class="setting-item" id="time-setting-item">
+                    <span class="setting-label">⏱ Time Limit</span>
+                    <select id="time-select">
+                        <option value="60">1 min</option>
+                        <option value="180">3 min</option>
+                        <option value="300">5 min</option>
+                    </select>
+                </div>
+                <div class="setting-item" id="wpm-setting-item">
+                    <span class="setting-label">📡 Morse Speed</span>
+                    <select id="wpm-select">
+                        <option value="20">20 WPM</option>
+                        <option value="21">21 WPM</option>
+                        <option value="22">22 WPM</option>
+                        <option value="23">23 WPM</option>
+                        <option value="24">24 WPM</option>
+                        <option value="25" selected>25 WPM</option>
+                        <option value="26">26 WPM</option>
+                        <option value="27">27 WPM</option>
+                        <option value="28">28 WPM</option>
+                        <option value="29">29 WPM</option>
+                        <option value="30">30 WPM</option>
+                    </select>
+                </div>
+                <div class="setting-item checkbox-item">
+                    <input type="checkbox" id="beginner-mode-check">
+                    <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">🔰</span>
+                    <label for="beginner-mode-check">Beginner Mode (shows the Morse for the current character)</label>
+                </div>
+                <div class="setting-item checkbox-item">
+                    <input type="checkbox" id="morse-board-mode-check" onchange="updateTxModeDesc()">
+                    <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">⌨️</span>
+                    <label for="morse-board-mode-check">Morse Board Mode</label>
+                </div>
+            </div>
+            <div id="free-mode-link">
+                <button id="free-mode-btn" onclick="startFreeMode()">📝 Free Input Mode</button>
+            </div>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
+                <button class="start-key-hint" onclick="unlockAndPrepare()"><span class="start-keycap">A</span><span id="start-hint-label">Press a key to start</span></button>
+                <button onclick="location.href='https://jl1gix.com/index-en.html'" style="font-size:0.72rem;padding:6px 16px;opacity:0.5;margin-top:10px;">◀ Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ GAME SCREEN ═══ -->
+    <div id="game-screen" class="hidden">
+        <div id="game-start-overlay" class="hidden" role="status" aria-live="assertive">START</div>
+        <div class="signal-indicators">
+            <span class="sig-label">SIG</span>
+            <div class="sig-dot" id="sig1"></div>
+            <div class="sig-dot" id="sig2"></div>
+            <div class="sig-dot active" id="sig3"></div>
+            <div class="sig-dot active blink-active" id="sig4"></div>
+        </div>
+        <div id="game-key-assign-row"></div>
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">▸ TIME</span>
+                <span class="stat-value" id="timer">00:00</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">▸ SCORE</span>
+                <span class="stat-value" id="score">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">▸ WPM</span>
+                <span class="stat-value" id="wpm-display">KEY</span>
+            </div>
+        </div>
+        <div id="scope-container">
+            <span id="scope-label">SPECTRUM ─ CW 750Hz</span>
+            <span id="scope-freq">SPAN 3kHz</span>
+            <canvas id="scope-canvas" width="600" height="160"></canvas>
+        </div>
+        <!-- TX paddle buttons (touch only) -->
+        <div id="tx-paddle-area" class="hidden">
+            <button class="tx-paddle-btn" id="pad-dot" ontouchstart="event.preventDefault();paddleDown(false);" ontouchend="event.preventDefault();paddleUp(false);" ontouchcancel="paddleUp(false);">
+                <span class="tx-paddle-sym">・</span>
+                <span class="tx-paddle-label">DIT</span>
+            </button>
+            <button class="tx-paddle-btn" id="pad-dash" ontouchstart="event.preventDefault();paddleDown(true);" ontouchend="event.preventDefault();paddleUp(true);" ontouchcancel="paddleUp(true);">
+                <span class="tx-paddle-sym">ー</span>
+                <span class="tx-paddle-label">DAH</span>
+            </button>
+        </div>
+        <!-- 初心者モード -->
+        <div id="beginner-display" class="hidden"></div>
+        <!-- TX area -->
+        <div id="tx-area">
+            <div id="tx-word-display"><span id="tx-target-text"></span></div>
+            <div id="tx-morse-input"><span id="tx-input-render"></span></div>
+        </div>
+        <div id="word-timer-track">
+            <span id="word-timer-label">📡 SIGNAL</span>
+            <div id="word-timer-bar-wrap">
+                <div id="word-timer-fill"></div>
+            </div>
+        </div>
+        <div id="status-msg">READY...</div>
+        <button class="quit-btn" onclick="quitGame()">■ QUIT</button>
+        <div class="result-key-hint" id="gameplay-key-hint">(Esc key)</div>
+    </div>
+
+    <!-- ═══ FREE INPUT SCREEN ═══ -->
+    <div id="free-screen" class="hidden">
+        <div id="free-header">▸ <span>FREE INPUT</span> ◂</div>
+        <div id="free-wpm-row" style="display:flex;align-items:center;justify-content:center;gap:10px;">
+            <span class="setting-label" style="margin-bottom:0;">📡 Morse Speed</span>
+            <select id="free-wpm-select" onchange="changeFreeWpm()">
+                <option value="20">20 WPM</option>
+                <option value="21">21 WPM</option>
+                <option value="22">22 WPM</option>
+                <option value="23">23 WPM</option>
+                <option value="24">24 WPM</option>
+                <option value="25" selected>25 WPM</option>
+                <option value="26">26 WPM</option>
+                <option value="27">27 WPM</option>
+                <option value="28">28 WPM</option>
+                <option value="29">29 WPM</option>
+                <option value="30">30 WPM</option>
+            </select>
+        </div>
+        <div id="free-key-assign-row"></div>
+        <div id="free-input-block" style="position:relative;">
+            <div class="free-section-label">INPUT</div>
+            <div id="free-morse-render"></div>
+        </div>
+        <div id="free-output-block">
+            <div class="free-section-label">DECODED</div>
+            <div id="free-text-display"><span class="cursor"></span></div>
+        </div>
+        <div id="free-controls">
+            <button class="free-reset-btn" onclick="resetFreeMode()">↺ RESET</button>
+            <button class="free-quit-btn" onclick="quitFreeMode()">■ QUIT</button>
+        </div>
+        <div id="free-paddle-area">
+            <button class="tx-paddle-btn" ontouchstart="event.preventDefault();paddleDown(false);" ontouchend="event.preventDefault();paddleUp(false);" ontouchcancel="paddleUp(false);">
+                <span class="tx-paddle-sym">・</span>
+                <span class="tx-paddle-label">DIT</span>
+            </button>
+            <button class="tx-paddle-btn" ontouchstart="event.preventDefault();paddleDown(true);" ontouchend="event.preventDefault();paddleUp(true);" ontouchcancel="paddleUp(true);">
+                <span class="tx-paddle-sym">ー</span>
+                <span class="tx-paddle-label">DAH</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══ RESULT SCREEN ═══ -->
+    <div id="result-screen" class="hidden">
+        <h2>MISSION END</h2>
+        <p id="final-result-text" style="margin: 20px 0;"></p>
+        <div id="asobi-mistake-area" class="hidden" style="margin:0 auto 20px; padding:12px 14px; border:1px solid var(--border); border-radius:6px; background:rgba(0,0,0,0.25); max-width:380px;">
+            <div style="font-size:0.65rem; letter-spacing:2px; color:var(--primary-dim); margin-bottom:8px;">▸ Frequently Missed Characters ◂</div>
+            <div id="asobi-mistake-list" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
+        </div>
+        <div class="share-area">
+            <div class="share-label">▸ SHARE YOUR RESULT ◂</div>
+            <div class="share-buttons">
+                <button class="share-btn share-btn-x" onclick="shareX()">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.402 6.231H2.744l7.73-8.835L2.25 2.25h6.832l4.258 5.632 4.905-5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    Share on X
+                </button>
+            </div>
+        </div>
+        <div id="score-reg-area" style="margin-top:18px; border-top:1px solid var(--border); padding-top:14px;">
+            <div id="score-reg-result" style="margin-bottom:12px; font-size:0.85rem; line-height:2; color:var(--primary);"></div>
+            <div id="score-reg-form" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="nickname-input" placeholder="Nickname (A-Z, up to 10 chars)" maxlength="10"
+                    autocomplete="off" autocapitalize="characters" spellcheck="false"
+                    oninput="if(!event.isComposing){this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();}"
+                    onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();setNickname();}"
+                    style="background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:2px;
+                           color:var(--primary); font-family:inherit; font-size:0.82rem;
+                           padding:8px 12px; width:230px; letter-spacing:1px; outline:none;">
+                <button onclick="setNickname()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">✏️ Set Name</button>
+            </div>
+        </div>
+        <button onclick="retryGame()" style="margin-top:16px;">▶ Retry</button>
+        <div class="result-key-hint" id="result-key-hint">(Esc key)</div>
+    </div>
+</div>
+
+<footer style="margin-top:20px;padding:12px 0 28px;border-top:1px solid #1e5c38;font-size:0.65rem;letter-spacing:1px;opacity:0.55;text-align:center;">
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 20px;">
+        <a href="https://jl1gix.com/index-en.html" style="color:#007b43; text-decoration:none;">Top</a>
+        <a href="/ranking-en.html" style="color:#007b43; text-decoration:none;">Ranking</a>
+<a href="/how-to-use-en.html" style="color:#007b43; text-decoration:none;">How to Use</a>
+        <a href="/morse-table-en.html" style="color:#007b43; text-decoration:none;">Morse Code Table</a>
+<a href="/profile-en.html" style="color:#007b43; text-decoration:none;">About</a>
+        <a href="/privacy-en.html" style="color:#007b43; text-decoration:none;">Privacy</a>
+        <a href="/contact-en.html" style="color:#007b43; text-decoration:none;">Contact</a>
+    </div>
+</footer>
+
+<script src="/asobi.js"></script>
+
+<!-- ═══ KEY CUSTOMIZE MODAL ═══ -->
+<div id="key-customize-modal">
+    <div class="kc-box">
+        <div class="kc-title">⌨ Key Customization</div>
+        <div class="kc-row">
+            <span class="kc-label">▸ Dot (・)</span>
+            <button class="kc-key-btn" id="dot-key-btn" onclick="startKeyCapture('dot')"></button>
+        </div>
+        <div class="kc-row">
+            <span class="kc-label">▸ Dash (－)</span>
+            <button class="kc-key-btn" id="dash-key-btn" onclick="startKeyCapture('dash')"></button>
+        </div>
+        <div id="kc-error"></div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">
+            <button onclick="saveKeyCustomize()" style="font-size:0.75rem;padding:7px 22px;letter-spacing:2px;">✓ Save</button>
+            <button onclick="closeKeyCustomize()" style="font-size:0.7rem;padding:6px 14px;opacity:0.5;">✕ Cancel</button>
+        </div>
+    </div>
+</div>
+<!-- ハンバーガーメニュー -->
+<button id="menu-btn" aria-label="Open menu" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);">☰</button>
+<a id="lang-switch-btn" href="/asobi.html" aria-label="Switch to Japanese" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:6px 12px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);text-decoration:none;display:inline-block;">🌐 JA</a>
+<div id="menu-overlay" onclick="document.getElementById('menu-panel').classList.remove('open');this.classList.remove('open');" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:998;"></div>
+<nav id="menu-panel" aria-label="Site menu" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#0e1f16;border-right:1px solid #1e5c38;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(0,0,0,0.6);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Game</h3>
+    <a href="/index-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 Home</a>
+    <a href="/rx-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 Receive Mode</a>
+    <a href="/tx-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 Transmit Mode</a>
+    <a href="/asobi-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 Fun Mode</a>
+    <a href="/ranking-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 Ranking</a>
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Learning</h3>
+    <a href="/how-to-use-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ How to Use</a>
+    <a href="/morse-table-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 Morse Code Table</a>
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Other</h3>
+    <a href="/profile-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 About</a>
+    <a href="/privacy-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 Privacy</a>
+    <a href="/contact-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ Contact</a>
+</nav>
+<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(0,100,55,0.25);}nav#menu-panel a:hover{background:rgba(0,100,55,0.15);padding-left:6px;transition:padding 0.15s;}#lang-switch-btn:hover{background:rgba(0,100,55,0.25);}</style>
+</body>
+</html>
