@@ -155,9 +155,10 @@ document.addEventListener('keydown', (e) => {
             return;
         }
         // ロビー画面: Escキーでモールス打のトップ画面へ（制御キーなので入力中でも有効）
+        // 英語モードで開いている場合は英語版トップ（index-en.html）へ戻す
         if (e.code === 'Escape') {
             e.preventDefault();
-            location.href = 'https://jl1gix.com';
+            location.href = (LANG === 'en') ? '/index-en.html' : 'https://jl1gix.com';
             return;
         }
     }
@@ -1115,7 +1116,7 @@ async function autoRegister(retryCount = 0) {
         const rankData = await rankRes.json();
         if (rankData.percentile !== undefined) pct = rankData.percentile;
     } catch (e) {}
-    const rankHref = (LANG === 'en' ? '/en/ranking.html' : '/ranking.html') + `?mode=TX&time=${minutes}`;
+    const rankHref = (LANG === 'en' ? '/ranking-en.html' : '/ranking.html') + `?mode=TX&time=${minutes}`;
     regResult.innerHTML =
         `<span style="color:var(--success);">${t('regDone')}</span>　${t('topPct', pct)}　` +
         `<a href="${rankHref}" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:4px 14px; font-size:0.75rem; letter-spacing:1px; border-radius:2px;">${t('rankingLink')}</a>`;
