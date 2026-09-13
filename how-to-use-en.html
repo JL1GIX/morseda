@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="canonical" href="https://jl1gix.com/how-to-use-en.html">
+    <link rel="alternate" hreflang="ja" href="https://jl1gix.com/how-to-use.html">
+    <link rel="alternate" hreflang="en" href="https://jl1gix.com/how-to-use-en.html">
+    <link rel="alternate" hreflang="x-default" href="https://jl1gix.com/how-to-use.html">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="モールス打">
+    <meta name="twitter:site" content="@JL1GIX">
+    <meta name="twitter:creator" content="@JL1GIX">
+    <meta name="author" content="JL1GIX">
+    <meta name="theme-color" content="#080f0b">
+    <title>Morseda Complete Guide - Morseda</title>
+    <meta name="description" content="A complete walkthrough of every Morseda feature: how to use Receive, Transmit, and Free Input modes, WPM settings, keyboard shortcuts, ranking registration, and tips to raise your score.">
+    <meta property="og:title" content="Morseda Complete Guide - Morseda">
+    <meta property="og:description" content="A complete walkthrough of every Morseda feature: how to use Receive, Transmit, and Free Input modes, WPM settings, keyboard shortcuts, ranking registration, and tips to raise your score.">
+    <meta property="og:url" content="https://jl1gix.com/how-to-use-en.html">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://jl1gix.com/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://jl1gix.com/ogp.png">
+    <meta name="twitter:title" content="Morseda Complete Guide - Morseda">
+    <meta name="twitter:description" content="A complete walkthrough of every Morseda feature: how to use Receive, Transmit, and Free Input modes, WPM settings, keyboard shortcuts, ranking registration, and tips to raise your score.">
+    <style>
+        :root {
+            --primary: #00c060;
+            --primary-dim: #00a050;
+            --bg: #080f0b;
+            --panel: #0e1f16;
+            --border: #1e5c38;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { scrollbar-gutter: stable; }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--primary);
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.8;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--primary);
+            border-radius: 4px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(0,100,55,0.2);
+        }
+        .header-bar { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .header-bar::before { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--primary-dim)); }
+        .header-bar::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(to left, transparent, var(--primary-dim)); }
+        h1 { margin: 0; letter-spacing: 6px; font-size: 1.4rem; color: var(--primary); text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5); }
+        .subtitle { font-size: 0.6rem; color: var(--primary-dim); letter-spacing: 4px; margin-bottom: 28px; opacity: 0.9; text-align: center; }
+        h2 { font-size: 1.15rem; letter-spacing: 2px; color: var(--primary); margin: 30px 0 12px; padding-left: 10px; border-left: 2px solid var(--primary); }
+        h3 { font-size: 1rem; letter-spacing: 1px; color: var(--primary); margin: 20px 0 8px; opacity: 0.95; }
+        p, li { font-size: 1rem; color: var(--primary-dim); margin-bottom: 10px; }
+        ul, ol { padding-left: 24px; margin-bottom: 12px; }
+        li { margin-bottom: 6px; }
+        a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+        a:hover { opacity: 0.7; }
+        .updated { font-size: 0.7rem; color: var(--primary-dim); opacity: 0.6; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+        table { border-collapse: collapse; margin: 12px 0 18px; width: 100%; font-size: 0.82rem; }
+        th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; color: var(--primary-dim); }
+        th { color: var(--primary); background: rgba(0,80,40,0.15); }
+        .callout { background: rgba(0,80,40,0.15); border-left: 3px solid var(--primary); padding: 12px 15px; margin: 15px 0; font-size: 0.82rem; }
+        footer { margin: 44px auto 0; padding: 22px 0 6px; border-top: 1px solid #1e5c38; font-size: 0.65rem; letter-spacing: 1px; opacity: 0.55; text-align: center; width: 95%; max-width: 860px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header-bar">
+        <h1><a href="https://jl1gix.com/index-en.html" style="color:inherit; text-decoration:none;">モールス打</a></h1>
+    </div>
+    <div class="subtitle">▸ HOW TO USE MORSEDA ◂</div>
+
+    <h2>1. What is Morseda</h2>
+    <p>Morseda is a Morse code training tool built around amateur radio contest CW contacts. It runs entirely in your browser — no installation or account required — and works on both PC and smartphone.</p>
+    <p>This page walks through every feature and how to use it, whether you're new to Morseda or want a refresher.</p>
+
+    <h2>2. Home Page</h2>
+    <p>Visit <a href="https://jl1gix.com/index-en.html">https://jl1gix.com/index-en.html</a> to see the mode selection screen. Choose one of the following modes to start.</p>
+    <ul>
+        <li><strong>Receive Mode</strong>: Listen to CW tones from your speakers and type what you hear on the keyboard</li>
+        <li><strong>Transmit Mode</strong>: Convert the characters shown on screen into Morse code using the keyboard or a paddle</li>
+        <li><strong>Fun Mode</strong>: Same controls as Transmit Mode, but with familiar English words as the material for casual play</li>
+    </ul>
+    <p>From the bottom of the page you can also access the Ranking, the Morse Code Table, and other learning content.</p>
+
+    <h2>3. How to Use Receive Mode</h2>
+
+    <h3>Settings Screen</h3>
+    <p>Once you enter Receive Mode, you can configure the following:</p>
+    <ul>
+        <li><strong>Time Limit</strong>: Choose 1, 3, or 5 minutes</li>
+        <li><strong>Morse Speed (WPM)</strong>: Choose from 20 to 30 WPM in 1 WPM steps (default 25 WPM)</li>
+        <li><strong>Beginner Mode</strong>: Shows the Morse code for the character currently being sent, in real time. Turning it on adds a "beginner" mark when you register your score</li>
+    </ul>
+
+    <h3>Audio Check</h3>
+    <p>Checking "🔊 Audio Check" at the top right loops the SOS pattern (・・・−−−・・・) so you can adjust your headphone or speaker volume and check the sound quality. Changing the WPM automatically adjusts the SOS playback speed to match.</p>
+
+    <h3>Starting the Game</h3>
+    <p>Clicking "▶ START MISSION" plays a callsign and an RST report alternately, in audio.</p>
+    <ul>
+        <li><strong>Callsign example</strong>: JL1GIX, 7K1ABC, 8J1RL/1</li>
+        <li><strong>RST example</strong>: 599108H (599 + prefecture code 108 + suffix letter). The leading "599" is conventionally sent as "5NN" outside Beginner Mode, but typing either 599 or 5NN counts as correct (in Beginner Mode it is always sent as 599, and only 599 counts as correct)</li>
+    </ul>
+    <p>Type what you heard into the input field at the bottom of the screen and press Enter to check it. If correct, you move to the next item; if wrong, the screen flashes red and the same item continues.</p>
+
+    <h3>Scoring</h3>
+    <p>Your score is simply the number of characters you get right. You compete on how many you can correctly answer within the 1, 3, or 5 minute time limit.</p>
+
+    <h3>QUIT Button</h3>
+    <p>You can stop before the time limit is up using the QUIT button. Quitting resets your score and it will not be registered to the ranking.</p>
+
+    <h2>4. How to Use Transmit Mode</h2>
+
+    <h3>Keyboard Controls</h3>
+    <p>On desktop, you can use keyboard keys as a CW keyer.</p>
+    <ul>
+        <li><strong>Dot (・)</strong>: Space key by default (changeable from "⌨ Key Settings")</li>
+        <li><strong>Dash (−)</strong>: J key by default (changeable from "⌨ Key Settings")</li>
+        <li><strong>Hold for repeats</strong>: Holding a key down sends a continuous stream of dots or dashes via the Iambic keyer</li>
+        <li><strong>Squeeze with both keys</strong>: Holding both keys at once automatically alternates dots and dashes (Iambic mode)</li>
+    </ul>
+
+    <h3>Paddle Buttons (Phone/Tablet)</h3>
+    <p>On touch devices, two buttons labeled "DIT" and "DAH" appear at the bottom of the screen.</p>
+    <ul>
+        <li><strong>Tap</strong>: Sends a single dot or dash</li>
+        <li><strong>Hold</strong>: Sends continuously (same behavior as the PC keyboard)</li>
+        <li><strong>Hold both at once</strong>: Automatically alternates in Iambic mode, same as PC</li>
+    </ul>
+
+    <h3>Decode Timing</h3>
+    <p>After you finish keying and a set time passes (roughly 2x a dit on desktop, roughly 5x on mobile), Morseda automatically decodes your input into a character. If correct, you move to the next character; if wrong, the screen flashes red and you key it again.</p>
+
+    <h3>Beginner Mode</h3>
+    <p>As in Receive Mode, turning this on shows the Morse code for the character you're about to key. Useful while you're still learning the codes.</p>
+
+    <h3>Keying the Contest Number (RST)</h3>
+    <p>The RST is presented with a leading "5NN", like "5NN108H", and only keying 5NN counts as correct. For contest number digits, keying 1 as "1" or "A", 0 as "0", "O", or "T", and 9 as "9" or "N" all count as correct (cut numbers). Callsign digits, however, only count as correct when keyed as the actual digit.</p>
+
+    <h2>5. Fun Mode</h2>
+    <p>Enter from "🎮 Fun Mode" on the home page. The controls are the same as Transmit Mode, but instead of callsigns and RST reports, the material is familiar English words like CAT or DOG.</p>
+    <ul>
+        <li>Each word has its own time limit, and you must finish keying it before the "📡 SIGNAL" bar at the bottom runs out (if you don't make it, the signal fades (QSB), the word is lost, and play moves to the next word)</li>
+        <li>The time limit adjusts automatically based on the word's length and your WPM setting</li>
+        <li>Keying a word with zero mistakes extends your overall play time by 1 second (a "+1s" effect appears next to the TIME display)</li>
+        <li>As in Receive and Transmit modes, your score can be registered to the ranking</li>
+    </ul>
+
+    <h2>6. Free Input Mode (inside Transmit Mode)</h2>
+    <p>Choosing "📝 Free Input Mode" from the Transmit Mode settings screen lets you key freely and hear the tones without any assigned material.</p>
+    <ul>
+        <li>No target text is shown — key whatever characters you want</li>
+        <li>Decoded characters appear on screen in real time</li>
+        <li>The dots and dashes you keyed are also shown, so you can check whether your keying was correct</li>
+    </ul>
+    <p>Handy as a stand-in for real equipment when practicing your keying, checking your tone, or memorizing new characters.</p>
+
+    <h2>7. Ranking Feature</h2>
+    <p>After a game ends, submitting your score registers it to the ranking (tallied separately for Receive, Transmit, and Fun modes).</p>
+
+    <h3>Registering a Nickname</h3>
+    <ul>
+        <li>Enter **only uppercase A-Z letters and digits 0-9** into the field (up to 10 characters)</li>
+        <li>Confirm with the "✏️ Set Name" button or the Enter key</li>
+        <li>If left blank, you'll be registered as "noname"</li>
+    </ul>
+
+    <h3>Viewing the Ranking</h3>
+    <p>From "Ranking" in the footer, you can view top scores broken down by mode (Receive/Transmit/Fun) and time limit (1/3/5 min). Your own standing is also shown as a percentile.</p>
+
+    <h2>8. Troubleshooting</h2>
+    <ul>
+        <li><strong>No sound plays</strong>: Browser autoplay policies require an initial click. Audio is enabled the moment you press "▶ START MISSION". If you still hear nothing, check your browser's or OS's volume settings.</li>
+        <li><strong>Transmit Mode isn't decoding my input</strong>: Uneven dot/dash length or spacing prevents recognition. Try lowering the WPM to keep a steady rhythm, aim for a dash about 3x a dot, and leave a bit more space between characters.</li>
+        <li><strong>My score wasn't registered</strong>: Scores aren't registered if you QUIT mid-game. Play until the time limit runs out.</li>
+    </ul>
+
+    <h2>9. Keyboard Shortcuts</h2>
+    <p>In addition to mouse/tap controls, the following keyboard shortcuts are available (shared across Receive/Transmit/Fun modes; the Morse Board ones apply only to Transmit and Fun modes).</p>
+    <table>
+    <tr><th>Screen</th><th>Key</th><th>Action</th></tr>
+    <tr><td>Home</td><td>T</td><td>Go to Transmit Mode lobby</td></tr>
+    <tr><td>Home</td><td>R</td><td>Go to Receive Mode lobby</td></tr>
+    <tr><td>Home</td><td>G</td><td>Go to Fun Mode lobby</td></tr>
+    <tr><td>Lobby</td><td>A</td><td>Start the game</td></tr>
+    <tr><td>Lobby (Morse Board)</td><td>Key A (・－)</td><td>Start the game</td></tr>
+    <tr><td>Lobby</td><td>Esc</td><td>Go to the Morseda home page</td></tr>
+    <tr><td>Result screen</td><td>Esc</td><td>Return to the lobby</td></tr>
+    <tr><td>Result screen (Morse Board)</td><td>Key R (・－・)</td><td>Return to the lobby</td></tr>
+    <tr><td>Result screen</td><td>/</td><td>Focus the nickname field</td></tr>
+    <tr><td>Result screen (Morse Board)</td><td>Key / (－・・－・)</td><td>Focus the nickname field; if already focused, key again to confirm</td></tr>
+    <tr><td>During play</td><td>Esc</td><td>Force return to the lobby</td></tr>
+    <tr><td>During play (Morse Board)</td><td>Key period (・－・－・－)</td><td>Force return to the lobby</td></tr>
+    </table>
+
+    <p class="updated">Last updated: 2026</p>
+</div>
+
+<footer>
+    <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 20px;">
+        <a href="https://jl1gix.com/index-en.html" style="color:#007b43; text-decoration:none;">Top</a>
+<a href="/how-to-use-en.html" style="color:#007b43; text-decoration:none;">How to Use</a>
+<a href="/morse-table-en.html" style="color:#007b43; text-decoration:none;">Morse Code Table</a>
+        <a href="/ranking-en.html" style="color:#007b43; text-decoration:none;">Ranking</a>
+        <a href="/profile-en.html" style="color:#007b43; text-decoration:none;">About</a>
+        <a href="/privacy-en.html" style="color:#007b43; text-decoration:none;">Privacy</a>
+        <a href="/contact-en.html" style="color:#007b43; text-decoration:none;">Contact</a>
+    </div>
+</footer>
+<!-- ハンバーガーメニュー -->
+<button id="menu-btn" aria-label="Open menu" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);">☰</button>
+<a id="lang-switch-btn" href="/how-to-use.html" aria-label="Switch to Japanese" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:6px 12px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);text-decoration:none;display:inline-block;">🌐 JA</a>
+<div id="menu-overlay" onclick="document.getElementById('menu-panel').classList.remove('open');this.classList.remove('open');" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:998;"></div>
+<nav id="menu-panel" aria-label="Site menu" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#0e1f16;border-right:1px solid #1e5c38;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(0,0,0,0.6);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Game</h3>
+    <a href="/index-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 Home</a>
+    <a href="/rx-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 Receive Mode</a>
+    <a href="/tx-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 Transmit Mode</a>
+    <a href="/asobi-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 Fun Mode</a>
+    <a href="/ranking-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 Ranking</a>
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Learning</h3>
+    <a href="/how-to-use-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ How to Use</a>
+    <a href="/morse-table-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 Morse Code Table</a>
+    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Other</h3>
+    <a href="/profile-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 About</a>
+    <a href="/privacy-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 Privacy</a>
+    <a href="/contact-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ Contact</a>
+</nav>
+<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(0,100,55,0.25);}nav#menu-panel a:hover{background:rgba(0,100,55,0.15);padding-left:6px;transition:padding 0.15s;}#lang-switch-btn:hover{background:rgba(0,100,55,0.25);}</style>
+</body>
+</html>
