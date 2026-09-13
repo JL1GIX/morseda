@@ -482,7 +482,8 @@
             .msym-dot  { width: 12px; height: 12px; }
             .msym-dash { width: 30px; height: 12px; }
             /* スマホ版: 音声チェックを絶対配置からその場のflow配置に変え、ゲーム説明文と被らないようにする */
-            #audio-check-item { position: static; justify-content: flex-end; margin-bottom: 10px; }
+            /* 注意: 要素自体がインラインstyleでposition:absoluteを持つため、!importantが必須 */
+            #audio-check-item { position: static !important; justify-content: flex-end !important; margin-bottom: 10px !important; }
         }
     </style>
 </head>
