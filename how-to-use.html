@@ -83,7 +83,12 @@
         th { color: var(--primary); background: rgba(0,80,40,0.15); }
         .callout { background: rgba(0,80,40,0.15); border-left: 3px solid var(--primary); padding: 12px 15px; margin: 15px 0; font-size: 0.82rem; }
         footer { margin: 44px auto 0; padding: 22px 0 6px; border-top: 1px solid #1e5c38; font-size: 0.65rem; letter-spacing: 1px; opacity: 0.55; text-align: center; width: 95%; max-width: 860px; }
-</style>
+        @media (max-width: 700px) {
+            h1 { font-size: 1.2rem; letter-spacing: 4px; }
+            /* スマホ版: 右上の🌐言語切替ボタンとタイトルが被らないよう、タイトルを少し下げる */
+            .header-bar { margin-top: 26px; }
+        }
+    </style>
 </head>
 <body>
 <div class="container">
