@@ -15,7 +15,9 @@
 ## 2. 技術構成
 
 - **完全な静的サイト**。ビルドツール・フレームワーク・パッケージマネージャは一切なし。
-- 各 HTML ファイルは **CSS と JavaScript を内包した「1ファイル完結」** の形式。`<style>` と `<script>` を分離していない。新規ファイル作成・既存ファイル編集の際もこの方針を維持すること。
+- 各 HTML ファイルは **CSS を内包した「1ファイル完結」** の形式。`<style>` は分離していない。
+- **2026-09〜 例外**: 英語モード実装のため、**JavaScript（ゲームロジック本体）のみ例外的に外部 `.js` ファイルに切り出している**（`index.js` / `tx.js` / `rx.js` / `asobi.js`）。ja/en 両方の HTML から同じ `.js` を読み込むことで、ロジックの修正が1箇所で済むようにするため。CSSは従来通り分離しない。詳細は 9章を参照。
+- **多言語対応（英語モード）**: 2026-09 に実装。詳細は 9章「英語モード（多言語対応）」を参照。
 - **ホスティング**: GitHub Pages (`CNAME` で `jl1gix.com` を割り当て)。push すれば数十秒〜数分で本番に反映される。
 - **バックエンド API**: `https://api.jl1gix.com`(別リポジトリで管理されている想定)
   - `POST /api/scores` — スコア登録
@@ -29,13 +31,21 @@
 | ファイル | 役割 | 規模 |
 |---|---|---|
 | `index.html` | トップページ。モード選択 (受信/送信) と、JL1GIX を 20WPM で打つスペクトラムスコープ風アニメーション | 約 17KB |
-| `rx.html` | **受信モード**。コールサイン・RST レポートをランダム生成して音で出題、ユーザーが聞き取って入力 | 約 52KB |
-| `tx.html` | **送信モード**。キーボード/パドルでモールスを打つ。Iambic キーヤー対応 | 約 66KB |
-| `ranking.html` | スコアランキング表示。モード別 (rx/tx) × 時間別 (1分/3分/5分) | 約 17KB |
-| `morse-table.html` | モールス符号表 (リファレンス) | 約 11KB |
-| `profile.html` | 運営者情報 | 約 11KB |
-| `privacy.html` | プライバシーポリシー | 約 7KB |
-| `contact.html` | お問い合わせ | 約 7KB |
+| `index.js` | index.html のゲームロジック（スペクトラムスコープ描画・キーボードショートカット）を外部化したもの。`index-en.html` と共有。テキストは全て静的HTML側にあるためi18n辞書は無し | 約 10KB |
+| `rx.html` | **受信モード**。コールサイン・RST レポートをランダム生成して音で出題、ユーザーが聞き取って入力 | 約 33KB |
+| `rx.js` | rx.html のゲームロジック外部化版。`rx-en.html` と共有。i18n辞書(`I18N`/`t()`)でJS生成テキストを切替 | 約 34KB |
+| `tx.html` | **送信モード**。キーボード/パドルでモールスを打つ。Iambic キーヤー対応。ミス分析（打ち間違えの多い文字表示）機能あり | 約 46KB |
+| `tx.js` | tx.html のゲームロジック外部化版。`tx-en.html` と共有。i18n辞書でJS生成テキストを切替 | 約 56KB |
+| `asobi.html` | **お遊びモード**。送信モードと同じ操作系で、英単語をお題にした気軽な練習。ミス分析機能あり | 約 49KB |
+| `asobi.js` | asobi.html のゲームロジック外部化版。`asobi-en.html` と共有 | 約 60KB |
+| `ranking.html` | スコアランキング表示。モード別 (rx/tx/asobi) × 時間別 (1分/3分/5分) | 約 22KB |
+| `morse-table.html` | モールス符号表 (リファレンス) | 約 15KB |
+| `how-to-use.html` | 使い方ガイド（全機能の説明、キーボードショートカット一覧を含む） | 約 22KB |
+| `profile.html` | 運営者情報 | 約 16KB |
+| `privacy.html` | プライバシーポリシー | 約 11KB |
+| `contact.html` | お問い合わせ | 約 11KB |
+| `sitemap.xml` | サイトマップ。ja/en 全20ページ分のURLと`hreflang`相互参照を記載 | 約 8KB |
+| `*-en.html`（`index-en.html`, `tx-en.html`, `rx-en.html`, `asobi-en.html`, `ranking-en.html`, `profile-en.html`, `contact-en.html`, `how-to-use-en.html`, `morse-table-en.html`, `privacy-en.html`） | 各ページの英語版。ルート直下に ja 版と並べて配置（`/en/`のようなサブフォルダは使わない）。詳細は 9章 | 各ページ ja版とほぼ同サイズ |
 | `CNAME` | GitHub Pages のカスタムドメイン (`jl1gix.com`) |  |
 | `favicon-*.png` / `apple-touch-icon.png` / `ogp.png` | アイコン・OGP 画像 |  |
 
@@ -141,6 +151,78 @@ git log --oneline -3
 
 (空欄。熊谷さんから要望が出たらここに追記していくと、次回の Cowork に引き継げる。)
 
+## 9. 英語モード（多言語対応）
+
+2026-09 に実装完了。**ルート直下は日本語版のまま維持し、各ページの英語版を `xxxx-en.html` という名前で同じディレクトリに並べて配置する**方式（`/en/` のようなサブフォルダは使わない）。ゲーム内容・練習素材（コールサイン、単語リスト等）は一切変更せず、UI表示テキストのみ英訳している。
+
+### 9.1 命名規則
+
+| 日本語版 | 英語版 |
+|---|---|
+| `index.html`（トップ） | `index-en.html` |
+| `tx.html` | `tx-en.html` |
+| `rx.html` | `rx-en.html` |
+| `asobi.html` | `asobi-en.html` |
+| `ranking.html` | `ranking-en.html` |
+| `profile.html` | `profile-en.html` |
+| `contact.html` | `contact-en.html` |
+| `how-to-use.html` | `how-to-use-en.html` |
+| `morse-table.html` | `morse-table-en.html` |
+| `privacy.html` | `privacy-en.html` |
+
+過去に一度「`/en/xxxx.html` というサブフォルダ方式」で実装しかけたが、GitHub Desktopでのcommit時にエラーが発生し、熊谷さんの判断で一旦全て破棄（discard）。その後改めて「`xxxx-en.html` を同じ階層に並べる」方式で熊谷さんから正式に依頼があり、これが現在の実装。**サブフォルダ方式に戻すことは想定していない**。
+
+### 9.2 言語切り替えUI
+
+- **ホーム画面 (`index.html` / `index-en.html`)**: 画面右上に `<select>` のプルダウン（`#lang-select`）を設置。「🌐 日本語」「🌐 English」の2択で、`onchange` で該当ページへ即座に遷移する（`English` 選択 → `index-en.html` へ、`日本語` 選択 → `/` へ）。
+- **それ以外の全ページ**: 画面右上に固定の🌐ボタン（`#lang-switch-btn`）を1つ設置。ja側は「🌐 EN」で対応する `xxxx-en.html` へ、en側は「🌐 JA」で対応する `xxxx.html` へリンクする、単純な相互リンク方式（ドロップダウンではない）。ホーム画面だけプルダウンにしているのは、熊谷さんからの明示的な要望のため。
+- 全ページに `<link rel="alternate" hreflang="ja|en|x-default">` を canonical の直後に追加済み（SEO対策）。
+
+### 9.3 JS外部化とi18n辞書
+
+- `tx.html`・`rx.html`・`asobi.html`・`index.html` は元々複雑な埋め込み `<script>` を持っていたため、これらのみ例外的に `tx.js` / `rx.js` / `asobi.js` / `index.js` として外部化し、ja/en 両方の HTML から `<script src="/tx.js"></script>` のように読み込む形にしている（1ファイル完結の原則の唯一の例外。これ以上例外を増やさないこと）。
+- `tx.js` / `rx.js` / `asobi.js` の内部で、JSが動的生成するテキスト（設定ボタンのラベル、リザルト画面の文言、ランキング登録の可否メッセージなど）は下記パターンの i18n 辞書で切り替える:
+  ```js
+  const LANG = (document.documentElement.lang === 'en') ? 'en' : 'ja';
+  const I18N = {
+      someKey: { ja: '日本語テキスト', en: 'English text' },
+      withArgs: (n) => ({ ja: `${n}件`, en: `${n} items` }),
+  };
+  function t(key, ...args) {
+      const entry = I18N[key];
+      const resolved = (typeof entry === 'function') ? entry(...args) : entry;
+      return resolved[LANG];
+  }
+  ```
+- `index.js` は画面上に動的にテキストを生成する処理が無い（スペクトラムスコープのcanvas描画とキーボードショートカットのみ）ため、i18n辞書は無し。ja/enで完全に同一のファイルを共有している。
+- `ranking.html`・`profile.html`・`contact.html`・`how-to-use.html`・`morse-table.html`・`privacy.html` は複雑なゲームロジックを持たないため、外部化はせず、ja/enそれぞれのHTMLファイルにスクリプトをそのまま複製している（`ranking.html`/`ranking-en.html`のJS生成文字列は各ファイル内で直接英訳）。
+
+### 9.4 ミス分析機能との関係
+
+`tx.html`・`asobi.html` には「ミスが多かった文字」を表示するミス分析機能が2026-09以前から実装済み（`txMistakeCounts`/`asobiMistakeCounts`、`renderMistakeBreakdown()`）。英語版でもこの機能はそのまま動作し、表示ラベルの静的HTML部分（`▸ ミスが多かった文字 ◂` → `▸ Frequently Missed Characters ◂`）のみ翻訳している。`rx.html`（受信モード）にはこの機能は未実装（2026-09時点）。
+
+### 9.5 sitemap.xml
+
+`xhtml:link rel="alternate" hreflang`形式で、全10ページ×ja/en（計20URL）を相互参照する形で記載済み。
+
+### 9.6 今後の注意点
+
+- 新しくページを追加する場合も、この命名規則（`xxxx-en.html` を同階層に配置）を踏襲すること。
+- フッター・ハンバーガーメニューのリンクを変更する場合は、ja版・en版・`common系ヘルパー`（Cowork側の作業用スクリプト、リポジトリには含まれない）の3箇所を揃える必要がある。
+- ja版ページを編集した際、対応するen版ページの翻訳内容が古くならないよう注意する（本文内容を変更したら英語版にも同じ変更を反映する）。
+
+## 10. Cowork の作業環境に関する注記（重要）
+
+2026-09時点、CoworkからこのPC（熊谷さんのWindows機）への**シェル直接アクセス（`device_bash`）が機能しない**状態が続いている（"no Plan9 drive shares mounted" エラー）。そのため6章・6.1章に書かれている `git commit-tree` を使った低レベルコミット手順は**実行不可能**（シェルが使えないため）。
+
+現在の実際のワークフローは以下の通り:
+
+1. Cowork が `device_stage_files` / `device_commit_files`（ファイル転送のみ、シェルなし）を使ってファイルの読み書きを行う。
+2. Cowork は **一切 commit しない**。ファイルを編集するだけ。
+3. 熊谷さんが GitHub Desktop を開き、**ご自身で commit → push** する。Coworkはコミットメッセージ案を提示するのみ。
+
+この制約が将来的に解消され `device_bash` が使えるようになった場合でも、**push は熊谷さんご自身が行う方針は変わらない**（誤って本番に反映されるのを防ぐため）。6.1章の手順は `device_bash` が復旧した場合の参考として残しているが、現状は使えない。
+
 ---
 
-_最終更新: 2026-05-26 (Cowork による初回作成)_
+_最終更新: 2026-09-13 (英語モード実装 v2: `-en.html` フラット命名方式に変更)_
