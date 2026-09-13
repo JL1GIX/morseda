@@ -215,19 +215,21 @@
 })();
 
 // ── キーボードショートカット: T=送信モード、R=受信モード、G=お遊びモード ────────────
+// 英語モード（index-en.html）で開いている場合は、対応する英語ページ（-en.html）へ遷移する
 document.addEventListener('keydown', (e) => {
     if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
     if (document.activeElement instanceof Element &&
         (document.activeElement.matches('input, select, textarea') || document.activeElement.isContentEditable)) return;
+    const lang = (document.documentElement.lang === 'en') ? 'en' : 'ja';
     const key = e.key.toUpperCase();
     if (key === 'T') {
         e.preventDefault();
-        location.href = 'tx.html';
+        location.href = (lang === 'en') ? 'tx-en.html' : 'tx.html';
     } else if (key === 'R') {
         e.preventDefault();
-        location.href = 'rx.html';
+        location.href = (lang === 'en') ? 'rx-en.html' : 'rx.html';
     } else if (key === 'G') {
         e.preventDefault();
-        location.href = 'asobi.html';
+        location.href = (lang === 'en') ? 'asobi-en.html' : 'asobi.html';
     }
 });
