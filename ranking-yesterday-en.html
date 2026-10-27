@@ -454,7 +454,7 @@ async function loadRanking(mode, minutes) {
     const body = document.getElementById('ranking-body');
     body.innerHTML = '<div class="status-msg">LOADING...</div>';
     const target = targetDateStr();
-    document.getElementById('date-label').textContent = target;
+    document.getElementById('date-label').textContent = target.slice(5); // omit year, show MM/DD only
     try {
         const allRows = await fetchAllRows(mode, minutes);
         filteredRows = allRows.filter(row => jstDateStr(new Date(row.created_at)) === target);
