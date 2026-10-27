@@ -446,7 +446,7 @@ const WORD_LIST = [
     'CLOUD','LIGHT','SMILE','HEART','MUSIC','DANCE','HOUSE','TABLE','CHAIR','PHONE','WATCH','CLOCK',
     'APPLE','BREAD','MILK','RICE','MEAT','FRUIT','WATER','EARTH','FIRE','HAPPY','SLEEP','SMALL',
     'GREEN','BLACK','WHITE','WHEEL','TRAIN','PLANE','SHIP','ROAD','PARK','SCHOOL','FRIEND','FAMILY',
-    'MORSE','RADIO','PADDLE','SIGNAL','ANTENNA','CONTEST',
+    'MORSE','RADIO','PADDLE','SIGNAL','ANTENNA','CONTEST','SOS',
     // 2026-09 追加分（お遊びモードの単語バリエーション増加）
     'SKY','ICE','TOY','JAM','OWL','BEE','ANT','COW','PIG','FOX','BAT','ARM','LEG',
     'EAR','LIP','JOB','ZOO','BOY','WEB','SEA','TOP','BED','CAP','JAR','VAN','WOLF',
@@ -499,7 +499,7 @@ function pickCurrentWord() {
 }
 
 // ── お遊びモード: 単語種別 × プレイスタイル (2026-10 第2弾) ─────────────────────
-// wordCategory: 'GENERAL'(一般単語) | 'CALLSIGN'(コールサイン+コンテストナンバー)
+// wordCategory: 'GENERAL'(身近な単語) | 'CALLSIGN'(コールサイン+コンテストナンバー)
 // gameVariant : 'NORMAL'(普通) | 'ACCURACY'(正確重視・ミスで単語の最初からやり直し) | 'ONESHOT'(一発勝負・ミスで即終了)
 let wordCategory = 'GENERAL';
 let gameVariant = 'NORMAL';
@@ -1344,7 +1344,7 @@ function shareX() {
 
 // ── Score registration ─────────────────────────────────────────────────────────
 // 単語種別(wordCategory) × プレイスタイル(gameVariant) の組み合わせ(計6通り)ごとに、
-// 得点を登録するバックエンドの mode 値を切り替える。一般単語+普通モードは従来からの
+// 得点を登録するバックエンドの mode 値を切り替える。身近な単語+普通モードは従来からの
 // 'ASOBI' をそのまま使い(過去スコアとの継続性を維持)、他の5通りは新設の mode 値を使う。
 const ASOBI_MODE_TABLE = {
     'GENERAL_NORMAL':   'ASOBI',

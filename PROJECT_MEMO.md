@@ -36,7 +36,7 @@
 | `rx.js` | rx.html のゲームロジック外部化版。`rx-en.html` と共有。i18n辞書(`I18N`/`t()`)でJS生成テキストを切替 | 約 34KB |
 | `tx.html` | **送信モード**。キーボード/パドルでモールスを打つ。Iambic キーヤー対応。ミス分析（打ち間違えの多い文字表示）機能あり | 約 46KB |
 | `tx.js` | tx.html のゲームロジック外部化版。`tx-en.html` と共有。i18n辞書でJS生成テキストを切替 | 約 56KB |
-| `asobi.html` | **お遊びモード**。ロビー画面（`#start-screen`）で単語種別（一般単語/コールサイン+コンテストナンバー）×プレイスタイル（普通/正確重視/一発勝負）を選ぶ2軸・計6通りの単語早打ちゲーム（12章参照）。ミス分析機能あり | 約 55KB |
+| `asobi.html` | **お遊びモード**。ロビー画面（`#start-screen`）で単語種別（身近な単語/コールサイン+コンテストナンバー）×プレイスタイル（普通/正確重視/一発勝負）を選ぶ2軸・計6通りの単語早打ちゲーム（12章参照）。ミス分析機能あり | 約 55KB |
 | `asobi.js` | asobi.html のゲームロジック外部化版。`asobi-en.html` と共有 | 約 70KB |
 | `ranking.html` | スコアランキング表示（全期間）。モード別 (rx/tx) × 時間別 (1分/3分/5分)。お遊びモードは12.6章の専用ページに分離したため非表示。`ranking-today.html`/`ranking-yesterday.html` への導線リンクあり | 約 23KB |
 | `ranking-today.html` | **今日のランキング**。`ranking.html` と同じモード/時間タブを持つ独立ページ。クライアント側で全ページ取得→JST日付でフィルタして表示（11.4章参照） | 約 23KB |
@@ -302,7 +302,7 @@ git log --oneline -3
 > **本章は旧12章（CQ交信シミュレーター/有名モールス符号/ガチモードのサブモード・モード選択画面・難易度バッジ）を完全に置き換える。** 熊谷さんより「お遊びモードのゲームモードは一番最初の『単語早押しのみ』に戻す」という方針変更があり、CQシミュレーター・有名モールス符号モードは**削除**、ガチモードは**プレイスタイルの一種として再構成**した。
 
 - **新しいゲーム設計**: 単語早打ちエンジン（キーヤー・パドル・スコープ描画等、既存のまま）に対して、独立した2つの軸を導入し、計 2×3 = 6通りの組み合わせで遊べるようにした。
-  - **単語種別 `wordCategory`**: `GENERAL`（一般単語、既存の単語リスト） / `CALLSIGN`（コールサイン+コンテストナンバー。送信モード`tx.js`の`generateCallsign()`/`generateRST()`をそのまま移植し、1語ごとに「コールサイン→RSTレポート」を交互に出題する`nextAsobiCallType`で管理）
+  - **単語種別 `wordCategory`**: `GENERAL`（身近な単語、既存の単語リスト。2026-10第3弾でタブ名を「一般単語」から「身近な単語」に変更し、`SOS`を追加） / `CALLSIGN`（コールサイン+コンテストナンバー。送信モード`tx.js`の`generateCallsign()`/`generateRST()`をそのまま移植し、1語ごとに「コールサイン→RSTレポート」を交互に出題する`nextAsobiCallType`で管理）
   - **プレイスタイル `gameVariant`**（寿司打を参考に設計）: `NORMAL`（普通、従来通りの挙動） / `ACCURACY`（正確重視、誤入力でその単語の入力を最初からやり直し＝`txCharIndex`を0にリセット） / `ONESHOT`（一発勝負、一度でも誤入力した時点で即`endGame()`。旧ガチモードの「3回連続ミス」をさらに厳格化したもの）
 - **ロビー画面の構造**: 旧モード選択画面（`#mode-select-screen`、4枚のカード）は廃止し、`asobi.html`を開くと即座に設定画面（`#start-screen`）が表示される1画面構成に戻した。設定画面の冒頭に単語種別タブ（`#wc-tabs`: `#wc-general`/`#wc-callsign`）とプレイスタイルタブ（`#variant-tabs`: `#var-normal`/`#var-accuracy`/`#var-oneshot`）を新設し、`ranking.html`の`.mode-tabs`/`.mode-tab`と同じ見た目のタブボタンで切替（`selectWordCategory(cat)`/`selectGameVariant(variant)`）。`applySelectorVisibility()`が選択状態に応じて、ONESHOT選択時は初心者モードのチェックボックスを隠して強制OFFにし、ランキングリンクの行き先を更新する。
 - **削除した旧機能**: CQ交信シミュレーター（`CQ_SCRIPT`、`startCqStep`/`loadCqWord`/`onCqWordComplete`/`renderCqOtherStep`/`cqContinue`等）、有名モールス符号モード（`FAMOUS_CODES`、`startFamousStep`/`loadFamousWord`/`onFamousWordComplete`/`showFamousTrivia`/`famousContinue`等）、モード選択画面一式（`#mode-select-screen`、`selectAsobiMode()`、`backToModeSelect()`/`backToModeSelectFromResult()`）、結果画面の`#experience-result`（体験完了メッセージ）と「◀ 他のモードを見る」ボタンを、HTML/JS/CSSから全て削除した。`contentPaused`フラグ（相手局応答表示中の打鍵ガード）も不要になったため削除。
@@ -326,4 +326,4 @@ git log --oneline -3
 
 ---
 
-_最終更新: 2026-10-27 (お遊びモードを再設計。CQ交信シミュレーター/有名モールス符号モード・モード選択画面・難易度バッジ・旧ガチモードを廃止し、単語種別(一般単語/コールサイン+コンテストナンバー)×プレイスタイル(普通/正確重視/一発勝負)の2軸・計6通りの単語早打ちゲームに統一。`ranking-asobi`系ランキングページを3段タブ(単語種別×プレイスタイル×時間)構成に再設計し、`ranking-hardcore`系6ファイルは削除。詳細は12章)_
+_最終更新: 2026-10-27 (お遊びモードを再設計。CQ交信シミュレーター/有名モールス符号モード・モード選択画面・難易度バッジ・旧ガチモードを廃止し、単語種別(身近な単語/コールサイン+コンテストナンバー)×プレイスタイル(普通/正確重視/一発勝負)の2軸・計6通りの単語早打ちゲームに統一。`ranking-asobi`系ランキングページを3段タブ(単語種別×プレイスタイル×時間)構成に再設計し、`ranking-hardcore`系6ファイルは削除。さらに正確重視のミス表示が次の単語でも残る不具合を修正し、単語種別タブ名を「一般単語」→「身近な単語」に変更、単語リストに`SOS`を追加。詳細は12章)_
