@@ -83,6 +83,15 @@ function updateWpmReadout(selId, valId, bandId) {
         bandEl.className = 'wpm-band-tag wpm-band-' + key;
     }
 }
+// 初心者帯(WPM)では、符号入力後の「文字区切り」判定までの猶予（TX_CHAR_GAP）を通常より少し長めに取る。
+// 初心者は次の符号を打ち始めるまでの反応が遅れがちで、通常倍率のままだと文字の途中で区切られてしまい
+// 一文字も正しく打てない事態になり得るための救済措置（中級者以上は従来通りの倍率のまま変更なし）。
+const BEGINNER_CHAR_GAP_BOOST = 1.3;
+function computeCharGap(dotTime, isTouch, wpmVal) {
+    const baseMult = isTouch ? 5.0 : 2.0;
+    const mult = (wpmBandKey(wpmVal) === 'beginner') ? baseMult * BEGINNER_CHAR_GAP_BOOST : baseMult;
+    return Math.round(dotTime * 1000 * mult);
+}
 
 
 // ── State ──────────────────────────────────────────────────────────────────────
@@ -551,7 +560,7 @@ function startTxGame() {
     if (_txMorseRender) _txMorseRender.innerHTML = '';
     if (_txMorseBox) _txMorseBox.style.display = (beginnerMode && !morseBoardMode) ? '' : 'none';
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    TX_CHAR_GAP = Math.round(TX_DOT_TIME * 1000 * (isTouch ? 5.0 : 2.0));  // モバイル: dit×5.0 / デスクトップ: dit×2.0 (どちらもWPM連動)
+    TX_CHAR_GAP = computeCharGap(TX_DOT_TIME, isTouch, Math.round(1.2 / TX_DOT_TIME));  // モバイル: dit×5.0 / デスクトップ: dit×2.0 (どちらもWPM連動、初心者帯はさらに1.3倍)
     if (isTouch && !morseBoardMode) document.getElementById('tx-paddle-area').classList.remove('hidden');
     document.getElementById('status-msg').innerText = morseBoardMode ? 'MORSE BOARD READY...' : 'TRANSMIT...';
     document.addEventListener('keydown', onTxKeyDown);
@@ -865,7 +874,7 @@ function launchFreeMode() {
     txMorseInput = ''; txCharTimer = null;
     dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    TX_CHAR_GAP = Math.round(TX_DOT_TIME * 1000 * (isTouch ? 5.0 : 2.0));  // モバイル: dit×5.0 / デスクトップ: dit×2.0 (どちらもWPM連動)
+    TX_CHAR_GAP = computeCharGap(TX_DOT_TIME, isTouch, wpmValFree);  // モバイル: dit×5.0 / デスクトップ: dit×2.0 (どちらもWPM連動、初心者帯はさらに1.3倍)
     renderFreeInput();
     renderFreeText();
     document.addEventListener('keydown', onTxKeyDown);
@@ -876,7 +885,7 @@ function changeFreeWpm() {
     const wpmVal = parseInt(document.getElementById('free-wpm-select').value);
     TX_DOT_TIME = 1.2 / wpmVal;
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    TX_CHAR_GAP = Math.round(TX_DOT_TIME * 1000 * (isTouch ? 5.0 : 2.0));  // モバイル: dit×5.0 / デスクトップ: dit×2.0 (どちらもWPM連動)
+    TX_CHAR_GAP = computeCharGap(TX_DOT_TIME, isTouch, wpmVal);  // モバイル: dit×5.0 / デスクトップ: dit×2.0 (どちらもWPM連動、初心者帯はさらに1.3倍)
     // 開始画面のセレクタとも同期しておく
     const mainSel = document.getElementById('wpm-select');
     if (mainSel) mainSel.value = String(wpmVal);
