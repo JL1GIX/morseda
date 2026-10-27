@@ -675,6 +675,14 @@
             opacity: 0.75; transition: opacity 0.2s, border-color 0.2s, color 0.2s;
         }
         #free-mode-link button:hover { opacity: 1; border-color: var(--primary); color: var(--primary); box-shadow: none; }
+        /* Link to this sub-mode's own ranking page */
+        #asobi-ranking-link { display: block; text-align: center; margin-top: 6px; }
+        #asobi-ranking-link a {
+            display: inline-block; background: transparent; border: 1px solid var(--border); color: var(--primary-dim);
+            font-size: 0.75rem; padding: 6px 22px; letter-spacing: 2px; text-decoration: none;
+            opacity: 0.75; transition: opacity 0.2s, border-color 0.2s, color 0.2s; border-radius: 2px;
+        }
+        #asobi-ranking-link a:hover { opacity: 1; border-color: var(--primary); color: var(--primary); }
         /* キー設定 */
         #key-customize-btn {
             background: transparent; border: 1px solid rgba(30,92,56,0.6);
@@ -699,6 +707,66 @@
         .kc-key-btn:hover { border-color: var(--primary-dim); }
         .kc-key-btn.listening { border-color: var(--primary); background: rgba(0,123,67,0.22); animation: blink 0.5s infinite; }
         #kc-error { font-size: 0.7rem; letter-spacing: 1px; color: var(--error); min-height: 1.1em; text-align: center; margin: 10px 0 2px; }
+        /* ═══ Mode Select Screen (2026-10) ═══ */
+        #mode-select-screen { width: 100%; }
+        .mode-select-lead { font-size: 0.8rem; color: var(--primary-dim); letter-spacing: 1px; line-height: 1.8; margin: 4px 0 18px; text-align: center; }
+        .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+        .mode-card {
+            background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 4px;
+            padding: 14px 14px 12px; text-align: left; cursor: pointer; transition: all 0.18s;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .mode-card:hover { border-color: var(--primary); background: rgba(0,123,67,0.12); box-shadow: 0 0 16px rgba(0,123,67,0.25); }
+        .mode-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .mode-card-icon { font-size: 1.3rem; line-height: 1; }
+        .mode-card-title { font-size: 0.86rem; font-weight: bold; color: var(--primary); letter-spacing: 1px; margin: 2px 0 2px; }
+        .mode-card-desc { font-size: 0.68rem; color: var(--primary-dim); line-height: 1.6; letter-spacing: 0.5px; opacity: 0.95; }
+        .mode-diff-tag {
+            font-size: 0.58rem; letter-spacing: 1px; padding: 2px 9px; border-radius: 10px;
+            border: 1px solid var(--border); white-space: nowrap; flex-shrink: 0;
+        }
+        .mode-diff-tag.diff-entry    { color: #6fcf97; border-color: #2d7a4f; background: rgba(50,180,100,0.08); }
+        .mode-diff-tag.diff-standard { color: #ffd166; border-color: #a6791f; background: rgba(220,170,40,0.08); }
+        .mode-diff-tag.diff-gachi    { color: #ff6f6f; border-color: #a63333; background: rgba(220,60,60,0.12); animation: gachi-pulse 1.6s ease-in-out infinite; }
+        @keyframes gachi-pulse { 0%, 100% { box-shadow: 0 0 0 rgba(220,60,60,0); } 50% { box-shadow: 0 0 10px rgba(220,60,60,0.55); } }
+        #back-to-modes-link { text-align: center; margin: 2px 0 6px; }
+        #back-to-modes-link button, .back-to-modes-btn {
+            background: transparent; border: 1px solid var(--border); color: var(--primary-dim);
+            font-size: 0.72rem; padding: 6px 18px; letter-spacing: 1px; opacity: 0.8;
+        }
+        #back-to-modes-link button:hover, .back-to-modes-btn:hover { opacity: 1; border-color: var(--primary); color: var(--primary); box-shadow: none; }
+        .settings-grid.no-time #wpm-setting-item { grid-column: 1 / -1; }
+
+        /* CQ Simulator / Famous Morse Codes mode: narration area */
+        #content-narration { margin-bottom: 10px; }
+        #content-progress { font-size: 0.6rem; letter-spacing: 2px; color: var(--primary-dim); opacity: 0.8; margin-bottom: 4px; text-align: center; }
+        #content-narration-text {
+            font-size: 0.82rem; line-height: 1.85; color: var(--primary); letter-spacing: 0.5px;
+            background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-left: 2px solid var(--primary);
+            padding: 10px 14px; border-radius: 2px; text-align: left;
+        }
+        .content-pause-box {
+            background: rgba(0,0,0,0.45); border: 1px solid var(--primary-dim); border-top: 2px solid var(--primary);
+            border-radius: 2px; padding: 18px 16px; text-align: center; min-height: 7rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+        }
+        .content-pause-label { font-size: 0.72rem; color: var(--primary-dim); letter-spacing: 1px; }
+        #cq-other-line {
+            font-size: 1.5rem; font-weight: bold; letter-spacing: 3px; color: var(--success);
+            text-shadow: 0 0 10px rgba(0,238,119,0.5); word-break: break-word;
+        }
+        .content-pause-caption { font-size: 0.76rem; color: var(--primary); line-height: 1.7; letter-spacing: 0.5px; max-width: 420px; }
+        #famous-trivia-title { font-size: 0.92rem; font-weight: bold; color: var(--success); letter-spacing: 0.5px; line-height: 1.6; }
+        #famous-trivia-text { font-size: 0.78rem; color: var(--primary); line-height: 1.85; letter-spacing: 0.3px; max-width: 460px; }
+
+        /* Hardcore Mode */
+        #hardcore-streak {
+            font-size: 0.68rem; letter-spacing: 1px; color: var(--error); text-align: center;
+            margin-bottom: 8px; text-shadow: 0 0 8px rgba(231,76,60,0.6); animation: blink 0.7s infinite;
+        }
+        #game-container.hardcore-active { border-color: #5c1e1e; border-top-color: var(--error); box-shadow: 0 0 50px rgba(231,76,60,0.25), 0 0 100px rgba(100,20,20,0.15), inset 0 1px 0 rgba(231,76,60,0.18); }
+        #game-container.hardcore-active #scope-container { border-color: #6a2a2a; }
+
         @media (max-width: 700px) {
             body { justify-content: flex-start; padding: 8px 0; overflow-y: auto; }
             #game-container { padding: 12px; border-radius: 0; border-left: none; border-right: none; width: 100%; max-width: 100%; }
@@ -706,6 +774,7 @@
             /* スマホ版: 右上の🌐言語切替ボタンとタイトルが被らないよう、タイトルを少し下げる */
             .header-bar { margin-top: 26px; }
             #scope-canvas { height: 90px; }
+            .mode-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -716,9 +785,49 @@
     </div>
     <div class="subtitle">▸ FUN WORD KEYING GAME ◂</div>
 
+    <!-- ═══ MODE SELECT SCREEN ═══ -->
+    <div id="mode-select-screen">
+        <p class="mode-select-lead">Choose a mode to play.</p>
+        <div class="mode-grid">
+            <div class="mode-card" onclick="selectAsobiMode('WORDRACE')" role="button" tabindex="0">
+                <div class="mode-card-top">
+                    <span class="mode-card-icon">⌨️</span>
+                    <span class="mode-diff-tag diff-standard">Standard</span>
+                </div>
+                <div class="mode-card-title">Word Race</div>
+                <div class="mode-card-desc">The classic mode: key familiar English words non-stop before time runs out. Scores are added to the ranking.</div>
+            </div>
+            <div class="mode-card" onclick="selectAsobiMode('CQ')" role="button" tabindex="0">
+                <div class="mode-card-top">
+                    <span class="mode-card-icon">📡</span>
+                    <span class="mode-diff-tag diff-entry">Entry</span>
+                </div>
+                <div class="mode-card-title">CQ Simulator</div>
+                <div class="mode-card-desc">Follow along and simulate your first-ever radio contact. No time limit — perfect even if you're new to Morse and radio.</div>
+            </div>
+            <div class="mode-card" onclick="selectAsobiMode('FAMOUS')" role="button" tabindex="0">
+                <div class="mode-card-top">
+                    <span class="mode-card-icon">📖</span>
+                    <span class="mode-diff-tag diff-entry">Entry</span>
+                </div>
+                <div class="mode-card-title">Famous Morse Codes</div>
+                <div class="mode-card-desc">Key out famous codes like SOS and CQ used worldwide, and learn a bit of trivia about each one. No time limit.</div>
+            </div>
+            <div class="mode-card" onclick="selectAsobiMode('HARDCORE')" role="button" tabindex="0">
+                <div class="mode-card-top">
+                    <span class="mode-card-icon">🔥</span>
+                    <span class="mode-diff-tag diff-gachi">Hardcore</span>
+                </div>
+                <div class="mode-card-title">Hardcore Mode</div>
+                <div class="mode-card-desc">3 misses in a row and it's over instantly. Shorter QSB grace period too. Scores are added to the ranking.</div>
+            </div>
+        </div>
+    </div>
+
     <!-- ═══ START SCREEN ═══ -->
-    <div id="start-screen">
+    <div id="start-screen" class="hidden">
         <div id="mode-settings" style="position:relative;">
+            <div id="back-to-modes-link"><button onclick="backToModeSelect()">◀ Back to Modes</button></div>
             <!-- モード説明 + キー設定ボタン -->
             <div style="display:flex;align-items:flex-start;gap:10px;margin:15px 0;">
                 <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:0;flex:1;"></p>
@@ -761,6 +870,9 @@
             <div id="free-mode-link">
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 Free Input Mode</button>
             </div>
+            <div id="asobi-ranking-link" class="hidden">
+                <a id="asobi-ranking-link-a" href="#">🏆 View this mode's ranking</a>
+            </div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
                 <button class="start-key-hint" onclick="unlockAndPrepare()"><span class="start-keycap">A</span><span id="start-hint-label">Press a key to start</span></button>
                 <button onclick="location.href='https://jl1gix.com/index-en.html'" style="font-size:0.72rem;padding:6px 16px;opacity:0.5;margin-top:10px;">◀ Back</button>
@@ -779,6 +891,7 @@
             <div class="sig-dot active blink-active" id="sig4"></div>
         </div>
         <div id="game-key-assign-row"></div>
+        <div id="hardcore-streak" class="hidden"></div>
         <div class="stats">
             <div class="stat-item">
                 <span class="stat-label">▸ TIME</span>
@@ -811,6 +924,23 @@
         </div>
         <!-- 初心者モード -->
         <div id="beginner-display" class="hidden"></div>
+        <!-- CQ Simulator / Famous Morse Codes: narration area -->
+        <div id="content-narration" class="hidden">
+            <div id="content-progress"></div>
+            <div id="content-narration-text"></div>
+        </div>
+        <!-- CQ Simulator: the other station's reply (no keying needed, advance with the button) -->
+        <div id="cq-other-box" class="hidden content-pause-box">
+            <div id="cq-other-line"></div>
+            <div class="content-pause-caption" id="cq-other-caption"></div>
+            <button id="cq-continue-btn" onclick="cqContinue()"></button>
+        </div>
+        <!-- Famous Morse Codes: trivia shown after keying -->
+        <div id="famous-trivia-box" class="hidden content-pause-box">
+            <div id="famous-trivia-title"></div>
+            <div class="content-pause-caption" id="famous-trivia-text"></div>
+            <button id="famous-continue-btn" onclick="famousContinue()"></button>
+        </div>
         <!-- TX area -->
         <div id="tx-area">
             <div id="tx-word-display"><span id="tx-target-text"></span></div>
@@ -868,35 +998,41 @@
 
     <!-- ═══ RESULT SCREEN ═══ -->
     <div id="result-screen" class="hidden">
-        <h2>MISSION END</h2>
-        <p id="final-result-text" style="margin: 20px 0;"></p>
-        <div id="asobi-mistake-area" class="hidden" style="margin:0 auto 20px; padding:12px 14px; border:1px solid var(--border); border-radius:6px; background:rgba(0,0,0,0.25); max-width:380px;">
-            <div style="font-size:0.65rem; letter-spacing:2px; color:var(--primary-dim); margin-bottom:8px;">▸ Frequently Missed Characters ◂</div>
-            <div id="asobi-mistake-list" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
-        </div>
-        <div class="share-area">
-            <div class="share-label">▸ SHARE YOUR RESULT ◂</div>
-            <div class="share-buttons">
-                <button class="share-btn share-btn-x" onclick="shareX()">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.402 6.231H2.744l7.73-8.835L2.25 2.25h6.832l4.258 5.632 4.905-5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                    Share on X
-                </button>
+        <h2 id="result-headline">MISSION END</h2>
+        <div id="score-result-block">
+            <p id="final-result-text" style="margin: 20px 0;"></p>
+            <div id="asobi-mistake-area" class="hidden" style="margin:0 auto 20px; padding:12px 14px; border:1px solid var(--border); border-radius:6px; background:rgba(0,0,0,0.25); max-width:380px;">
+                <div style="font-size:0.65rem; letter-spacing:2px; color:var(--primary-dim); margin-bottom:8px;">▸ Frequently Missed Characters ◂</div>
+                <div id="asobi-mistake-list" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
+            </div>
+            <div class="share-area">
+                <div class="share-label">▸ SHARE YOUR RESULT ◂</div>
+                <div class="share-buttons">
+                    <button class="share-btn share-btn-x" onclick="shareX()">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.402 6.231H2.744l7.73-8.835L2.25 2.25h6.832l4.258 5.632 4.905-5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        Share on X
+                    </button>
+                </div>
+            </div>
+            <div id="score-reg-area" style="margin-top:18px; border-top:1px solid var(--border); padding-top:14px;">
+                <div id="score-reg-result" style="margin-bottom:12px; font-size:0.85rem; line-height:2; color:var(--primary);"></div>
+                <div id="score-reg-form" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; align-items:center;">
+                    <input type="text" id="nickname-input" placeholder="Nickname (A-Z, up to 10 chars)" maxlength="10"
+                        autocomplete="off" autocapitalize="characters" spellcheck="false"
+                        oninput="if(!event.isComposing){this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();}"
+                        onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();setNickname();}"
+                        style="background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:2px;
+                               color:var(--primary); font-family:inherit; font-size:0.82rem;
+                               padding:8px 12px; width:230px; letter-spacing:1px; outline:none;">
+                    <button onclick="setNickname()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">✏️ Set Name</button>
+                </div>
             </div>
         </div>
-        <div id="score-reg-area" style="margin-top:18px; border-top:1px solid var(--border); padding-top:14px;">
-            <div id="score-reg-result" style="margin-bottom:12px; font-size:0.85rem; line-height:2; color:var(--primary);"></div>
-            <div id="score-reg-form" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; align-items:center;">
-                <input type="text" id="nickname-input" placeholder="Nickname (A-Z, up to 10 chars)" maxlength="10"
-                    autocomplete="off" autocapitalize="characters" spellcheck="false"
-                    oninput="if(!event.isComposing){this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();}"
-                    onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();setNickname();}"
-                    style="background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:2px;
-                           color:var(--primary); font-family:inherit; font-size:0.82rem;
-                           padding:8px 12px; width:230px; letter-spacing:1px; outline:none;">
-                <button onclick="setNickname()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">✏️ Set Name</button>
-            </div>
+        <div id="experience-result" class="hidden"></div>
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px;">
+            <button onclick="retryGame()">▶ Retry</button>
+            <button class="back-to-modes-btn" onclick="backToModeSelectFromResult()">◀ Try Another Mode</button>
         </div>
-        <button onclick="retryGame()" style="margin-top:16px;">▶ Retry</button>
         <div class="result-key-hint" id="result-key-hint">(Esc key)</div>
     </div>
 </div>
