@@ -36,11 +36,34 @@ const I18N = {
     regDone:           { ja: '✓ 登録完了！', en: '✓ Registered!' },
     topPct:            (pct) => ({ ja: `上位 ${pct}%`, en: `Top ${pct}%` }),
     rankingLink:       { ja: '🏆 ランキング', en: '🏆 Ranking' },
+    wpmBand_beginner:     { ja: '初心者向け', en: 'Beginner' },
+    wpmBand_intermediate: { ja: '中級者向け', en: 'Intermediate' },
+    wpmBand_advanced:     { ja: '上級者向け', en: 'Advanced' },
 };
 function t(key, ...args) {
     const entry = I18N[key];
     const resolved = (typeof entry === 'function') ? entry(...args) : entry;
     return resolved[LANG];
+}
+
+// ── WPM速度スライダー：WPM値 → 習熟度帯（初心者/中級者/上級者）────────────────────
+function wpmBandKey(wpm) {
+    if (wpm <= 16) return 'beginner';
+    if (wpm <= 23) return 'intermediate';
+    return 'advanced';
+}
+function updateWpmReadout(selId, valId, bandId) {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    const wpm = parseInt(sel.value);
+    const valEl = document.getElementById(valId);
+    if (valEl) valEl.textContent = wpm;
+    const bandEl = document.getElementById(bandId);
+    if (bandEl) {
+        const key = wpmBandKey(wpm);
+        bandEl.textContent = t('wpmBand_' + key);
+        bandEl.className = 'wpm-band-tag wpm-band-' + key;
+    }
 }
 
 // ── State ──────────────────────────────────────────────────────────────────────
@@ -162,6 +185,7 @@ function startGame() {
 // ── 音声チェック（SOS ループ）────────────────────────────────────────────────────
 function toggleSosCheck(on) { if (on) startSosCheck(); else stopSosCheck(); }
 function onWpmSelectChange() {
+    updateWpmReadout('wpm-select', 'wpm-readout-val', 'wpm-readout-band');
     // 音声チェックが ON のとき、選択された WPM で SOS を流し直す
     const cb = document.getElementById('audio-check');
     if (cb && cb.checked) {
@@ -739,3 +763,6 @@ async function setNickname() {
         alert(t('setFailAlert'));
     }
 }
+
+// ── Initialize WPM readout on page load ─────────────────────────────────────────
+updateWpmReadout('wpm-select', 'wpm-readout-val', 'wpm-readout-band');
