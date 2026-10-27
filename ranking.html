@@ -156,44 +156,27 @@
             border-color: var(--primary-dim);
             color: var(--primary);
         }
-        /* Date filter */
-        .date-filter-row {
+        /* Today/Yesterday ranking nav links */
+        .ranking-nav-links {
             display: flex;
-            align-items: center;
+            gap: 10px;
             justify-content: center;
-            gap: 8px;
-            margin: -4px 0 4px;
+            flex-wrap: wrap;
+            margin: -6px 0 14px;
         }
-        .date-filter-row label {
-            font-size: 0.68rem;
+        .ranking-nav-links a {
             color: var(--primary-dim);
+            font-size: 0.72rem;
             letter-spacing: 1px;
-            white-space: nowrap;
-        }
-        #date-select {
-            background: rgba(0,0,0,0.85);
-            color: var(--primary);
+            text-decoration: none;
             border: 1px solid var(--border);
-            font-size: 0.78rem;
-            padding: 6px 26px 6px 10px;
             border-radius: 2px;
-            font-family: inherit;
-            cursor: pointer;
-            outline: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2300a050' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            max-width: 180px;
+            padding: 6px 14px;
+            transition: all 0.15s;
         }
-        #date-select:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(0,123,67,0.3); }
-        #date-view-note {
-            font-size: 0.68rem;
-            color: var(--primary-dim);
-            text-align: center;
-            margin: 0 0 10px;
-            min-height: 1em;
-            letter-spacing: 1px;
+        .ranking-nav-links a:hover {
+            border-color: var(--primary);
+            color: var(--primary);
         }
         /* Table */
         .ranking-wrap {
@@ -374,13 +357,10 @@
         <button class="mode-tab" id="tab-5" onclick="switchMinutes(5)" style="font-size:0.75rem; padding:6px 0;">5分</button>
     </div>
 
-    <div class="date-filter-row">
-        <label for="date-select">📅 日付</label>
-        <select id="date-select" onmousedown="ensureDateOptionsLoaded()" onfocus="ensureDateOptionsLoaded()" onchange="switchDate(this.value)">
-            <option value="ALL">全期間</option>
-        </select>
+    <div class="ranking-nav-links">
+        <a href="ranking-today.html">📅 今日のランキング</a>
+        <a href="ranking-yesterday.html">📅 昨日のランキング</a>
     </div>
-    <div id="date-view-note"></div>
 
     <div id="ranking-body">
         <div class="status-msg">LOADING...</div>
@@ -415,95 +395,17 @@ let currentMode = 'RX';
 let currentMinutes = 1;
 let currentPage = 1;
 let totalPages = 1;
-let currentDate = 'ALL'; // 'ALL' または 'YYYY/MM/DD'
-const allRowsCache = {}; // キー: `${mode}_${minutes}` → 全件配列（日付絞り込み・日付一覧生成用）
-let dateOptionsLoadedKey = null; // 現在 #date-select に読み込まれている mode_minutes キー
-
-function jstDateStr(createdAt) {
-    // JST (UTC+9) で日付表示
-    const d = new Date(new Date(createdAt).getTime() + 9 * 60 * 60 * 1000);
-    return `${d.getUTCFullYear()}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${String(d.getUTCDate()).padStart(2,'0')}`;
-}
-
-async function fetchAllRows(mode, minutes) {
-    // 日付絞り込みはサーバー側に対応するAPIパラメータが無いため、
-    // 該当モード・制限時間の全件をクライアント側で取得してから絞り込む
-    const key = `${mode}_${minutes}`;
-    if (allRowsCache[key]) return allRowsCache[key];
-    let page = 1, rows = [], totalP = 1;
-    do {
-        const res = await fetch(`${API}/api/scores?mode=${mode}&minutes=${minutes}&page=${page}`);
-        if (!res.ok) throw new Error('server error');
-        const data = await res.json();
-        const pageRows = data.rows || [];
-        const total = data.total || 0;
-        totalP = Math.max(1, Math.ceil(total / 100));
-        rows = rows.concat(pageRows);
-        page++;
-    } while (page <= totalP);
-    rows.forEach(r => { r._dateStr = jstDateStr(r.created_at); });
-    allRowsCache[key] = rows;
-    return rows;
-}
-
-async function ensureDateOptionsLoaded() {
-    // 日付プルダウンを初めて開いたときだけ、その時点のモード・制限時間の日付一覧を読み込む（遅延読み込み）
-    const key = `${currentMode}_${currentMinutes}`;
-    if (dateOptionsLoadedKey === key) return;
-    const sel = document.getElementById('date-select');
-    const prevValue = sel.value;
-    sel.innerHTML = '<option value="ALL">全期間</option><option value="" disabled>読み込み中...</option>';
-    try {
-        const rows = await fetchAllRows(currentMode, currentMinutes);
-        const dateList = Array.from(new Set(rows.map(r => r._dateStr))).sort().reverse();
-        let html = '<option value="ALL">全期間</option>';
-        dateList.forEach(d => { html += `<option value="${d}">${d}</option>`; });
-        sel.innerHTML = html;
-        dateOptionsLoadedKey = key;
-        sel.value = (prevValue !== 'ALL' && dateList.includes(prevValue)) ? prevValue : 'ALL';
-    } catch (e) {
-        sel.innerHTML = '<option value="ALL">全期間</option>';
-    }
-}
-
-function resetDateSelect() {
-    currentDate = 'ALL';
-    dateOptionsLoadedKey = null;
-    const sel = document.getElementById('date-select');
-    if (sel) { sel.innerHTML = '<option value="ALL">全期間</option>'; sel.value = 'ALL'; }
-    const note = document.getElementById('date-view-note');
-    if (note) note.textContent = '';
-}
-
-function switchDate(dateVal) {
-    currentDate = dateVal;
-    currentPage = 1;
-    loadRanking(currentMode, currentMinutes, 1);
-}
 
 async function loadRanking(mode, minutes, page) {
     const body = document.getElementById('ranking-body');
     body.innerHTML = '<div class="status-msg">LOADING...</div>';
     try {
-        let rows, total;
-        if (currentDate !== 'ALL') {
-            const all = await fetchAllRows(mode, minutes);
-            const filtered = all.filter(r => r._dateStr === currentDate).sort((a, b) => b.score - a.score);
-            total = filtered.length;
-            totalPages = Math.max(1, Math.ceil(total / 100));
-            rows = filtered.slice((page - 1) * 100, page * 100);
-            const note = document.getElementById('date-view-note');
-            if (note) note.textContent = `${currentDate} のランキング（${total}件）`;
-        } else {
-            const res = await fetch(`${API}/api/scores?mode=${mode}&minutes=${minutes}&page=${page}`);
-            if (!res.ok) throw new Error('server error');
-            const data = await res.json();
-            rows = data.rows || [];
-            total = data.total || 0;
-            totalPages = Math.max(1, Math.ceil(total / 100));
-            const note = document.getElementById('date-view-note');
-            if (note) note.textContent = '';
-        }
+        const res = await fetch(`${API}/api/scores?mode=${mode}&minutes=${minutes}&page=${page}`);
+        if (!res.ok) throw new Error('server error');
+        const data = await res.json();
+        const rows = data.rows || [];
+        const total = data.total || 0;
+        totalPages = Math.max(1, Math.ceil(total / 100));
 
         document.getElementById('page-info').textContent = `PAGE ${page} / ${totalPages}`;
         document.getElementById('prev-btn').disabled = page <= 1;
@@ -531,7 +433,9 @@ async function loadRanking(mode, minutes, page) {
             else if (rank === 3) rankDisplay = '<span class="rank-3">🥉</span>';
             else rankDisplay = rank;
 
-            const date = row._dateStr || jstDateStr(row.created_at);
+            // JST (UTC+9) で日付表示
+            const d = new Date(new Date(row.created_at).getTime() + 9 * 60 * 60 * 1000);
+            const date = `${d.getUTCFullYear()}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${String(d.getUTCDate()).padStart(2,'0')}`;
             const beginnerBadge = row.is_beginner ? ' 🔰' : '';
 
             html += `<tr>
@@ -566,7 +470,6 @@ function formatNickname(nick) {
 function switchMode(mode) {
     currentMode = mode;
     currentPage = 1;
-    resetDateSelect();
     document.getElementById('tab-rx').classList.toggle('active', mode === 'RX');
     document.getElementById('tab-tx').classList.toggle('active', mode === 'TX');
     document.getElementById('tab-asobi').classList.toggle('active', mode === 'ASOBI');
@@ -576,7 +479,6 @@ function switchMode(mode) {
 function switchMinutes(min) {
     currentMinutes = min;
     currentPage = 1;
-    resetDateSelect();
     [1, 3, 5].forEach(m => {
         document.getElementById(`tab-${m}`).classList.toggle('active', m === min);
     });

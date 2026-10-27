@@ -116,6 +116,12 @@ let TX_CHAR_GAP = 280;
 let TX_DOT_TIME = 1.2 / 25; // 25 WPM デフォルト、設定で 20-30 から選択可能
 // Iambic keyer state
 let dotHeld = false, dashHeld = false;
+// dotLatched/dashLatched: キーを「押した」事実を、keyup で即座に消さずkeyerStep()が
+// 実際にその符号を送信するまで保持するためのラッチ。素早いタップ（押してすぐ離す）だと、
+// 次のkeyerStep()実行タイミング（前の符号送出＋ギャップ分、後）までにkeyup済みとなり
+// dotHeld/dashHeldだけで判定すると符号が消えてしまう（例: N=－・でJ(長点)の直後に
+// SPACE(短点)を素早くタップすると短点が無効になる）不具合の対策。
+let dotLatched = false, dashLatched = false;
 let lastSentSym = null;
 let keyerPending = false;
 // Key bindings
@@ -495,7 +501,7 @@ function tick() {
 // ── TX Game ────────────────────────────────────────────────────────────────────
 function startTxGame() {
     txCharIndex = 0; txMorseInput = ''; txCharTimer = null;
-    dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
+    dotHeld = false; dashHeld = false; dotLatched = false; dashLatched = false; lastSentSym = null; keyerPending = false;
     nextTxType = 'CALLSIGN';
     txMistakeCounts = {};
     // 前回プレイの短点・長点表示をクリア
@@ -590,7 +596,10 @@ function renderTxInput() {
 function keyerStep() {
     keyerPending = false;
     if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
-    if (!dotHeld && !dashHeld) {
+    // 物理的に押されているか(Held)、まだ消費されていないタップがあるか(Latched)のどちらかで判定する
+    const dotActive = dotHeld || dotLatched;
+    const dashActive = dashHeld || dashLatched;
+    if (!dotActive && !dashActive) {
         if (txMorseInput && !txCharTimer) {
             txCharTimer = setTimeout(
                 gameMode === 'FREE' ? decodeFreeChar : decodeTxChar,
@@ -601,11 +610,13 @@ function keyerStep() {
     }
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
     let sym;
-    if (dotHeld && dashHeld) {
+    if (dotActive && dashActive) {
         sym = (lastSentSym === '.') ? '-' : '.';
     } else {
-        sym = dotHeld ? '.' : '-';
+        sym = dotActive ? '.' : '-';
     }
+    // 今回送信した符号のラッチだけを消費する（もう一方はまだ未処理の可能性があるため残す）
+    if (sym === '.') dotLatched = false; else dashLatched = false;
     lastSentSym = sym;
     playSidetone(sym === '-');
     txMorseInput += sym;
@@ -637,9 +648,9 @@ function tapSymbol(isDash) {
 function paddleDown(isDash) {
     if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
     if (isDash) {
-        if (!dashHeld) { dashHeld = true; startKeyerLoop(); }
+        if (!dashHeld) { dashHeld = true; dashLatched = true; startKeyerLoop(); }
     } else {
-        if (!dotHeld) { dotHeld = true; startKeyerLoop(); }
+        if (!dotHeld) { dotHeld = true; dotLatched = true; startKeyerLoop(); }
     }
 }
 function paddleUp(isDash) {
@@ -655,10 +666,10 @@ function onTxKeyDown(e) {
     }
     if (e.code === dotKey) {
         e.preventDefault();
-        if (!dotHeld) { dotHeld = true; startKeyerLoop(); }
+        if (!dotHeld) { dotHeld = true; dotLatched = true; startKeyerLoop(); }
     } else if (e.code === dashKey) {
         e.preventDefault();
-        if (!dashHeld) { dashHeld = true; startKeyerLoop(); }
+        if (!dashHeld) { dashHeld = true; dashLatched = true; startKeyerLoop(); }
     }
 }
 
@@ -748,7 +759,7 @@ function evaluateTxChar(decoded) {
 function cleanupTx() {
     document.removeEventListener('keydown', onTxKeyDown);
     document.removeEventListener('keyup',   onTxKeyUp);
-    dotHeld = false; dashHeld = false; keyerPending = false;
+    dotHeld = false; dashHeld = false; dotLatched = false; dashLatched = false; keyerPending = false;
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
     const pa = document.getElementById('tx-paddle-area');
     if (pa) pa.classList.add('hidden');
@@ -792,7 +803,7 @@ function launchFreeMode() {
     isPlaying = true;
     freeTextBuffer = '';
     txMorseInput = ''; txCharTimer = null;
-    dotHeld = false; dashHeld = false; lastSentSym = null; keyerPending = false;
+    dotHeld = false; dashHeld = false; dotLatched = false; dashLatched = false; lastSentSym = null; keyerPending = false;
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     TX_CHAR_GAP = computeCharGap(TX_DOT_TIME, isTouch, wpmValFree);  // モバイル: dit×5.0 / デスクトップ: dit×2.0 (どちらもWPM連動、初心者帯はさらに1.3倍)
     renderFreeInput();
@@ -842,7 +853,7 @@ function resetFreeMode() {
     freeTextBuffer = '';
     txMorseInput = '';
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
-    dotHeld = false; dashHeld = false; keyerPending = false; lastSentSym = null;
+    dotHeld = false; dashHeld = false; dotLatched = false; dashLatched = false; keyerPending = false; lastSentSym = null;
     renderFreeInput();
     renderFreeText();
 }
@@ -854,7 +865,7 @@ function quitFreeMode() {
     document.removeEventListener('keydown', onTxKeyDown);
     document.removeEventListener('keyup',   onTxKeyUp);
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
-    dotHeld = false; dashHeld = false; keyerPending = false;
+    dotHeld = false; dashHeld = false; dotLatched = false; dashLatched = false; keyerPending = false;
     document.getElementById('free-screen').classList.add('hidden');
     document.getElementById('start-screen').classList.remove('hidden');
     updateTxModeDesc();

@@ -38,14 +38,16 @@
 | `tx.js` | tx.html のゲームロジック外部化版。`tx-en.html` と共有。i18n辞書でJS生成テキストを切替 | 約 56KB |
 | `asobi.html` | **お遊びモード**。送信モードと同じ操作系で、英単語をお題にした気軽な練習。ミス分析機能あり | 約 49KB |
 | `asobi.js` | asobi.html のゲームロジック外部化版。`asobi-en.html` と共有 | 約 60KB |
-| `ranking.html` | スコアランキング表示。モード別 (rx/tx/asobi) × 時間別 (1分/3分/5分) | 約 22KB |
+| `ranking.html` | スコアランキング表示（全期間）。モード別 (rx/tx/asobi) × 時間別 (1分/3分/5分)。`ranking-today.html`/`ranking-yesterday.html` への導線リンクあり | 約 22KB |
+| `ranking-today.html` | **今日のランキング**。`ranking.html` と同じモード/時間タブを持つ独立ページ。クライアント側で全ページ取得→JST日付でフィルタして表示（11.4章参照） | 約 23KB |
+| `ranking-yesterday.html` | **昨日のランキング**。`ranking-today.html` と全く同じ仕組みで対象日を1日前にしたもの | 約 23KB |
 | `morse-table.html` | モールス符号表 (リファレンス) | 約 15KB |
 | `how-to-use.html` | 使い方ガイド（全機能の説明、キーボードショートカット一覧を含む） | 約 22KB |
 | `profile.html` | 運営者情報 | 約 16KB |
 | `privacy.html` | プライバシーポリシー | 約 11KB |
 | `contact.html` | お問い合わせ | 約 11KB |
-| `sitemap.xml` | サイトマップ。ja/en 全20ページ分のURLと`hreflang`相互参照を記載 | 約 8KB |
-| `*-en.html`（`index-en.html`, `tx-en.html`, `rx-en.html`, `asobi-en.html`, `ranking-en.html`, `profile-en.html`, `contact-en.html`, `how-to-use-en.html`, `morse-table-en.html`, `privacy-en.html`） | 各ページの英語版。ルート直下に ja 版と並べて配置（`/en/`のようなサブフォルダは使わない）。詳細は 9章 | 各ページ ja版とほぼ同サイズ |
+| `sitemap.xml` | サイトマップ。ja/en 全24ページ分のURLと`hreflang`相互参照を記載（2026-10、`ranking-today`/`ranking-yesterday`のja/en 4ページ追加） | 約 9KB |
+| `*-en.html`（`index-en.html`, `tx-en.html`, `rx-en.html`, `asobi-en.html`, `ranking-en.html`, `ranking-today-en.html`, `ranking-yesterday-en.html`, `profile-en.html`, `contact-en.html`, `how-to-use-en.html`, `morse-table-en.html`, `privacy-en.html`） | 各ページの英語版。ルート直下に ja 版と並べて配置（`/en/`のようなサブフォルダは使わない）。詳細は 9章 | 各ページ ja版とほぼ同サイズ |
 | `CNAME` | GitHub Pages のカスタムドメイン (`jl1gix.com`) |  |
 | `favicon-*.png` / `apple-touch-icon.png` / `ogp.png` | アイコン・OGP 画像 |  |
 
@@ -243,14 +245,24 @@ git log --oneline -3
 
 2026-10 に実装。ランキングページへの「日付別ランキング」機能追加と、送信/受信/お遊びの3モードの「WPM設定画面」のプルダウン→スライダー化。
 
-### 11.1 ランキングページの日付フィルタ（`ranking.html` / `ranking-en.html`）
+### 11.1 ランキングページの日付別表示（`ranking.html`/`ranking-en.html` + 新規ページ）
 
-- モードタブ（RX/TX/ASOBI）・時間タブ（1分/3分/5分）・ページネーションなど、既存機能は一切変更せず維持。タブの下に新しく「📅 日付」プルダウン（`#date-select`）を追加。デフォルトは「全期間」(`ALL`) で、これまで通りサーバー側ページネーション（`GET /api/scores?mode=&minutes=&page=`）をそのまま使う。
-- バックエンドAPIには日付絞り込み用のクエリパラメータが存在しない（確認済み: `&date=2026-10-17` を付けても `total` が変化しない）。そのため「特定の日付」を選んだ場合のみ、該当モード・時間の**全ページをクライアント側で取得**（`fetchAllRows()`）し、JST日付でフィルタ→スコア降順で再ソート→クライアント側ページネーション、という形でその日専用のランキングを再構築している。
-- パフォーマンス配慮: 全件取得は重いので、**日付プルダウンを初めて開いた瞬間（`onmousedown`/`onfocus` → `ensureDateOptionsLoaded()`）に初めて実行する遅延読み込み**にしている。モード/時間タブを切り替えただけでは全件取得は走らず、「全期間」表示時の負荷は従来と完全に同じ。取得結果はモード×時間の組み合わせごとに `allRowsCache` にメモ化し、同じ組み合わせ内でのプルダウン再操作時は再取得しない。
-- モード/時間タブを切り替えると日付フィルタは自動的に「全期間」にリセットされる（`resetDateSelect()`）。異なるモード/時間では存在する日付が変わるため。
-- 日付選択時は `#date-view-note` に「YYYY/MM/DD のランキング（n件）」を表示。
-- ja/en で実装ロジックは完全に同一（この2ファイルは外部化せずそれぞれ複製する既存方針のまま）。UI文言のみ翻訳（「全期間」↔`All Time`、「📅 日付」↔`📅 Date` 等）。
+- **2026-10、実装方針を変更**（熊谷さんのフィードバックにより、同月内で仕様を2回変えている）。当初は `ranking.html` 内に「📅 日付」プルダウン（`#date-select`）を追加する実装だったが、「今日のランキングを**ブラウザのリロードボタンを押すだけ**で即確認したい」という要望に対し、プルダウン＋JS状態だとワンアクションで戻ってこないため、**独立した静的HTMLページ方式に全面変更**した。旧プルダウン実装（`fetchAllRows`/`ensureDateOptionsLoaded`/`resetDateSelect`/`switchDate`/`jstDateStr`/`currentDate`/`allRowsCache`/`#date-select`/`#date-view-note` 等）は `ranking.html`/`ranking-en.html` から**完全に削除**し、この2ファイルは日付フィルタ追加前の状態（モードタブ・時間タブ・サーバー側ページネーションのみ）に復元済み。
+- 代わりに **`ranking-today.html`/`ranking-today-en.html`（今日のランキング）** と **`ranking-yesterday.html`/`ranking-yesterday-en.html`（昨日のランキング）** の4ファイルを新規追加。`ranking.html`/`ranking-en.html` のモードタブ下に導線リンク（`.ranking-nav-links`）を設置し、そこから各ページへ遷移できるようにした。
+  - `ranking.html` → `ranking-today.html` / `ranking-yesterday.html`
+  - `ranking-en.html` → `ranking-today-en.html` / `ranking-yesterday-en.html`
+  - 新規4ページ同士も相互リンク（今日ページには「🏆 全期間ランキング」「📅 昨日のランキング」、昨日ページには「🏆 全期間ランキング」「📅 今日のランキング」）。
+- `ranking.html`（全期間表示）はこれまで通りサーバー側ページネーション（`GET /api/scores?mode=&minutes=&page=`）のみを使い、変更前と全く同じ挙動・負荷のまま。
+
+### 11.1.1 `ranking-today.html`/`ranking-yesterday.html` の実装詳細
+
+- バックエンドAPIには日付絞り込み用のクエリパラメータが存在しない（確認済み: `&date=2026-10-17` を付けても `total` が変化しない）ため、ページを開くたびに該当モード・時間の**全ページをクライアント側で取得**（`fetchAllRows()`：1ページ目で `total` を見て残りページを `Promise.all` で並列取得）し、JST日付（`jstDateStr()`：`created_at` に9時間加算してUTCのまま年/月/日を取り出す）で `targetDateStr()`（今日ページは `DAY_OFFSET=0`、昨日ページは `DAY_OFFSET=-1` のみが差分）と一致する行だけに絞り込んで表示する。
+- 元のAPIレスポンスはスコア降順で返ってくるため、絞り込み後も相対順序はそのまま保持され、再ソートは不要。表示上の「RANK」は**元の全期間内での順位ではなく、その日のデータだけの中での順位**（絞り込み後の配列内でのインデックス+1）として算出している（「今日のランキング」という名前に合わせた意図的な仕様）。
+- ページネーションはクライアント側の `filteredRows` 配列を100件ずつスライスするだけ（`renderPage(page)`）。モード/時間タブ切り替え（`switchMode`/`switchMinutes`）時のみ `loadRanking()` を呼んで再取得し、ページ送り（`changePage()`）では再取得しない。
+- ページ上部に `📅 YYYY/MM/DD (JST)` の日付バッジ（`#date-label`）を表示し、実際に絞り込み対象になっている日付をユーザーが確認できるようにしている。
+- **「ブラウザのリロードボタンだけで最新化」という要件の満たし方**: これらのページは完全にステートレスな静的HTMLで、`localStorage` 等に何も保存しない。ページを開く＝ `loadRanking()` が走り、その時点のサーバーデータを全件取得して現在時刻基準でJST日付フィルタをかけ直すため、ブラウザの通常のリロード操作（F5等）だけで常に最新のその日のデータが再構築される。
+- ja/en で実装ロジックは完全に同一（この4ファイルも外部化せずそれぞれ複製する既存方針のまま）。UI文言のみ翻訳。
+- Playwrightで `route.fulfill()` によるAPIモック（今日/昨日/2日前に分散した150件のダミーデータ）を用いて、(a) JST日付フィルタが正しい件数に絞り込まれること、(b) 100件超のフィルタ結果が正しく2ページに分割され、ページ送りでは再フェッチが発生しないこと、(c) フィルタ結果0件時に適切な空表示になりクラッシュしないこと、(d) モード/時間タブ切り替えで再取得・再フィルタが走ること、の4パターンを検証済み（全てPASS）。
 
 ### 11.2 WPM速度スライダー（`tx.html`/`tx-en.html`、`rx.html`/`rx-en.html`、`asobi.html`/`asobi-en.html`）
 
@@ -269,6 +281,15 @@ git log --oneline -3
 - **実装上の注意（ハマった点）**: `startTxGame()`（ゲーム開始ボタン押下後、約1秒の準備演出を経てから呼ばれる関数）内の `TX_CHAR_GAP` 算出箇所で、当初誤って `unlockAndPrepare()` 内のローカル変数 `wpmVal` をそのまま参照してしまい、`startTxGame()` が実際に発火した瞬間に `ReferenceError: wpmVal is not defined` が発生する実行時バグを作り込んでしまった（`unlockAndPrepare()` と `startTxGame()` は別々のトップレベル関数で、`wpmVal` のスコープは前者にしか及ばない）。Playwrightで `unlockAndPrepare()` 呼び出し直後だけ検証した際は約1秒の遅延実行前のためエラーが表面化せず見逃しかけたが、**遅延分（1.5秒程度）待ってから検証し直すことで発覚・修正**した。修正後は、どの関数からでも常に正しく参照できるグローバル変数 `TX_DOT_TIME` から `Math.round(1.2 / TX_DOT_TIME)` で現在のWPMを逆算する方式にして、スコープ問題を根本的に回避している。今後 `startTxGame()`/`unlockAndPrepare()` 周りを触る際は、両者が別関数である点と、ゲーム開始に約1秒の遅延演出があるため**即時検証だけでは見逃すバグがある**点に注意。
 - `device_commit_files` の運用上の注意（今回ハマった点）: 同一セッション内で**同じ `stagedPath`（例: `/mnt/user-data/outputs/morseda/tx.js`）を使い回して2回目のコミットを行うと、ファイルを上書きしてから送っても古い内容のまま書き込まれてしまう**現象を確認した（ツール自体は `written` で成功を返すが、実機に反映されるのは古い内容）。2回目以降の書き込みでは、`stagedPath` を新しい未使用のパス（例: 別ディレクトリ `morseda_v2/`）にすることで正しく最新内容が書き込まれることを確認済み。同一ファイルを同一セッション内で複数回 `device_commit_files` する場合は、毎回 **未使用の `stagedPath`** を使うこと。
 
+### 11.4 Iambicキーヤーの「素早いタップでキーが無効になる」不具合修正（`tx.js`/`asobi.js`、TX/ASOBIモードのみ）
+
+- 2026-10、熊谷さんから「Nなど（－・）でJ（長点）を押した直後にスペース（短点）を素早く押しても、スペースキーが無効になる」という報告。初心者・非初心者に関係なく発生するため、両方に対して修正するよう明示的に要望された。
+- **原因**: Iambicキーヤー (`keyerStep()`) は `setTimeout` で自己再スケジュールする構造で、再度発火したタイミングでその時点の `dotHeld`/`dashHeld`（物理的にキーが押されているかどうかの生の状態）だけを見て次に送出する符号を決めていた。パドルを「押し続ける」想定の実装だったため、素早くタップ（押してすぐ離す）するとキーダウン→キーアップが完了してしまい、次の `keyerStep()` 発火時には既に離されている状態になり、そのタップの符号が送出されずに消えてしまっていた。
+- **修正**: `dotLatched`/`dashLatched` という「ラッチ」変数を追加。`paddleDown()`/`onTxKeyDown()` でキーが押された瞬間に対応するラッチを立て、`keyerStep()` は `dotHeld || dotLatched`（`dashHeld || dashLatched`）で「送信すべき符号があるか」を判定するように変更。そのタップ分の符号を実際に送出した時点で、消費した側のラッチだけを `false` に戻す（もう一方はまだ未処理の可能性があるため残す）。これにより、物理的なキー状態がどうなっていても「押した」という事実が次の `keyerStep()` 発火まで確実に保持され、符号が消えなくなった。
+- `startTxGame()`/`cleanupTx()`/`launchFreeMode()`/`resetFreeMode()`/`quitFreeMode()` 等、既存の `dotHeld = false; dashHeld = false;` リセット箇所は全て `dotLatched = false; dashLatched = false;` も併せてリセットするように修正済み（ゲーム終了/再開時にラッチが残留してゴースト入力が起きないようにするため）。
+- `tx.js`・`asobi.js`の両方に同一のロジックを適用済み。RXモード（`rx.js`）はIambicキーヤーを持たないため対象外。
+- **検証方法**: Playwrightで「J押下→即リリース→Space押下→即リリース」というタップシーケンスを `keyboard.down/up` で再現し、`decodeTxChar`/`decodeFreeChar` に渡される最終的なモールス文字列が `"-."`（N）になることを確認。さらに、修正前のコード（ラッチなし版）を別ポートで同時に動かし、同じテストで実際に `"-"` のみ（短点が消える）になることを確認した上で、修正後のコードでは再現しないことを突き合わせて検証（意図的な「修正前に戻して再現させる」コントロールテスト）。
+
 ---
 
-_最終更新: 2026-10-27 (ランキング日付フィルタ、WPM速度スライダー化、初心者帯の文字区切り猶予延長)_
+_最終更新: 2026-10-27 (ランキングの日付別表示を独立ページ方式に全面変更し`ranking-today`/`ranking-yesterday`のja/en 4ページを新規追加、WPM速度スライダー化、初心者帯の文字区切り猶予延長、Iambicキーヤーの素早いタップ対応)_

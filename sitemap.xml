@@ -97,6 +97,38 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://jl1gix.com/ranking-today.html</loc>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://jl1gix.com/ranking-today.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jl1gix.com/ranking-today-en.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jl1gix.com/ranking-today.html"/>
+    <changefreq>daily</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jl1gix.com/ranking-today-en.html</loc>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://jl1gix.com/ranking-today.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jl1gix.com/ranking-today-en.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jl1gix.com/ranking-today.html"/>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://jl1gix.com/ranking-yesterday.html</loc>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://jl1gix.com/ranking-yesterday.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jl1gix.com/ranking-yesterday-en.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jl1gix.com/ranking-yesterday.html"/>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://jl1gix.com/ranking-yesterday-en.html</loc>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://jl1gix.com/ranking-yesterday.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jl1gix.com/ranking-yesterday-en.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jl1gix.com/ranking-yesterday.html"/>
+    <changefreq>daily</changefreq>
+    <priority>0.55</priority>
+  </url>
+  <url>
     <loc>https://jl1gix.com/morse-table.html</loc>
     <xhtml:link rel="alternate" hreflang="ja" href="https://jl1gix.com/morse-table.html"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://jl1gix.com/morse-table-en.html"/>
