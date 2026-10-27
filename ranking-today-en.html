@@ -120,13 +120,21 @@
             text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5), 0 0 80px rgba(0,123,67,0.2);
         }
         .day-title {
-            text-align: center;
+            display: block;
+            width: max-content;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin: 2px auto 20px;
+            padding: 10px 24px;
             font-size: 1.3rem;
             font-weight: bold;
             letter-spacing: 1px;
             color: var(--primary);
-            margin: 2px 0 20px;
             text-shadow: 0 0 10px rgba(0,123,67,0.5);
+            text-align: center;
+            border: 1px solid rgba(0,192,96,0.4);
+            border-radius: 8px;
+            background: rgba(0,192,96,0.05);
         }
         .day-title .day-date {
             display: inline-block;
@@ -135,12 +143,6 @@
             color: var(--success);
             letter-spacing: 1px;
             text-shadow: 0 0 8px rgba(0,238,119,0.45);
-            padding: 2px 12px;
-            margin: 0 2px;
-            border: 1px solid rgba(0,238,119,0.4);
-            border-radius: 5px;
-            background: rgba(0,238,119,0.07);
-            vertical-align: middle;
         }
         /* Mode tabs */
         .mode-tabs {
@@ -350,8 +352,8 @@
             h1 { font-size: 1.5rem; letter-spacing: 5px; }
             /* Mobile: push the title down a bit so it doesn't overlap the 🌐 language toggle in the top right */
             .header-bar { margin-top: 26px; }
-            .day-title { font-size: 1.05rem; letter-spacing: 0.5px; }
-            .day-title .day-date { font-size: 0.9rem; padding: 2px 8px; }
+            .day-title { font-size: 1.05rem; letter-spacing: 0.5px; padding: 8px 14px; }
+            .day-title .day-date { font-size: 0.9rem; }
         }
     </style>
 </head>
