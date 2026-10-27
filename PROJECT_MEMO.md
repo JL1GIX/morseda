@@ -36,20 +36,19 @@
 | `rx.js` | rx.html のゲームロジック外部化版。`rx-en.html` と共有。i18n辞書(`I18N`/`t()`)でJS生成テキストを切替 | 約 34KB |
 | `tx.html` | **送信モード**。キーボード/パドルでモールスを打つ。Iambic キーヤー対応。ミス分析（打ち間違えの多い文字表示）機能あり | 約 46KB |
 | `tx.js` | tx.html のゲームロジック外部化版。`tx-en.html` と共有。i18n辞書でJS生成テキストを切替 | 約 56KB |
-| `asobi.html` | **お遊びモード**。モード選択画面から「単語早打ち/CQ交信シミュレーター/有名モールス符号/ガチモード」の4サブモードを選択（12章参照）。ミス分析機能あり | 約 60KB |
-| `asobi.js` | asobi.html のゲームロジック外部化版。`asobi-en.html` と共有 | 約 85KB |
+| `asobi.html` | **お遊びモード**。ロビー画面（`#start-screen`）で単語種別（一般単語/コールサイン+コンテストナンバー）×プレイスタイル（普通/正確重視/一発勝負）を選ぶ2軸・計6通りの単語早打ちゲーム（12章参照）。ミス分析機能あり | 約 55KB |
+| `asobi.js` | asobi.html のゲームロジック外部化版。`asobi-en.html` と共有 | 約 70KB |
 | `ranking.html` | スコアランキング表示（全期間）。モード別 (rx/tx) × 時間別 (1分/3分/5分)。お遊びモードは12.6章の専用ページに分離したため非表示。`ranking-today.html`/`ranking-yesterday.html` への導線リンクあり | 約 23KB |
 | `ranking-today.html` | **今日のランキング**。`ranking.html` と同じモード/時間タブを持つ独立ページ。クライアント側で全ページ取得→JST日付でフィルタして表示（11.4章参照） | 約 23KB |
 | `ranking-yesterday.html` | **昨日のランキング**。`ranking-today.html` と全く同じ仕組みで対象日を1日前にしたもの | 約 23KB |
-| `ranking-asobi.html` / `ranking-asobi-today.html` / `ranking-asobi-yesterday.html` | **単語早打ちモード専用ランキング**（全期間/今日/昨日）。`mode:'ASOBI'`固定、モード切替タブなし。詳細は12.6章 | 各約 21〜24KB |
-| `ranking-hardcore.html` / `ranking-hardcore-today.html` / `ranking-hardcore-yesterday.html` | **ガチモード専用ランキング**（全期間/今日/昨日）。`mode:'ASOBI_HARD'`固定（新規mode値、要デプロイ後確認）。詳細は12.6章 | 各約 22〜24KB |
+| `ranking-asobi.html` / `ranking-asobi-today.html` / `ranking-asobi-yesterday.html` | **お遊びモード専用ランキング**（全期間/今日/昨日）。単語種別タブ×プレイスタイルタブ×時間タブの3段タブで6通りの組み合わせを切替表示（`?wordcat=&variant=&time=`をURLパラメータで共有可）。詳細は12章 | 各約 23〜26KB |
 | `morse-table.html` | モールス符号表 (リファレンス) | 約 15KB |
 | `how-to-use.html` | 使い方ガイド（全機能の説明、キーボードショートカット一覧を含む） | 約 22KB |
 | `profile.html` | 運営者情報 | 約 16KB |
 | `privacy.html` | プライバシーポリシー | 約 11KB |
 | `contact.html` | お問い合わせ | 約 11KB |
-| `sitemap.xml` | サイトマップ。ja/en 全36ページ分のURLと`hreflang`相互参照を記載（2026-10、`ranking-today`/`ranking-yesterday`のja/en 4ページに加え、`ranking-asobi`系/`ranking-hardcore`系(全期間/今日/昨日)のja/en 12ページを追加） | 約 11KB |
-| `*-en.html`（`index-en.html`, `tx-en.html`, `rx-en.html`, `asobi-en.html`, `ranking-en.html`, `ranking-today-en.html`, `ranking-yesterday-en.html`, `ranking-asobi-en.html`, `ranking-asobi-today-en.html`, `ranking-asobi-yesterday-en.html`, `ranking-hardcore-en.html`, `ranking-hardcore-today-en.html`, `ranking-hardcore-yesterday-en.html`, `profile-en.html`, `contact-en.html`, `how-to-use-en.html`, `morse-table-en.html`, `privacy-en.html`） | 各ページの英語版。ルート直下に ja 版と並べて配置（`/en/`のようなサブフォルダは使わない）。詳細は 9章 | 各ページ ja版とほぼ同サイズ |
+| `sitemap.xml` | サイトマップ。ja/en 全30ページ分のURLと`hreflang`相互参照を記載（2026-10、`ranking-today`/`ranking-yesterday`のja/en 4ページ、`ranking-asobi`系(全期間/今日/昨日)のja/en 6ページを含む。旧`ranking-hardcore`系6ページは12章の再設計で廃止） | 約 10KB |
+| `*-en.html`（`index-en.html`, `tx-en.html`, `rx-en.html`, `asobi-en.html`, `ranking-en.html`, `ranking-today-en.html`, `ranking-yesterday-en.html`, `ranking-asobi-en.html`, `ranking-asobi-today-en.html`, `ranking-asobi-yesterday-en.html`, `profile-en.html`, `contact-en.html`, `how-to-use-en.html`, `morse-table-en.html`, `privacy-en.html`） | 各ページの英語版。ルート直下に ja 版と並べて配置（`/en/`のようなサブフォルダは使わない）。詳細は 9章 | 各ページ ja版とほぼ同サイズ |
 | `CNAME` | GitHub Pages のカスタムドメイン (`jl1gix.com`) |  |
 | `favicon-*.png` / `apple-touch-icon.png` / `ogp.png` | アイコン・OGP 画像 |  |
 
@@ -298,55 +297,33 @@ git log --oneline -3
 - `tx.js`・`asobi.js`の両方に同一のロジックを適用済み。RXモード（`rx.js`）はIambicキーヤーを持たないため対象外。
 - **検証方法**: Playwrightで「J押下→即リリース→Space押下→即リリース」というタップシーケンスを `keyboard.down/up` で再現し、`decodeTxChar`/`decodeFreeChar` に渡される最終的なモールス文字列が `"-."`（N）になることを確認。さらに、修正前のコード（ラッチなし版）を別ポートで同時に動かし、同じテストで実際に `"-"` のみ（短点が消える）になることを確認した上で、修正後のコードでは再現しないことを突き合わせて検証（意図的な「修正前に戻して再現させる」コントロールテスト）。
 
-## 12. お遊びモードのサブモード追加（CQシミュレーター/有名モールス符号/ガチモード）(2026-10)
+## 12. お遊びモードの再設計: 単語種別×プレイスタイルの2軸6モード制 (2026-10 第2弾)
 
-- 熊谷さんより「受信/送信モードはガチのコンテスター向け練習ツールのままでよいが、お遊びモードは『モールス・無線の世界に興味を持ってもらうきっかけ』のページにしたい」という方針が示され、相談の上で以下3モードを追加し、さらにモード選択画面と難易度バッジを新設した。
-- **実装方針**: 1ファイル完結方針・JS外部化方針（9.3章）を維持するため、新規ページは作らず全て既存の `asobi.html`/`asobi-en.html`/`asobi.js` に追加。`asobi.js` に `asobiSubMode`（`'WORDRACE'|'CQ'|'FAMOUS'|'HARDCORE'`）という概念を導入し、既存のTX単語早打ちエンジン（キーヤー・パドル・スコープ描画等）をほぼそのまま再利用しつつ、お題の出し方・QSBタイマーの有無・結果画面の出し分けだけを `asobiSubMode` で分岐させる設計にした（`gameMode`自体は全サブモード共通で`'TX'`のまま変更していない）。
+> **本章は旧12章（CQ交信シミュレーター/有名モールス符号/ガチモードのサブモード・モード選択画面・難易度バッジ）を完全に置き換える。** 熊谷さんより「お遊びモードのゲームモードは一番最初の『単語早押しのみ』に戻す」という方針変更があり、CQシミュレーター・有名モールス符号モードは**削除**、ガチモードは**プレイスタイルの一種として再構成**した。
 
-### 12.1 モード選択画面
-
-- 従来は `asobi.html` を開くと即座に単語早打ちの設定画面（`#start-screen`）が表示されていたが、その手前に新しく `#mode-select-screen` を追加し、4枚のカード（単語早打ち/CQ交信シミュレーター/有名モールス符号/ガチモード）から選ぶ形式に変更。各カードに難易度バッジ（`入門`=緑 / `標準`=黄 / `ガチ`=赤・点滅アニメーション付き）を表示。既存のWPM帯タグ（`.wpm-band-tag`）と似た配色・形状で統一感を持たせている。
-- `selectAsobiMode(mode)` でモードを確定して設定画面（`#start-screen`）へ、`applySubModeSettingsVisibility()` でサブモードごとに不要な設定項目を隠す（CQ/有名符号モードは制限時間セレクトとフリー入力モードへのリンクを非表示、ガチモードは初心者モードのチェックボックスを非表示にして強制OFF）。設定画面には「◀ モード選択へ」の戻りリンクを新設、結果画面にも「◀ 他のモードを見る」ボタンを追加（`backToModeSelect()`/`backToModeSelectFromResult()`）。
-
-### 12.2 CQ交信シミュレーター（`asobiSubMode === 'CQ'`）
-
-- 実際のアマチュア無線CW交信で使われる手順（CQ呼び出し→応答→信号レポート(RST/599)交換→名前・QTH交換→お礼の挨拶(TNX/73/SK)）を簡略化した8ステップの台本（`CQ_SCRIPT`、ja/en共通のコールサイン等は変更せず、案内文(narration)のみ言語別）に沿って進行する。プレイヤーが打鍵する行(`speaker:'player'`)と、相手局からの応答として読むだけの行(`speaker:'other'`、打鍵不要・「次へ」ボタンで進行)が交互に並ぶ。
-- 制限時間なし（`startGame()`内で`asobiSubMode`が`CQ`/`FAMOUS`の場合は`initialSeconds=0`とし全体カウントダウンの`setInterval`自体を起動しない。TIME表示は`∞`固定）。QSB単語タイマーも使わない。
-- 相手局の応答を表示中（`renderCqOtherStep()`）は `contentPaused` フラグを立てて打鍵系関数（`keyerStep`/`tapSymbol`/`paddleDown`/`onTxKeyDown`）の入り口をガードし、誤入力やスコア加算が起きないようにしている。
-- 内容の出典: アマチュア無線の基本QSO手順はLong Island CW Clubの公開プロトコル資料で裏取り済み。CQ/DE/K/RST/599/QTH/TNX/73/SK等の用語はいずれも実際にハムが使う標準的な符丁。
-
-### 12.3 有名モールス符号モード（`asobiSubMode === 'FAMOUS'`）
-
-- `FAMOUS_CODES`（SOS/CQD/CQ/73/「What Hath God Wrought」の5エントリ）を順番に打鍵し、1つ完了するごとにトリビア（`showFamousTrivia()`）を表示してから「次へ」で次の符号に進む、制限時間なしのモード。
-- 史実の裏取り: SOSが「Save Our Souls」の略という俗説は誤りで単純な符号パターンゆえの採用であること（1906年ベルリン国際無線電信条約）、タイタニック号はCQDとSOS両方を送信したこと、「What Hath God Wrought」はサミュエル・モールス自身が1844年に送った世界初の電信メッセージであること等、いずれもWeb検索で確認済みの内容のみ採用。
-
-### 12.4 ガチモード（`asobiSubMode === 'HARDCORE'`）
-
-- 既存の単語早打ちエンジンに「3回連続ミスで即終了」を追加したバリアント。熊谷さんの要望を踏まえ、追加で以下も実装:
-  - QSB単語タイマーの猶予倍率を通常(3.5倍/初心者4.5倍)より切り詰めた2.4倍に（`getWordTimeLimitMs()`内で`asobiSubMode==='HARDCORE'`を判定）。
-  - 連続ミスカウンタ（`hardcoreMissStreak`、正解で0にリセット）を画面上部に赤い点滅表示（`#hardcore-streak`、「⚠ ミス n/3」）。誤入力・QSB単語タイムアウトの両方をミスとしてカウント。3回到達で即座に`endGame()`を呼び、結果画面見出しを「🔥 ELIMINATED（3ミスで脱落）」に差し替える（`hardcoreEliminated`フラグ）。
-  - 初心者モードのチェックボックスは非表示・強制OFF。
-  - `#game-container`に`.hardcore-active`クラスを付与し、枠色をエラーカラー基調の赤いグロー演出に変更（視覚的な緊張感の演出）。
-- **スコア登録（ランキング）の扱い**: 当初はガチモードも単語早打ちと同じ `mode: 'ASOBI'` バケツに登録する設計にしていたが、熊谷さんより「お遊びモードの得点は全体ランキングに乗せず、サブモードごとに個別のランキングページを用意したい」という要望があり、12.6章の設計に差し替えた。ガチモードは新しいバックエンド `mode` 値 `'ASOBI_HARD'` で登録する（単語早打ちは既存の `'ASOBI'` を維持し、過去のスコア履歴との継続性を保っている）。CQシミュレーター・有名モールス符号モードはスコアという概念がそぐわないため、どちらもランキング登録は一切行わない（結果画面も`#score-reg-area`等を丸ごと非表示にし、代わりに`#experience-result`で完了メッセージのみ表示）。
-  - **未確認の前提（要デプロイ後の確認）**: バックエンドAPIが `mode` に任意の新規文字列値（`'ASOBI_HARD'`）を渡してもエラーにならず、`GET /api/scores?mode=ASOBI_HARD&...` 等で正しく独立集計されることを前提に実装しているが、このサンドボックス環境からは `api.jl1gix.com` に到達できず実機確認ができていない（7章の方針どおり、デプロイ後に熊谷さんにガチモードでスコア登録→`ranking-hardcore.html`に反映されるか確認をお願いしたい）。
-
-### 12.5 結果画面の構造変更
-
-- `<h2>MISSION END</h2>` に `id="result-headline"` を付与しJSから書き換え可能に。スコア系の表示一式（最終結果・ミス分析・シェア・ランキング登録フォーム）を `#score-result-block` にラップし、CQ/有名符号モードではこれを丸ごと非表示にして代わりに `#experience-result`（完了メッセージのみ）を表示する出し分けを `endGame()` に実装。
-
-### 12.6 お遊びモード専用ランキングページ群の新設 (2026-10 追加)
-
-- 熊谷さんより「お遊びモードの得点は全体ランキングに乗せず、サブモードごとに個別のランキングテーブルを用意し、`ranking.html`/`ranking-en.html` では受信・送信のみを表示するようにしてほしい。個別ページもトップページにリンクは不要だが各ゲームモードの画面から辿れるようにし、今日/昨日別のページも用意してほしい」という要望を受け、以下を実装した。
-- **`ranking.html`/`ranking-en.html` の変更**: 3択だったモードタブ（受信/送信/お遊び）から「🎮 お遊びモード」ボタンを削除し、受信・送信の2択のみに変更。`switchMode()`と初期化IIFEの`ASOBI`分岐も削除。あわせて一貫性のため `ranking-today(.html|-en.html)`/`ranking-yesterday(.html|-en.html)` の4ページからも同様に「お遊びモード」タブを削除した（単語早打ちは引き続き既存の `mode:'ASOBI'` で登録されるため、タブを残すと全体の今日/昨日ランキングに単語早打ちのスコアだけが混ざって表示されてしまうため）。
-- **新設した12ファイル**（既存の `ranking.html`系・`ranking-today.html`系をベースに、モード切替UIを撤去し「どのサブモードのランキングか」を示す固定ラベル（`.mode-label`）に置き換える形で生成。`let currentMode` の代わりに `const LOCKED_MODE` でAPI呼び出しのmode値を固定）:
-  - 単語早打ち（`mode:'ASOBI'`）: `ranking-asobi.html` / `ranking-asobi-en.html`（全期間）、`ranking-asobi-today.html` / `ranking-asobi-today-en.html`（今日）、`ranking-asobi-yesterday.html` / `ranking-asobi-yesterday-en.html`（昨日）
-  - ガチモード（`mode:'ASOBI_HARD'`、新規mode値）: `ranking-hardcore.html` / `ranking-hardcore-en.html`（全期間）、`ranking-hardcore-today.html` / `ranking-hardcore-today-en.html`（今日）、`ranking-hardcore-yesterday.html` / `ranking-hardcore-yesterday-en.html`（昨日）
-  - 今日/昨日版は `ranking-today.html`/`ranking-yesterday.html` と全く同じ「JST基準で全ページ取得してクライアント側でフィルタ」方式（`fetchAllRows`/`jstDateStr`/`targetDateStr`/`filteredRows`/`renderPage`）をそのまま流用している。CQ・有名モールス符号モードはスコアという概念がないため、専用ランキングページは作っていない。
-- **`asobi.js` 側の対応**: `asobiBackendMode()`（`HARDCORE`なら`'ASOBI_HARD'`、それ以外は`'ASOBI'`を返す）と `asobiRankingBase()`（サブモードと`LANG`に応じて上記12ファイルのうち「全期間」版4つのいずれかのパスを返す）を新設し、`autoRegister()`内のPOST/`/api/scores/rank`取得/結果画面の`rankHref`すべてをこの2関数経由に差し替えた。
-- **各モード画面からのランキング導線**: `#start-screen`内の設定画面（フリー入力モードリンクの下）に `#asobi-ranking-link`（🏆 このモードのランキングを見る）を新設。`applySubModeSettingsVisibility()`で単語早打ち・ガチモードの時だけ表示し、リンク先は`asobiRankingBase()`で都度更新。CQ・有名符号モードでは非表示。熊谷さんの要望通りトップページ（`index.html`）には一切リンクを追加していない。
-- **`sitemap.xml`**: 上記12ファイルを ja/en の hreflang 相互参照付きで追加済み（priority 0.4〜0.5、`ranking-today`/`ranking-yesterday`系より一段低い値）。
-- **未確認の前提**: `'ASOBI_HARD'` という新しいmode値をバックエンドAPIがそのまま受け付け、独立した集計・ランキング取得ができるかはこのサンドボックスからは検証不可能（`api.jl1gix.com`に到達できないため）。デプロイ後に熊谷さんに実機確認をお願いしたい。もし未対応だった場合は、バックエンドAPI側の改修要否について別途相談が必要（7章の方針）。
+- **新しいゲーム設計**: 単語早打ちエンジン（キーヤー・パドル・スコープ描画等、既存のまま）に対して、独立した2つの軸を導入し、計 2×3 = 6通りの組み合わせで遊べるようにした。
+  - **単語種別 `wordCategory`**: `GENERAL`（一般単語、既存の単語リスト） / `CALLSIGN`（コールサイン+コンテストナンバー。送信モード`tx.js`の`generateCallsign()`/`generateRST()`をそのまま移植し、1語ごとに「コールサイン→RSTレポート」を交互に出題する`nextAsobiCallType`で管理）
+  - **プレイスタイル `gameVariant`**（寿司打を参考に設計）: `NORMAL`（普通、従来通りの挙動） / `ACCURACY`（正確重視、誤入力でその単語の入力を最初からやり直し＝`txCharIndex`を0にリセット） / `ONESHOT`（一発勝負、一度でも誤入力した時点で即`endGame()`。旧ガチモードの「3回連続ミス」をさらに厳格化したもの）
+- **ロビー画面の構造**: 旧モード選択画面（`#mode-select-screen`、4枚のカード）は廃止し、`asobi.html`を開くと即座に設定画面（`#start-screen`）が表示される1画面構成に戻した。設定画面の冒頭に単語種別タブ（`#wc-tabs`: `#wc-general`/`#wc-callsign`）とプレイスタイルタブ（`#variant-tabs`: `#var-normal`/`#var-accuracy`/`#var-oneshot`）を新設し、`ranking.html`の`.mode-tabs`/`.mode-tab`と同じ見た目のタブボタンで切替（`selectWordCategory(cat)`/`selectGameVariant(variant)`）。`applySelectorVisibility()`が選択状態に応じて、ONESHOT選択時は初心者モードのチェックボックスを隠して強制OFFにし、ランキングリンクの行き先を更新する。
+- **削除した旧機能**: CQ交信シミュレーター（`CQ_SCRIPT`、`startCqStep`/`loadCqWord`/`onCqWordComplete`/`renderCqOtherStep`/`cqContinue`等）、有名モールス符号モード（`FAMOUS_CODES`、`startFamousStep`/`loadFamousWord`/`onFamousWordComplete`/`showFamousTrivia`/`famousContinue`等）、モード選択画面一式（`#mode-select-screen`、`selectAsobiMode()`、`backToModeSelect()`/`backToModeSelectFromResult()`）、結果画面の`#experience-result`（体験完了メッセージ）と「◀ 他のモードを見る」ボタンを、HTML/JS/CSSから全て削除した。`contentPaused`フラグ（相手局応答表示中の打鍵ガード）も不要になったため削除。
+- **プレイ中のステータス表示**: 旧`#hardcore-streak`（連続ミスカウンタ）を`#variant-status`に改名・再設計。ACCURACY選択時のみ「やり直し n回」を表示（`updateVariantStatusUI()`、`accuracyResetCount`）。`#game-container`の強調演出クラスも`.hardcore-active`→`.oneshot-active`に改名し、ONESHOT選択時のみ枠を赤いグロー演出にする。
+- **QSB単語タイマーの猶予倍率**: `getWordTimeLimitMs()`内で、ONESHOT選択時のみ通常(3.5倍/初心者4.5倍)より切り詰めた2.4倍を適用（旧ガチモードの挙動を引き継ぐ）。
+- **スコア登録（バックエンドmode値）**: 単語種別×プレイスタイルの組み合わせごとに異なる`mode`値を使う`ASOBI_MODE_TABLE`ルックアップを新設（`asobiBackendMode()`）。
+  | 単語種別 | プレイスタイル | mode値 |
+  |---|---|---|
+  | GENERAL | NORMAL | `ASOBI`（既存。過去スコアとの継続性を維持） |
+  | GENERAL | ACCURACY | `ASOBI_GEN_ACC`（新規） |
+  | GENERAL | ONESHOT | `ASOBI_GEN_ONE`（新規） |
+  | CALLSIGN | NORMAL | `ASOBI_CALL_NORM`（新規） |
+  | CALLSIGN | ACCURACY | `ASOBI_CALL_ACC`（新規） |
+  | CALLSIGN | ONESHOT | `ASOBI_CALL_ONE`（新規） |
+  - **未確認の前提（要デプロイ後の確認）**: 上記5つの新規mode値をバックエンドAPIがそのまま受け付け、`GET /api/scores?mode=...`等で正しく独立集計されることを前提に実装しているが、このサンドボックス環境からは`api.jl1gix.com`に到達できず実機確認ができていない。デプロイ後に熊谷さんに各組み合わせでスコア登録→対応するランキングタブに反映されるか確認をお願いしたい。
+  - 旧ガチモード用に導入した`'ASOBI_HARD'`というmode値は、本章の再設計で使われなくなった（孤立値）。バックエンド側に既にこの値のスコアが存在する場合は、別途取り扱いを相談したい。
+- **お遊びモード専用ランキングページの再設計（`ranking-asobi.html`系6ファイル、`ranking-hardcore.html`系6ファイルは削除）**: 旧版は`const LOCKED_MODE`でサブモードごとに1つのmode値へ固定していたが、今回は単語種別タブ×プレイスタイルタブ×時間タブ（1分/3分/5分）の3段タブ構成に変更し、`ranking.html`自体が1ページでRX/TXタブを持つのと同じ考え方で、6通りの組み合わせを1つのページ群（全期間/今日/昨日×ja/en = 6ファイル）内で切替表示するようにした。各ページは`computeMode(wordcat, variant)`（`ASOBI_MODE_TABLE`と同じ対応表をJS側に複製）でmode値を算出し、`?wordcat=&variant=&time=`のURLパラメータで初期タブを指定可能（`asobi.js`の`asobiRankingBase()`が生成するリンクもこの形式）。今日/昨日版は従来通り「JST基準で全ページ取得してクライアント側でフィルタ」方式（`fetchAllRows`/`jstDateStr`/`targetDateStr`/`filteredRows`/`renderPage`）を流用。全期間↔今日↔昨日のナビリンクは、現在選択中のタブの組み合わせを保ったまま遷移できるよう`updateNavLinks()`でクエリ文字列を都度更新している。
+- **各モード画面からのランキング導線**: `#start-screen`内の`#asobi-ranking-link`（🏆 このモードのランキングを見る）は、全組み合わせにスコアがあるため常時表示に変更（旧版はサブモードによって非表示にしていた）。リンク先は`asobiRankingBase()`で都度更新。
+- **`ranking.html`/`ranking-en.html`、`ranking-today`/`ranking-yesterday`系**: 前回の再設計時点で既に「受信/送信のみ表示（お遊びモードタブなし）」になっており、本章の変更による影響はない。
+- **`sitemap.xml`**: 旧`ranking-hardcore`系6エントリ（ja/en×全期間/今日/昨日）を削除。`ranking-asobi`系6エントリはURLがそのまま継続するため変更なし。
 
 ---
 
-_最終更新: 2026-10-27 (お遊びモードにCQ交信シミュレーター/有名モールス符号/ガチモードのサブモードとモード選択画面・難易度バッジを追加。ランキングの日付別表示を独立ページ方式に全面変更し`ranking-today`/`ranking-yesterday`のja/en 4ページを新規追加、WPM速度スライダー化、初心者帯の文字区切り猶予延長、Iambicキーヤーの素早いタップ対応。さらにお遊びモードのサブモード別（単語早打ち/ガチモード）に個別ランキングページ12ファイルを新設し、`ranking.html`系からは「お遊びモード」タブを削除)_
+_最終更新: 2026-10-27 (お遊びモードを再設計。CQ交信シミュレーター/有名モールス符号モード・モード選択画面・難易度バッジ・旧ガチモードを廃止し、単語種別(一般単語/コールサイン+コンテストナンバー)×プレイスタイル(普通/正確重視/一発勝負)の2軸・計6通りの単語早打ちゲームに統一。`ranking-asobi`系ランキングページを3段タブ(単語種別×プレイスタイル×時間)構成に再設計し、`ranking-hardcore`系6ファイルは削除。詳細は12章)_

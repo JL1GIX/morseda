@@ -4,15 +4,15 @@
     <script src="/lang-guard.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Word Race Ranking - Morse Da</title>
-    <meta name="description" content="Score ranking for the Word Race fun mode in Morse Da. Check rankings by time limit (1/3/5 min).">
-    <meta property="og:title" content="Word Race Ranking - Morse Da">
-    <meta property="og:description" content="Score ranking for the Word Race fun mode in Morse Da. Check rankings by time limit.">
+    <title>Fun Mode Ranking - Morse Da</title>
+    <meta name="description" content="Score ranking for Morse Da's Fun Mode. Check rankings by word category (General Words / Callsign + Contest Number), play style (Normal / Accuracy Focus / One Shot), and time limit (1/3/5 min).">
+    <meta property="og:title" content="Fun Mode Ranking - Morse Da">
+    <meta property="og:description" content="Score ranking for Morse Da's Fun Mode. Check rankings by word category, play style, and time limit.">
     <meta property="og:url" content="https://jl1gix.com/ranking-asobi-en.html">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Word Race Ranking - Morse Da">
-    <meta name="twitter:description" content="Score ranking for the Word Race fun mode in Morse Da. Check rankings by time limit.">
+    <meta name="twitter:title" content="Fun Mode Ranking - Morse Da">
+    <meta name="twitter:description" content="Score ranking for Morse Da's Fun Mode. Check rankings by word category, play style, and time limit.">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -165,6 +165,7 @@
             margin-bottom: 14px;
             text-shadow: 0 0 8px rgba(0,192,96,0.4);
         }
+        .mode-tabs-label { font-size: 0.64rem; color: var(--primary-dim); letter-spacing: 2px; margin: 14px 0 6px; opacity: 0.85; text-align: left; }
         /* Today/Yesterday ranking nav links */
         .ranking-nav-links {
             display: flex;
@@ -354,17 +355,31 @@
     </div>
     <div class="subtitle">▸ RANKING ◂</div>
 
-    <div class="mode-label">🏃 Word Race Mode</div>
+    <div class="mode-label">🎮 Fun Mode</div>
 
-    <div class="mode-tabs" style="gap:6px; margin-top:-8px;">
+    <div class="mode-tabs-label">▸ Word Category</div>
+    <div class="mode-tabs" id="wc-tabs">
+        <button class="mode-tab active" id="tab-wc-general" onclick="switchWordCat('GENERAL')">🔤 General Words</button>
+        <button class="mode-tab" id="tab-wc-callsign" onclick="switchWordCat('CALLSIGN')">📡 Callsign + Contest Number</button>
+    </div>
+
+    <div class="mode-tabs-label">▸ Play Style</div>
+    <div class="mode-tabs" id="variant-tabs">
+        <button class="mode-tab active" id="tab-var-normal" onclick="switchVariant('NORMAL')">Normal</button>
+        <button class="mode-tab" id="tab-var-accuracy" onclick="switchVariant('ACCURACY')">Accuracy Focus</button>
+        <button class="mode-tab" id="tab-var-oneshot" onclick="switchVariant('ONESHOT')">One Shot</button>
+    </div>
+
+    <div class="mode-tabs-label">▸ Time Limit</div>
+    <div class="mode-tabs" style="gap:6px;">
         <button class="mode-tab active" id="tab-1" onclick="switchMinutes(1)" style="font-size:0.75rem; padding:6px 0;">1 min</button>
         <button class="mode-tab" id="tab-3" onclick="switchMinutes(3)" style="font-size:0.75rem; padding:6px 0;">3 min</button>
         <button class="mode-tab" id="tab-5" onclick="switchMinutes(5)" style="font-size:0.75rem; padding:6px 0;">5 min</button>
     </div>
 
     <div class="ranking-nav-links">
-        <a href="/ranking-asobi-today-en.html">📅 Today's Ranking</a>
-        <a href="/ranking-asobi-yesterday-en.html">📅 Yesterday's Ranking</a>
+        <a id="nav-today-link" href="/ranking-asobi-today-en.html">📅 Today's Ranking</a>
+        <a id="nav-yesterday-link" href="/ranking-asobi-yesterday-en.html">📅 Yesterday's Ranking</a>
     </div>
 
     <div id="ranking-body">
@@ -396,10 +411,30 @@
 
 <script>
 const API = 'https://api.jl1gix.com';
-const LOCKED_MODE = 'ASOBI';
+const ASOBI_MODE_TABLE = {
+    'GENERAL_NORMAL':   'ASOBI',
+    'GENERAL_ACCURACY': 'ASOBI_GEN_ACC',
+    'GENERAL_ONESHOT':  'ASOBI_GEN_ONE',
+    'CALLSIGN_NORMAL':  'ASOBI_CALL_NORM',
+    'CALLSIGN_ACCURACY':'ASOBI_CALL_ACC',
+    'CALLSIGN_ONESHOT': 'ASOBI_CALL_ONE',
+};
+function computeMode(wc, variant) {
+    return ASOBI_MODE_TABLE[`${wc}_${variant}`] || 'ASOBI';
+}
+let currentWordCat = 'GENERAL';
+let currentVariant = 'NORMAL';
 let currentMinutes = 1;
 let currentPage = 1;
 let totalPages = 1;
+
+function updateNavLinks() {
+    const qs = `?wordcat=${currentWordCat}&variant=${currentVariant}&time=${currentMinutes}`;
+    const todayLink = document.getElementById('nav-today-link');
+    if (todayLink) todayLink.href = '/ranking-asobi-today-en.html' + qs;
+    const yesterdayLink = document.getElementById('nav-yesterday-link');
+    if (yesterdayLink) yesterdayLink.href = '/ranking-asobi-yesterday-en.html' + qs;
+}
 
 async function loadRanking(mode, minutes, page) {
     const body = document.getElementById('ranking-body');
@@ -472,33 +507,63 @@ function formatNickname(nick) {
     return upper || 'noname';
 }
 
+function switchWordCat(wc) {
+    currentWordCat = wc;
+    document.getElementById('tab-wc-general').classList.toggle('active', wc === 'GENERAL');
+    document.getElementById('tab-wc-callsign').classList.toggle('active', wc === 'CALLSIGN');
+    currentPage = 1;
+    updateNavLinks();
+    loadRanking(computeMode(currentWordCat, currentVariant), currentMinutes, 1);
+}
+
+function switchVariant(variant) {
+    currentVariant = variant;
+    document.getElementById('tab-var-normal').classList.toggle('active', variant === 'NORMAL');
+    document.getElementById('tab-var-accuracy').classList.toggle('active', variant === 'ACCURACY');
+    document.getElementById('tab-var-oneshot').classList.toggle('active', variant === 'ONESHOT');
+    currentPage = 1;
+    updateNavLinks();
+    loadRanking(computeMode(currentWordCat, currentVariant), currentMinutes, 1);
+}
+
 function switchMinutes(min) {
     currentMinutes = min;
     currentPage = 1;
     [1, 3, 5].forEach(m => {
         document.getElementById(`tab-${m}`).classList.toggle('active', m === min);
     });
-    loadRanking(LOCKED_MODE, currentMinutes, 1);
+    updateNavLinks();
+    loadRanking(computeMode(currentWordCat, currentVariant), currentMinutes, 1);
 }
 
 function changePage(delta) {
     const newPage = currentPage + delta;
     if (newPage < 1 || newPage > totalPages) return;
     currentPage = newPage;
-    loadRanking(LOCKED_MODE, currentMinutes, currentPage);
+    loadRanking(computeMode(currentWordCat, currentVariant), currentMinutes, currentPage);
 }
 
-// Initial load — URLパラメータがあれば時間タブを選択
+// Initial load — select tabs from URL params if present
 (function() {
     const params = new URLSearchParams(window.location.search);
+    const wc = params.get('wordcat');
+    if (wc === 'GENERAL' || wc === 'CALLSIGN') currentWordCat = wc;
+    const variant = params.get('variant');
+    if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(variant)) currentVariant = variant;
     const timeParam = parseInt(params.get('time'));
-    if ([1, 3, 5].includes(timeParam)) {
-        currentMinutes = timeParam;
-        [1, 3, 5].forEach(m => {
-            document.getElementById(`tab-${m}`).classList.toggle('active', m === timeParam);
-        });
-    }
-    loadRanking(LOCKED_MODE, currentMinutes, 1);
+    if ([1, 3, 5].includes(timeParam)) currentMinutes = timeParam;
+
+    document.getElementById('tab-wc-general').classList.toggle('active', currentWordCat === 'GENERAL');
+    document.getElementById('tab-wc-callsign').classList.toggle('active', currentWordCat === 'CALLSIGN');
+    document.getElementById('tab-var-normal').classList.toggle('active', currentVariant === 'NORMAL');
+    document.getElementById('tab-var-accuracy').classList.toggle('active', currentVariant === 'ACCURACY');
+    document.getElementById('tab-var-oneshot').classList.toggle('active', currentVariant === 'ONESHOT');
+    [1, 3, 5].forEach(m => {
+        document.getElementById(`tab-${m}`).classList.toggle('active', m === currentMinutes);
+    });
+
+    updateNavLinks();
+    loadRanking(computeMode(currentWordCat, currentVariant), currentMinutes, 1);
 })();
 </script>
 <!-- ハンバーガーメニュー -->

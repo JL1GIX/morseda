@@ -4,15 +4,15 @@
     <script src="/lang-guard.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>単語早打ち 昨日のランキング - モールス打</title>
-    <meta name="description" content="モールス打お遊びモード「単語早打ち」の昨日のスコアランキング（JST基準）。制限時間別（1分・3分・5分）に昨日の順位を確認できます。ページを再読み込みすれば常に最新の結果が表示されます。">
-    <meta property="og:title" content="単語早打ち 昨日のランキング - モールス打">
-    <meta property="og:description" content="モールス打お遊びモード「単語早打ち」の昨日のスコアランキング（JST基準）。制限時間別に昨日の順位を確認できます。">
+    <title>お遊びモード 昨日のランキング - モールス打</title>
+    <meta name="description" content="モールス打お遊びモードの昨日のスコアランキング（JST基準）。単語種別×プレイスタイル×制限時間（1分・3分・5分）で昨日の順位を確認できます。ページを再読み込みすれば常に最新の結果が表示されます。">
+    <meta property="og:title" content="お遊びモード 昨日のランキング - モールス打">
+    <meta property="og:description" content="モールス打お遊びモードの昨日のスコアランキング（JST基準）。単語種別×プレイスタイル×制限時間で昨日の順位を確認できます。">
     <meta property="og:url" content="https://jl1gix.com/ranking-asobi-yesterday.html">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="単語早打ち 昨日のランキング - モールス打">
-    <meta name="twitter:description" content="モールス打お遊びモード「単語早打ち」の昨日のスコアランキング（JST基準）。制限時間別に昨日の順位を確認できます。">
+    <meta name="twitter:title" content="お遊びモード 昨日のランキング - モールス打">
+    <meta name="twitter:description" content="モールス打お遊びモードの昨日のスコアランキング（JST基準）。単語種別×プレイスタイル×制限時間で昨日の順位を確認できます。">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -182,6 +182,7 @@
             margin-bottom: 14px;
             text-shadow: 0 0 8px rgba(0,192,96,0.4);
         }
+        .mode-tabs-label { font-size: 0.64rem; color: var(--primary-dim); letter-spacing: 2px; margin: 14px 0 6px; opacity: 0.85; text-align: left; }
         /* Today/Yesterday/All-time ranking nav links */
         .ranking-nav-links {
             display: flex;
@@ -373,17 +374,31 @@
     </div>
     <div class="day-title">昨日<span class="day-date">（<span id="date-label">----/--/--</span>）</span>のランキング</div>
 
-    <div class="mode-label">🏃 単語早打ちモード</div>
+    <div class="mode-label">🎮 お遊びモード</div>
 
-    <div class="mode-tabs" style="gap:6px; margin-top:-8px;">
+    <div class="mode-tabs-label">▸ 単語種別</div>
+    <div class="mode-tabs" id="wc-tabs">
+        <button class="mode-tab active" id="tab-wc-general" onclick="switchWordCat('GENERAL')">🔤 一般単語</button>
+        <button class="mode-tab" id="tab-wc-callsign" onclick="switchWordCat('CALLSIGN')">📡 コールサイン+コンテストナンバー</button>
+    </div>
+
+    <div class="mode-tabs-label">▸ プレイスタイル</div>
+    <div class="mode-tabs" id="variant-tabs">
+        <button class="mode-tab active" id="tab-var-normal" onclick="switchVariant('NORMAL')">普通</button>
+        <button class="mode-tab" id="tab-var-accuracy" onclick="switchVariant('ACCURACY')">正確重視</button>
+        <button class="mode-tab" id="tab-var-oneshot" onclick="switchVariant('ONESHOT')">一発勝負</button>
+    </div>
+
+    <div class="mode-tabs-label">▸ 制限時間</div>
+    <div class="mode-tabs" style="gap:6px;">
         <button class="mode-tab active" id="tab-1" onclick="switchMinutes(1)" style="font-size:0.75rem; padding:6px 0;">1分</button>
         <button class="mode-tab" id="tab-3" onclick="switchMinutes(3)" style="font-size:0.75rem; padding:6px 0;">3分</button>
         <button class="mode-tab" id="tab-5" onclick="switchMinutes(5)" style="font-size:0.75rem; padding:6px 0;">5分</button>
     </div>
 
     <div class="ranking-nav-links">
-        <a href="ranking-asobi.html">🏆 全期間ランキング</a>
-        <a href="ranking-asobi-today.html">📅 今日のランキング</a>
+        <a id="nav-alltime-link" href="ranking-asobi.html">🏆 全期間ランキング</a>
+        <a id="nav-today-link" href="ranking-asobi-today.html">📅 今日のランキング</a>
     </div>
 
     <div id="ranking-body">
@@ -417,11 +432,31 @@
 const API = 'https://api.jl1gix.com';
 const DAY_OFFSET = -1; // -1 = 昨日
 const PAGE_SIZE = 100;
-const LOCKED_MODE = 'ASOBI';
+const ASOBI_MODE_TABLE = {
+    'GENERAL_NORMAL':   'ASOBI',
+    'GENERAL_ACCURACY': 'ASOBI_GEN_ACC',
+    'GENERAL_ONESHOT':  'ASOBI_GEN_ONE',
+    'CALLSIGN_NORMAL':  'ASOBI_CALL_NORM',
+    'CALLSIGN_ACCURACY':'ASOBI_CALL_ACC',
+    'CALLSIGN_ONESHOT': 'ASOBI_CALL_ONE',
+};
+function computeMode(wc, variant) {
+    return ASOBI_MODE_TABLE[`${wc}_${variant}`] || 'ASOBI';
+}
+let currentWordCat = 'GENERAL';
+let currentVariant = 'NORMAL';
 let currentMinutes = 1;
 let currentPage = 1;
 let totalPages = 1;
 let filteredRows = [];
+
+function updateNavLinks() {
+    const qs = `?wordcat=${currentWordCat}&variant=${currentVariant}&time=${currentMinutes}`;
+    const alltimeLink = document.getElementById('nav-alltime-link');
+    if (alltimeLink) alltimeLink.href = 'ranking-asobi.html' + qs;
+    const todayLink = document.getElementById('nav-today-link');
+    if (todayLink) todayLink.href = 'ranking-asobi-today.html' + qs;
+}
 
 function jstDateStr(d) {
     const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
@@ -537,12 +572,30 @@ function formatNickname(nick) {
     return upper || 'noname';
 }
 
+function switchWordCat(wc) {
+    currentWordCat = wc;
+    document.getElementById('tab-wc-general').classList.toggle('active', wc === 'GENERAL');
+    document.getElementById('tab-wc-callsign').classList.toggle('active', wc === 'CALLSIGN');
+    updateNavLinks();
+    loadRanking(computeMode(currentWordCat, currentVariant), currentMinutes);
+}
+
+function switchVariant(variant) {
+    currentVariant = variant;
+    document.getElementById('tab-var-normal').classList.toggle('active', variant === 'NORMAL');
+    document.getElementById('tab-var-accuracy').classList.toggle('active', variant === 'ACCURACY');
+    document.getElementById('tab-var-oneshot').classList.toggle('active', variant === 'ONESHOT');
+    updateNavLinks();
+    loadRanking(computeMode(currentWordCat, currentVariant), currentMinutes);
+}
+
 function switchMinutes(min) {
     currentMinutes = min;
     [1, 3, 5].forEach(m => {
         document.getElementById(`tab-${m}`).classList.toggle('active', m === min);
     });
-    loadRanking(LOCKED_MODE, currentMinutes);
+    updateNavLinks();
+    loadRanking(computeMode(currentWordCat, currentVariant), currentMinutes);
 }
 
 function changePage(delta) {
@@ -551,17 +604,27 @@ function changePage(delta) {
     renderPage(newPage);
 }
 
-// Initial load — URLパラメータがあれば時間タブを選択
+// Initial load — URLパラメータがあれば各タブを選択
 (function() {
     const params = new URLSearchParams(window.location.search);
+    const wc = params.get('wordcat');
+    if (wc === 'GENERAL' || wc === 'CALLSIGN') currentWordCat = wc;
+    const variant = params.get('variant');
+    if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(variant)) currentVariant = variant;
     const timeParam = parseInt(params.get('time'));
-    if ([1, 3, 5].includes(timeParam)) {
-        currentMinutes = timeParam;
-        [1, 3, 5].forEach(m => {
-            document.getElementById(`tab-${m}`).classList.toggle('active', m === timeParam);
-        });
-    }
-    loadRanking(LOCKED_MODE, currentMinutes);
+    if ([1, 3, 5].includes(timeParam)) currentMinutes = timeParam;
+
+    document.getElementById('tab-wc-general').classList.toggle('active', currentWordCat === 'GENERAL');
+    document.getElementById('tab-wc-callsign').classList.toggle('active', currentWordCat === 'CALLSIGN');
+    document.getElementById('tab-var-normal').classList.toggle('active', currentVariant === 'NORMAL');
+    document.getElementById('tab-var-accuracy').classList.toggle('active', currentVariant === 'ACCURACY');
+    document.getElementById('tab-var-oneshot').classList.toggle('active', currentVariant === 'ONESHOT');
+    [1, 3, 5].forEach(m => {
+        document.getElementById(`tab-${m}`).classList.toggle('active', m === currentMinutes);
+    });
+
+    updateNavLinks();
+    loadRanking(computeMode(currentWordCat, currentVariant), currentMinutes);
 })();
 </script>
 <!-- ハンバーガーメニュー -->

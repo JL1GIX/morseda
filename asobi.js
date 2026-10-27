@@ -57,33 +57,17 @@ const I18N = {
     wpmBand_beginner:     { ja: '初心者向け', en: 'Beginner' },
     wpmBand_intermediate: { ja: '中級者向け', en: 'Intermediate' },
     wpmBand_advanced:     { ja: '上級者向け', en: 'Advanced' },
-    // ── モード選択・CQシミュレーター・有名モールス符号・ガチモード (2026-10) ──────
-    modeDesc_CQ: {
-        ja: 'アマチュア無線で実際に使われる交信の流れを、やさしく体験できます。画面の案内に沿って、CQの呼び出しから信号レポート・お礼の挨拶まで打ってみましょう。制限時間はありません。',
-        en: 'Experience the real flow of an amateur radio contact, gently guided step by step — from calling CQ to exchanging reports and signing off. No time limit.'
+    // ── 単語種別・プレイスタイル選択 (2026-10 第2弾) ──────────────────────────────
+    variantPrefix_ACCURACY: {
+        ja: '⚠ 正確重視: 打ち間違えると、その単語を最初から打ち直しになります。<br>',
+        en: '⚠ Accuracy Focus: A mistake sends you back to the start of the word.<br>'
     },
-    modeDesc_FAMOUS: {
-        ja: 'SOSやCQなど、世界中で使われてきた有名なモールス符号を実際に打ってみるモード。打ち終えると、その符号にまつわる豆知識が読めます。制限時間はありません。',
-        en: 'Key out famous Morse code messages like SOS and CQ, used around the world throughout history. After each one, read a bit of trivia about it. No time limit.'
+    variantPrefix_ONESHOT: {
+        ja: '⚠ 一発勝負: 一度でもミスした時点でゲーム終了。手加減なし。<br>',
+        en: '⚠ One Shot: A single mistake ends the game immediately. No mercy.<br>'
     },
-    hardcorePrefix: {
-        ja: '⚠ ガチモード: 3回連続でミスするとその時点で即終了。手加減なし。<br>',
-        en: "⚠ Hardcore Mode: 3 misses in a row and it's over immediately. No mercy.<br>"
-    },
-    missStreakWarn: (n) => ({ ja: `⚠ ミス ${n}/3`, en: `⚠ Miss ${n}/3` }),
-    hardcoreEliminatedHeadline: { ja: '🔥 ELIMINATED（3ミスで脱落）', en: '🔥 ELIMINATED (3 misses)' },
-    cqResultHeadline:    { ja: '🎉 はじめての交信、成立！', en: '🎉 Your First QSO is Complete!' },
-    famousResultHeadline: { ja: '📖 コンプリート！', en: '📖 Complete!' },
-    cqResultBody: {
-        ja: 'お疲れ様でした！これが、アマチュア無線のCW交信の基本的な流れです。CQで呼びかけて、信号レポートと名前・QTHを交換して、お礼を伝えて締めくくる —— 実際の無線の世界でも、今まさに同じようなやり取りが行われています。',
-        en: "Great job! That's the basic flow of a real CW amateur radio contact — calling CQ, exchanging signal reports, names and locations, then signing off. Right now, somewhere in the world, real hams are having this exact kind of conversation."
-    },
-    famousResultBody: (n) => ({
-        ja: `${n}個の有名な符号をすべて打ち終えました。モールス符号には、100年以上前からの歴史と物語が詰まっています。`,
-        en: `You keyed all ${n} famous Morse code messages. Morse code carries over a century of history and stories behind every dot and dash.`
-    }),
-    nextBtn:      { ja: '▶ 次へ', en: '▶ Next' },
-    seeResultBtn: { ja: '🏁 結果を見る', en: '🏁 See Result' },
+    accuracyResetLabel: (n) => ({ ja: `↺ やり直し ${n}回`, en: `↺ Restarted ${n} time${n === 1 ? '' : 's'}` }),
+    oneShotEliminatedHeadline: { ja: '🔥 ELIMINATED（ミスで即終了）', en: '🔥 ELIMINATED (one mistake)' },
 };
 function t(key, ...args) {
     const entry = I18N[key];
@@ -347,12 +331,6 @@ function updateTxModeDesc() {
     const startHintLabel = document.getElementById('start-hint-label');
     if (startHintLabel) startHintLabel.textContent = isMorseBoard ? t('startHintMorseBoard') : t('startHintKey');
 
-    // CQシミュレーター/有名モールス符号モードは専用の説明文を表示する
-    if (asobiSubMode === 'CQ' || asobiSubMode === 'FAMOUS') {
-        document.getElementById('mode-description').innerHTML = t('modeDesc_' + asobiSubMode);
-        updateKeyAssignDisplay();
-        return;
-    }
     let desc;
     if (isMorseBoard) {
         desc = t('modeDescMorseBoard');
@@ -360,58 +338,50 @@ function updateTxModeDesc() {
         const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
         desc = isTouchDevice ? t('modeDescTouch') : t('modeDescDesktop', getKeyLabel(dotKey), getKeyLabel(dashKey));
     }
-    if (asobiSubMode === 'HARDCORE') desc = t('hardcorePrefix') + desc;
+    if (gameVariant === 'ACCURACY') desc = t('variantPrefix_ACCURACY') + desc;
+    else if (gameVariant === 'ONESHOT') desc = t('variantPrefix_ONESHOT') + desc;
     document.getElementById('mode-description').innerHTML = desc;
     updateKeyAssignDisplay();
 }
 
-// ── モード選択画面 ──────────────────────────────────────────────────────────────
-function applySubModeSettingsVisibility() {
-    const isExperience = (asobiSubMode === 'CQ' || asobiSubMode === 'FAMOUS');
-    const isHardcore = (asobiSubMode === 'HARDCORE');
-    const timeItem = document.getElementById('time-setting-item');
-    if (timeItem) timeItem.classList.toggle('hidden', isExperience);
-    const settingsGrid = document.querySelector('#mode-settings .settings-grid');
-    if (settingsGrid) settingsGrid.classList.toggle('no-time', isExperience);
-    const freeLink = document.getElementById('free-mode-link');
-    if (freeLink) freeLink.classList.toggle('hidden', isExperience || isHardcore);
+// ── 単語種別・プレイスタイル選択（ロビー画面） ───────────────────────────────────
+function applySelectorVisibility() {
+    const isOneShot = (gameVariant === 'ONESHOT');
     const beginnerCheck = document.getElementById('beginner-mode-check');
     const beginnerItem = beginnerCheck ? beginnerCheck.closest('.setting-item') : null;
-    if (beginnerItem) beginnerItem.classList.toggle('hidden', isHardcore);
-    if (isHardcore && beginnerCheck) beginnerCheck.checked = false;
-    // スコアのあるサブモード（単語早打ち・ガチモード）のみ、専用ランキングへのリンクを出す
-    const rankLink = document.getElementById('asobi-ranking-link');
+    if (beginnerItem) beginnerItem.classList.toggle('hidden', isOneShot);
+    if (isOneShot && beginnerCheck) beginnerCheck.checked = false;
+    // 全サブモードにスコアがあるので、ランキングリンクは常に表示し、リンク先だけ切り替える
     const rankLinkA = document.getElementById('asobi-ranking-link-a');
-    if (rankLink) rankLink.classList.toggle('hidden', isExperience);
-    if (rankLinkA && !isExperience) rankLinkA.href = asobiRankingBase();
+    if (rankLinkA) rankLinkA.href = asobiRankingBase();
 }
-function selectAsobiMode(mode) {
-    asobiSubMode = mode;
-    document.getElementById('mode-select-screen').classList.add('hidden');
-    document.getElementById('start-screen').classList.remove('hidden');
-    applySubModeSettingsVisibility();
+function selectWordCategory(cat) {
+    wordCategory = cat;
+    document.getElementById('wc-general').classList.toggle('active', cat === 'GENERAL');
+    document.getElementById('wc-callsign').classList.toggle('active', cat === 'CALLSIGN');
+    applySelectorVisibility();
     updateTxModeDesc();
 }
-function backToModeSelect() {
-    document.getElementById('start-screen').classList.add('hidden');
-    document.getElementById('mode-select-screen').classList.remove('hidden');
-}
-function backToModeSelectFromResult() {
-    document.getElementById('result-screen').classList.add('hidden');
-    document.getElementById('mode-select-screen').classList.remove('hidden');
+function selectGameVariant(variant) {
+    gameVariant = variant;
+    document.getElementById('var-normal').classList.toggle('active', variant === 'NORMAL');
+    document.getElementById('var-accuracy').classList.toggle('active', variant === 'ACCURACY');
+    document.getElementById('var-oneshot').classList.toggle('active', variant === 'ONESHOT');
+    applySelectorVisibility();
+    updateTxModeDesc();
 }
 
-// ── ガチモード: 連続ミス表示 ──────────────────────────────────────────────────────
-function updateHardcoreStreakUI() {
-    const el = document.getElementById('hardcore-streak');
+// ── プレイ中のモード別ステータス表示（正確重視: やり直し回数） ───────────────────────
+function updateVariantStatusUI() {
+    const el = document.getElementById('variant-status');
     if (!el) return;
-    if (asobiSubMode !== 'HARDCORE' || hardcoreMissStreak <= 0) {
+    if (gameVariant !== 'ACCURACY' || accuracyResetCount <= 0) {
         el.classList.add('hidden');
         el.textContent = '';
         return;
     }
     el.classList.remove('hidden');
-    el.textContent = t('missStreakWarn', hardcoreMissStreak);
+    el.textContent = t('accuracyResetLabel', accuracyResetCount);
 }
 
 // キーラベルを、実物のキー形状に近いアイコンで描画する（Space＝横長の長方形、それ以外＝正方形）
@@ -496,69 +466,45 @@ function pickWord() {
     return w;
 }
 
-// ── お遊びモード: サブモード選択 (2026-10) ───────────────────────────────────────
-// WORDRACE = 単語早打ち(既存) / CQ = CQ交信シミュレーター / FAMOUS = 有名モールス符号 / HARDCORE = ガチモード
-let asobiSubMode = 'WORDRACE';
-let contentPaused = false; // CQ/有名符号モードの「次へ」待ち中は打鍵を無視する
+// ── コールサイン+コンテストナンバー（送信モードの生成ロジックを移植）────────────────
+// tx.js の generateCallsign()/generateRST() と同一ロジック。コールサイン→ナンバー→コールサイン…と交互に出題する。
+function generateCallsign() {
+    const rAZ = () => String.fromCharCode(65 + Math.floor(Math.random() * 26));
+    const r09 = () => Math.floor(Math.random() * 10).toString();
+    const rRange = (a, z) => String.fromCharCode(a.charCodeAt(0) + Math.floor(Math.random() * (z.charCodeAt(0) - a.charCodeAt(0) + 1)));
+    const r = Math.random();
+    const pfx = r < 0.90 ? 'J' : (r < 0.97 ? '7' : '8');
+    let second;
+    if (pfx === 'J') second = rRange('A', 'S');
+    else if (pfx === '7') second = rRange('J', 'N');
+    else second = (Math.random() < 0.5 ? 'J' : 'N');
+    const call = pfx + second + r09() + rAZ() + rAZ() + rAZ();
+    if (Math.random() < 0.3) return call + '/' + r09();
+    return call;
+}
+function generateRST() {
+    const areas = ['101','102','103','104','105','106','107','108','109','110','111','112','113','114'];
+    for (let i = 2; i <= 48; i++) areas.push(i.toString().padStart(2,'0'));
+    return '5NN' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
+}
+let nextAsobiCallType = 'CALLSIGN';
+function pickCallsignWord() {
+    const isCallsign = (nextAsobiCallType === 'CALLSIGN');
+    nextAsobiCallType = isCallsign ? 'RST' : 'CALLSIGN';
+    return isCallsign ? generateCallsign() : generateRST();
+}
+// 現在選択中の単語種別に応じて出題を切り替えるディスパッチャ
+function pickCurrentWord() {
+    return (wordCategory === 'CALLSIGN') ? pickCallsignWord() : pickWord();
+}
 
-// ── 有名モールス符号モード: お題リスト ───────────────────────────────────────────
-// 各エントリの words は複数単語になる場合あり(スペースを含む1打鍵対象として扱えないため単語ごとに分割)
-const FAMOUS_CODES = [
-    { words: ['SOS'],
-      title:  { ja: '世界共通の遭難信号', en: 'The universal distress signal' },
-      trivia: { ja: '「Save Our Souls」の略だと思われがちですが、実は違います。「・・・－－－・・・」と区切りなく打てる、分かりやすいパターンだから選ばれました。1906年のベルリン国際無線電信条約で、世界共通の遭難信号として採用されています。',
-                en: 'Often assumed to stand for "Save Our Souls" — but that’s a myth. SOS was chosen simply because ···−−−··· is a short, unmistakable pattern with no gaps. It became the international distress signal at the 1906 Berlin Radiotelegraph Convention.' } },
-    { words: ['CQD'],
-      title:  { ja: 'タイタニック号が最初に打った遭難信号', en: 'The first distress call sent by the Titanic' },
-      trivia: { ja: '1912年のタイタニック号沈没事故で、通信士はまず当時主流だったマルコーニ社の遭難符号「CQD」を送信し、その直後に新しい「SOS」も送りました。この事故をきっかけにSOSの名が世界中に知れ渡りました。',
-                en: 'As the Titanic sank in 1912, its operators first sent CQD, the older Marconi distress call, then soon after sent the newer SOS too. The disaster helped SOS become known worldwide.' } },
-    { words: ['CQ'],
-      title:  { ja: '「どなたでも応答ください」の呼び出し符号', en: 'The "calling anyone" signal' },
-      trivia: { ja: '無線家が交信相手を探すときに打つ符号。「CQ CQ CQ」と打って、聞いている誰かに応答してもらいます。いわば無線の世界の「こんにちはー、どなたかいますか？」です。',
-                en: 'Hams key this when they’re looking for anyone to talk to. Sending "CQ CQ CQ" is like calling out "hello, is anyone out there?" into the airwaves.' } },
-    { words: ['73'],
-      title:  { ja: '無線家どうしの「よろしく」のあいさつ', en: 'The ham radio sign-off for "best regards"' },
-      trivia: { ja: '交信の最後に送る、いわば「お疲れ様でした」の符号。今も世界中のアマチュア無線家がCWはもちろん、普段の会話やメールでも使う、無線文化の定番フレーズです。',
-                en: '"73" means "best regards" and is sent at the end of almost every ham radio contact. It’s still used worldwide today, even outside of CW, as a classic piece of ham radio culture.' } },
-    { words: ['WHAT','HATH','GOD','WROUGHT'],
-      title:  { ja: 'モールス符号の生みの親が打った、世界初の電信メッセージ', en: "The first message ever sent by Morse code's inventor" },
-      trivia: { ja: '1844年5月24日、サミュエル・モールス自身がボルチモア〜ワシントン間の電信線でこの一文を送りました。聖書の一節（民数記23:23）から選ばれたと言われています。',
-                en: 'On May 24, 1844, Samuel Morse himself sent this line over the new Baltimore–Washington telegraph line. The phrase is said to come from the Bible (Numbers 23:23).' } },
-];
-
-// ── CQシミュレーターモード: 初交信の流れ ─────────────────────────────────────────
-// speaker: 'player' = プレイヤーが打鍵する / 'other' = 相手局からの応答(打鍵不要、ボタンで進む)
-const CQ_SCRIPT = [
-    { speaker: 'player', words: ['CQ','CQ','CQ','DE','JA1ABC','K'],
-      narration: { ja: 'これから「はじめての交信」を疑似体験してみましょう。あなたの体験用コールサイン(識別符号)は「JA1ABC」。まずは「CQ」を3回と自分のコールサインを打って、相手を呼び出します。「DE」は『こちらは』、「K」は『どうぞ、応答してください』という意味です。',
-                 en: 'Let’s simulate your first-ever radio contact (QSO). Your training callsign is "JA1ABC". First, key "CQ" three times followed by your callsign, to call out for anyone listening. "DE" means "this is," and "K" means "go ahead."' } },
-    { speaker: 'other', line: 'JA1ABC DE JA2XYZ K',
-      narration: { ja: '📡 応答がありました！', en: '📡 Someone answered!' },
-      caption: { ja: '「JA2XYZ」さんが、あなたの呼び出しに応答してくれました。', en: 'A station with the callsign "JA2XYZ" answered your call.' } },
-    { speaker: 'player', words: ['UR','RST','599','K'],
-      narration: { ja: '応答してくれたJA2XYZさんに、信号の強さを伝えましょう。「UR」は『あなたの』、「RST」は信号レポート、「599」は『バッチリ聞こえています』という最高評価です。',
-                 en: 'Let’s tell JA2XYZ how well you can hear them. "UR" means "your," "RST" is the signal report, and "599" is the best possible score — "loud and clear."' } },
-    { speaker: 'other', line: 'RST 599 TU',
-      narration: { ja: '📡 相手からも信号レポートが届きました', en: '📡 They sent their signal report back' },
-      caption: { ja: 'あなたの信号も「599」、バッチリ届いているそうです。「TU」は『ありがとう』。', en: 'Your signal is also a perfect "599." "TU" means "thank you."' } },
-    { speaker: 'player', words: ['NAME','TARO','QTH','TOKYO','K'],
-      narration: { ja: '今度はお名前と場所(QTH)を伝えましょう。ここでは練習用に「TARO」「TOKYO」を打ってみます。実際の交信では、ここに自分の名前や都道府県を入れます。',
-                 en: 'Now let’s share a name and location (QTH). For this practice, key "TARO" and "TOKYO" — in a real QSO, you’d use your own name and location here.' } },
-    { speaker: 'other', line: 'NAME JIRO QTH OSAKA',
-      narration: { ja: '📡 相手の情報も届きました', en: '📡 Their info came through too' },
-      caption: { ja: '「JIRO」さん、「OSAKA」からの交信でした。', en: 'Their name is "JIRO," calling from "OSAKA."' } },
-    { speaker: 'player', words: ['TNX','FER','QSO','73','SK'],
-      narration: { ja: '最後に、交信してくれたお礼を伝えましょう。「TNX FER QSO」は『交信ありがとう』、「73」は『よろしく』、「SK」は『交信終了』を意味します。',
-                 en: 'Finally, let’s say thanks for the contact. "TNX FER QSO" means "thanks for the QSO," "73" means "best regards," and "SK" means "end of contact."' } },
-    { speaker: 'other', line: '73 TU SK', final: true,
-      narration: { ja: '📡 相手からも挨拶が返ってきました', en: '📡 They signed off too' },
-      caption: { ja: '交信成立です！お疲れ様でした 🎉', en: 'QSO complete! Great job. 🎉' } },
-];
-let cqStepIndex = 0, cqWordIndex = 0;
-let famousIndex = 0, famousWordIndex = 0;
-let hardcoreMissStreak = 0;
-const HARDCORE_MISS_LIMIT = 3;
-let hardcoreEliminated = false;
+// ── お遊びモード: 単語種別 × プレイスタイル (2026-10 第2弾) ─────────────────────
+// wordCategory: 'GENERAL'(一般単語) | 'CALLSIGN'(コールサイン+コンテストナンバー)
+// gameVariant : 'NORMAL'(普通) | 'ACCURACY'(正確重視・ミスで単語の最初からやり直し) | 'ONESHOT'(一発勝負・ミスで即終了)
+let wordCategory = 'GENERAL';
+let gameVariant = 'NORMAL';
+let accuracyResetCount = 0; // 正確重視モードでの「やり直し」回数
+let oneShotEliminated = false; // 一発勝負モードで脱落したか
 
 // ── 単語ごとの制限時間（Sメーター風シグナルバーが尽きるとアウト） ──────────────────────
 // 現在のWPMで単語を打つのに理想的にかかる時間(秒)を見積もる
@@ -578,8 +524,8 @@ function estimateWordMorseSeconds(word) {
 // 単語の制限時間(ミリ秒)。理想時間の3.5倍(初心者は4.5倍)＋余裕を持たせる
 function getWordTimeLimitMs(word) {
     const idealSec = estimateWordMorseSeconds(word);
-    // ガチモードは通常より切り詰めた猶予にして「QSBで落ちる」緊張感を出す
-    const multiplier = (asobiSubMode === 'HARDCORE') ? 2.4 : (beginnerMode ? 4.5 : 3.5);
+    // 一発勝負モードは通常より切り詰めた猶予にして「QSBで落ちる」緊張感を出す
+    const multiplier = (gameVariant === 'ONESHOT') ? 2.4 : (beginnerMode ? 4.5 : 3.5);
     return Math.max(3500, idealSec * 1000 * multiplier + 800);
 }
 function clearWordTimer() {
@@ -610,14 +556,10 @@ function handleWordTimeout() {
         setTimeout(() => txArea.classList.remove('flash-error'), 400);
     }
     document.getElementById('status-msg').innerText = t('qsbLost', txWord.join(''));
-    if (asobiSubMode === 'HARDCORE') {
-        hardcoreMissStreak++;
-        updateHardcoreStreakUI();
-        if (hardcoreMissStreak >= HARDCORE_MISS_LIMIT) {
-            hardcoreEliminated = true;
-            setTimeout(() => endGame(), 350);
-            return;
-        }
+    if (gameVariant === 'ONESHOT') {
+        oneShotEliminated = true;
+        setTimeout(() => endGame(), 350);
+        return;
     }
     nextTxWord();
 }
@@ -685,18 +627,13 @@ function unlockAndPrepare() {
 
 function startGame() {
     document.getElementById('game-start-overlay').classList.add('hidden');
-    const isExperience = (asobiSubMode === 'CQ' || asobiSubMode === 'FAMOUS');
-    initialSeconds = isExperience ? 0 : parseInt(document.getElementById('time-select').value);
+    initialSeconds = parseInt(document.getElementById('time-select').value);
     timeLeft = initialSeconds;
     score = 0; isPlaying = true;
     wordsCompleted = 0; wordsMissed = 0;
     document.getElementById('score').innerText = 0;
     masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
-    if (isExperience) {
-        document.getElementById('timer').innerText = '∞';
-    } else {
-        timerId = setInterval(tick, 1000);
-    }
+    timerId = setInterval(tick, 1000);
     startTxGame();
 }
 
@@ -720,9 +657,9 @@ function startTxGame() {
     txCharIndex = 0; txMorseInput = ''; txCharTimer = null;
     dotHeld = false; dashHeld = false; dotLatched = false; dashLatched = false; lastSentSym = null; keyerPending = false;
     asobiMistakeCounts = {};
-    contentPaused = false;
-    hardcoreMissStreak = 0; hardcoreEliminated = false;
-    updateHardcoreStreakUI();
+    accuracyResetCount = 0; oneShotEliminated = false;
+    nextAsobiCallType = 'CALLSIGN';
+    updateVariantStatusUI();
     // 前回プレイの短点・長点表示をクリア
     const _txMorseBox = document.getElementById('tx-morse-input');
     const _txMorseRender = document.getElementById('tx-input-render');
@@ -735,135 +672,14 @@ function startTxGame() {
     document.addEventListener('keydown', onTxKeyDown);
     document.addEventListener('keyup',   onTxKeyUp);
 
-    const isExperience = (asobiSubMode === 'CQ' || asobiSubMode === 'FAMOUS');
-    const narrationEl = document.getElementById('content-narration');
-    if (narrationEl) narrationEl.classList.toggle('hidden', !isExperience);
-    const timerTrack = document.getElementById('word-timer-track');
-    if (timerTrack) timerTrack.classList.toggle('hidden', isExperience);
     const gameContainer = document.getElementById('game-container');
-    if (gameContainer) gameContainer.classList.toggle('hardcore-active', asobiSubMode === 'HARDCORE');
+    if (gameContainer) gameContainer.classList.toggle('oneshot-active', gameVariant === 'ONESHOT');
 
-    if (asobiSubMode === 'CQ') {
-        cqStepIndex = 0;
-        startCqStep();
-    } else if (asobiSubMode === 'FAMOUS') {
-        famousIndex = 0;
-        startFamousStep();
-    } else {
-        nextTxWord();
-    }
-}
-
-// ── CQシミュレーター: ステップ進行 ───────────────────────────────────────────────
-function setContentNarration(obj) {
-    const el = document.getElementById('content-narration-text');
-    if (el) el.innerHTML = obj[LANG];
-}
-function updateContentProgress() {
-    const el = document.getElementById('content-progress');
-    if (!el) return;
-    if (asobiSubMode === 'CQ') {
-        el.textContent = `STEP ${Math.min(cqStepIndex + 1, CQ_SCRIPT.length)} / ${CQ_SCRIPT.length}`;
-    } else if (asobiSubMode === 'FAMOUS') {
-        el.textContent = `${Math.min(famousIndex + 1, FAMOUS_CODES.length)} / ${FAMOUS_CODES.length}`;
-    }
-}
-function startCqStep() {
-    const step = CQ_SCRIPT[cqStepIndex];
-    if (!step) { endGame(); return; }
-    updateContentProgress();
-    if (step.speaker === 'other') {
-        renderCqOtherStep(step);
-        return;
-    }
-    cqWordIndex = 0;
-    contentPaused = false;
-    setContentNarration(step.narration);
-    document.getElementById('tx-area').classList.remove('hidden');
-    document.getElementById('cq-other-box').classList.add('hidden');
-    loadCqWord(step);
-}
-function loadCqWord(step) {
-    const raw = step.words[cqWordIndex];
-    txWord = raw.split('');
-    txCharIndex = 0; txMorseInput = '';
-    txWordHasMistake = false;
-    renderTxInput();
-    updateTxDisplay();
-    if (beginnerMode) updateTxBeginnerDisplay();
-    document.getElementById('status-msg').innerText = morseBoardMode ? 'MORSE BOARD READY...' : 'TRANSMIT...';
-}
-function onCqWordComplete() {
-    const step = CQ_SCRIPT[cqStepIndex];
-    cqWordIndex++;
-    if (cqWordIndex < step.words.length) {
-        loadCqWord(step);
-    } else {
-        cqStepIndex++;
-        startCqStep();
-    }
-}
-function renderCqOtherStep(step) {
-    contentPaused = true;
-    document.getElementById('tx-area').classList.add('hidden');
-    setContentNarration(step.narration);
-    document.getElementById('cq-other-line').textContent = step.line;
-    document.getElementById('cq-other-caption').textContent = step.caption[LANG];
-    document.getElementById('cq-continue-btn').textContent = step.final ? t('seeResultBtn') : t('nextBtn');
-    document.getElementById('cq-other-box').classList.remove('hidden');
-}
-function cqContinue() {
-    cqStepIndex++;
-    startCqStep();
-}
-
-// ── 有名モールス符号モード: 進行 ─────────────────────────────────────────────────
-function startFamousStep() {
-    const entry = FAMOUS_CODES[famousIndex];
-    if (!entry) { endGame(); return; }
-    updateContentProgress();
-    famousWordIndex = 0;
-    contentPaused = false;
-    setContentNarration(entry.title);
-    document.getElementById('tx-area').classList.remove('hidden');
-    document.getElementById('famous-trivia-box').classList.add('hidden');
-    loadFamousWord(entry);
-}
-function loadFamousWord(entry) {
-    const raw = entry.words[famousWordIndex];
-    txWord = raw.split('');
-    txCharIndex = 0; txMorseInput = '';
-    txWordHasMistake = false;
-    renderTxInput();
-    updateTxDisplay();
-    if (beginnerMode) updateTxBeginnerDisplay();
-    document.getElementById('status-msg').innerText = morseBoardMode ? 'MORSE BOARD READY...' : 'TRANSMIT...';
-}
-function onFamousWordComplete() {
-    const entry = FAMOUS_CODES[famousIndex];
-    famousWordIndex++;
-    if (famousWordIndex < entry.words.length) {
-        loadFamousWord(entry);
-    } else {
-        showFamousTrivia(entry);
-    }
-}
-function showFamousTrivia(entry) {
-    contentPaused = true;
-    document.getElementById('tx-area').classList.add('hidden');
-    document.getElementById('famous-trivia-title').innerHTML = entry.title[LANG];
-    document.getElementById('famous-trivia-text').innerHTML = entry.trivia[LANG];
-    const isLast = (famousIndex >= FAMOUS_CODES.length - 1);
-    document.getElementById('famous-continue-btn').textContent = isLast ? t('seeResultBtn') : t('nextBtn');
-    document.getElementById('famous-trivia-box').classList.remove('hidden');
-}
-function famousContinue() {
-    famousIndex++;
-    startFamousStep();
+    nextTxWord();
 }
 
 function nextTxWord() {
-    const raw = pickWord();
+    const raw = pickCurrentWord();
     txWord = raw.split('');
     txCharIndex = 0; txMorseInput = '';
     txWordHasMistake = false;
@@ -938,7 +754,7 @@ function renderTxInput() {
 // ── Iambic keyer ───────────────────────────────────────────────────────────────
 function keyerStep() {
     keyerPending = false;
-    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE') || contentPaused) return;
+    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
     // 物理的に押されているか(Held)、まだ消費されていないタップがあるか(Latched)のどちらかで判定する
     const dotActive = dotHeld || dotLatched;
     const dashActive = dashHeld || dashLatched;
@@ -975,7 +791,7 @@ function startKeyerLoop() {
 }
 
 function tapSymbol(isDash) {
-    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE') || contentPaused) return;
+    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
     const sym = isDash ? '-' : '.';
     playSidetone(isDash);
@@ -989,7 +805,7 @@ function tapSymbol(isDash) {
 
 // タッチパドル(長押し対応): touchstart で押下→キーヤーループ開始、touchend/cancel で解放
 function paddleDown(isDash) {
-    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE') || contentPaused) return;
+    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
     if (isDash) {
         if (!dashHeld) { dashHeld = true; dashLatched = true; startKeyerLoop(); }
     } else {
@@ -1002,7 +818,7 @@ function paddleUp(isDash) {
 }
 
 function onTxKeyDown(e) {
-    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE') || contentPaused) return;
+    if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
     if (gameMode === 'TX' && morseBoardMode) {
         handleMorseBoardKey(e);
         return;
@@ -1074,10 +890,6 @@ function evaluateTxChar(decoded) {
     const txArea   = document.getElementById('tx-area');
     const isCorrect = (decoded === expected);
     if (isCorrect) {
-        if (asobiSubMode === 'HARDCORE' && hardcoreMissStreak > 0) {
-            hardcoreMissStreak = 0;
-            updateHardcoreStreakUI();
-        }
         txCharIndex++;
         score++;
         document.getElementById('score').innerText = score;
@@ -1087,8 +899,6 @@ function evaluateTxChar(decoded) {
         document.getElementById('status-msg').innerText = `✓ ${expected}`;
         if (txCharIndex >= txWord.length) {
             wordsCompleted++;
-            if (asobiSubMode === 'CQ') { onCqWordComplete(); return; }
-            if (asobiSubMode === 'FAMOUS') { onFamousWordComplete(); return; }
             // その単語をノーミス（誤入力ゼロ）で打ち切れた場合、全体の制限時間を1秒延長する
             if (!txWordHasMistake) {
                 timeLeft++;
@@ -1107,15 +917,23 @@ function evaluateTxChar(decoded) {
         txArea.classList.remove('flash-correct');
         txArea.classList.add('flash-error');
         setTimeout(() => txArea.classList.remove('flash-error'), 400);
-        document.getElementById('status-msg').innerText = `✗ RETRY: ${expected}`;
-        if (asobiSubMode === 'HARDCORE') {
-            hardcoreMissStreak++;
-            updateHardcoreStreakUI();
-            if (hardcoreMissStreak >= HARDCORE_MISS_LIMIT) {
-                hardcoreEliminated = true;
-                setTimeout(() => endGame(), 350);
-            }
+        if (gameVariant === 'ONESHOT') {
+            document.getElementById('status-msg').innerText = `✗ MISS: ${expected}`;
+            oneShotEliminated = true;
+            setTimeout(() => endGame(), 350);
+            return;
         }
+        if (gameVariant === 'ACCURACY') {
+            // 正確重視: ミスしたらその単語の最初からやり直し
+            accuracyResetCount++;
+            updateVariantStatusUI();
+            txCharIndex = 0;
+            updateTxDisplay();
+            if (beginnerMode) updateTxBeginnerDisplay();
+            document.getElementById('status-msg').innerText = `✗ RESTART: ${txWord.join('')}`;
+            return;
+        }
+        document.getElementById('status-msg').innerText = `✗ RETRY: ${expected}`;
     }
 }
 
@@ -1143,20 +961,13 @@ function cleanupTx() {
     dotHeld = false; dashHeld = false; dotLatched = false; dashLatched = false; keyerPending = false;
     if (txCharTimer) { clearTimeout(txCharTimer); txCharTimer = null; }
     clearWordTimer();
-    contentPaused = false;
     const pa = document.getElementById('tx-paddle-area');
     if (pa) pa.classList.add('hidden');
     beginnerDisplay.classList.remove('tx-beginner');
     const txArea = document.getElementById('tx-area');
     if (txArea) txArea.classList.remove('hidden');
-    const cqBox = document.getElementById('cq-other-box');
-    if (cqBox) cqBox.classList.add('hidden');
-    const famBox = document.getElementById('famous-trivia-box');
-    if (famBox) famBox.classList.add('hidden');
-    const narration = document.getElementById('content-narration');
-    if (narration) narration.classList.add('hidden');
     const gameContainer = document.getElementById('game-container');
-    if (gameContainer) gameContainer.classList.remove('hardcore-active');
+    if (gameContainer) gameContainer.classList.remove('oneshot-active');
 }
 
 // ── Free Input Mode ────────────────────────────────────────────────────────────
@@ -1467,8 +1278,8 @@ function quitGame() {
     cleanupTx();
     score = 0;
     gameMode = 'TX';
-    hardcoreMissStreak = 0;
-    updateHardcoreStreakUI();
+    accuracyResetCount = 0;
+    updateVariantStatusUI();
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('start-screen').classList.remove('hidden');
     updateTxModeDesc();
@@ -1489,26 +1300,8 @@ function endGame() {
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
 
-    const isExperience = (asobiSubMode === 'CQ' || asobiSubMode === 'FAMOUS');
-    const scoreBlock = document.getElementById('score-result-block');
-    const expBlock = document.getElementById('experience-result');
-    if (scoreBlock) scoreBlock.classList.toggle('hidden', isExperience);
-    if (expBlock) expBlock.classList.toggle('hidden', !isExperience);
     const headlineEl = document.getElementById('result-headline');
-
-    if (isExperience) {
-        if (headlineEl) headlineEl.textContent = (asobiSubMode === 'CQ') ? t('cqResultHeadline') : t('famousResultHeadline');
-        if (expBlock) {
-            expBlock.innerHTML = (asobiSubMode === 'CQ')
-                ? `<p style="color:var(--success); font-size:1rem; line-height:1.9; margin:16px 0;">${t('cqResultBody')}</p>`
-                : `<p style="color:var(--success); font-size:1rem; line-height:1.9; margin:16px 0;">${t('famousResultBody', FAMOUS_CODES.length)}</p>`;
-        }
-        const resultKeyHint = document.getElementById('result-key-hint');
-        if (resultKeyHint) resultKeyHint.textContent = morseBoardMode ? t('resultHintMorseBoard') : t('resultHintEsc');
-        return;
-    }
-
-    if (headlineEl) headlineEl.textContent = (asobiSubMode === 'HARDCORE' && hardcoreEliminated) ? t('hardcoreEliminatedHeadline') : 'MISSION END';
+    if (headlineEl) headlineEl.textContent = (gameVariant === 'ONESHOT' && oneShotEliminated) ? t('oneShotEliminatedHeadline') : 'MISSION END';
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
         `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min` + t('resultSuffix', wordsCompleted);
@@ -1542,17 +1335,23 @@ function shareX() {
 }
 
 // ── Score registration ─────────────────────────────────────────────────────────
-// お遊びモードのサブモードごとに、得点を登録するバックエンドの mode 値と
-// 遷移先のランキングページを切り替える。単語早打ち(WORDRACE)は既存の
-// 'ASOBI' をそのまま使い、ガチモード(HARDCORE)は新設の 'ASOBI_HARD' を使う。
+// 単語種別(wordCategory) × プレイスタイル(gameVariant) の組み合わせ(計6通り)ごとに、
+// 得点を登録するバックエンドの mode 値を切り替える。一般単語+普通モードは従来からの
+// 'ASOBI' をそのまま使い(過去スコアとの継続性を維持)、他の5通りは新設の mode 値を使う。
+const ASOBI_MODE_TABLE = {
+    'GENERAL_NORMAL':   'ASOBI',
+    'GENERAL_ACCURACY': 'ASOBI_GEN_ACC',
+    'GENERAL_ONESHOT':  'ASOBI_GEN_ONE',
+    'CALLSIGN_NORMAL':  'ASOBI_CALL_NORM',
+    'CALLSIGN_ACCURACY':'ASOBI_CALL_ACC',
+    'CALLSIGN_ONESHOT': 'ASOBI_CALL_ONE',
+};
 function asobiBackendMode() {
-    return (asobiSubMode === 'HARDCORE') ? 'ASOBI_HARD' : 'ASOBI';
+    return ASOBI_MODE_TABLE[`${wordCategory}_${gameVariant}`] || 'ASOBI';
 }
 function asobiRankingBase() {
-    if (asobiSubMode === 'HARDCORE') {
-        return (LANG === 'en') ? '/ranking-hardcore-en.html' : '/ranking-hardcore.html';
-    }
-    return (LANG === 'en') ? '/ranking-asobi-en.html' : '/ranking-asobi.html';
+    const base = (LANG === 'en') ? '/ranking-asobi-en.html' : '/ranking-asobi.html';
+    return `${base}?wordcat=${wordCategory}&variant=${gameVariant}`;
 }
 
 let _registeredId = null;
@@ -1592,7 +1391,7 @@ async function autoRegister(retryCount = 0) {
         const rankData = await rankRes.json();
         if (rankData.percentile !== undefined) pct = rankData.percentile;
     } catch (e) {}
-    const rankHref = asobiRankingBase() + `?time=${minutes}`;
+    const rankHref = asobiRankingBase() + `&time=${minutes}`;
     regResult.innerHTML =
         `<span style="color:var(--success);">${t('regDone')}</span>　${t('topPct', pct)}　` +
         `<a href="${rankHref}" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:4px 14px; font-size:0.75rem; letter-spacing:1px; border-radius:2px;">${t('rankingLink')}</a>`;
@@ -1621,6 +1420,7 @@ async function setNickname() {
 }
 
 // ── Initialize mode description on page load ───────────────────────────────────
+applySelectorVisibility();
 updateTxModeDesc();
 updateWpmReadout('wpm-select', 'wpm-readout-val', 'wpm-readout-band');
 updateWpmReadout('free-wpm-select', 'free-wpm-readout-val', 'free-wpm-readout-band');

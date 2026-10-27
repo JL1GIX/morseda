@@ -177,54 +177,6 @@
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://jl1gix.com/ranking-hardcore.html</loc>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://jl1gix.com/ranking-hardcore.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://jl1gix.com/ranking-hardcore-en.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://jl1gix.com/ranking-hardcore.html"/>
-    <changefreq>daily</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://jl1gix.com/ranking-hardcore-en.html</loc>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://jl1gix.com/ranking-hardcore.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://jl1gix.com/ranking-hardcore-en.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://jl1gix.com/ranking-hardcore.html"/>
-    <changefreq>daily</changefreq>
-    <priority>0.45</priority>
-  </url>
-  <url>
-    <loc>https://jl1gix.com/ranking-hardcore-today.html</loc>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://jl1gix.com/ranking-hardcore-today.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://jl1gix.com/ranking-hardcore-today-en.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://jl1gix.com/ranking-hardcore-today.html"/>
-    <changefreq>daily</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://jl1gix.com/ranking-hardcore-today-en.html</loc>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://jl1gix.com/ranking-hardcore-today.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://jl1gix.com/ranking-hardcore-today-en.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://jl1gix.com/ranking-hardcore-today.html"/>
-    <changefreq>daily</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://jl1gix.com/ranking-hardcore-yesterday.html</loc>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://jl1gix.com/ranking-hardcore-yesterday.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://jl1gix.com/ranking-hardcore-yesterday-en.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://jl1gix.com/ranking-hardcore-yesterday.html"/>
-    <changefreq>daily</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://jl1gix.com/ranking-hardcore-yesterday-en.html</loc>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://jl1gix.com/ranking-hardcore-yesterday.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://jl1gix.com/ranking-hardcore-yesterday-en.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://jl1gix.com/ranking-hardcore-yesterday.html"/>
-    <changefreq>daily</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
     <loc>https://jl1gix.com/morse-table.html</loc>
     <xhtml:link rel="alternate" hreflang="ja" href="https://jl1gix.com/morse-table.html"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://jl1gix.com/morse-table-en.html"/>
