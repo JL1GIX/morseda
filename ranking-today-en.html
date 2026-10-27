@@ -132,9 +132,15 @@
             display: inline-block;
             font-size: 1.05rem;
             font-weight: bold;
-            color: #ffd700;
+            color: var(--success);
             letter-spacing: 1px;
-            text-shadow: 0 0 10px rgba(255,215,0,0.55);
+            text-shadow: 0 0 8px rgba(0,238,119,0.45);
+            padding: 2px 12px;
+            margin: 0 2px;
+            border: 1px solid rgba(0,238,119,0.4);
+            border-radius: 5px;
+            background: rgba(0,238,119,0.07);
+            vertical-align: middle;
         }
         /* Mode tabs */
         .mode-tabs {
@@ -345,7 +351,7 @@
             /* Mobile: push the title down a bit so it doesn't overlap the 🌐 language toggle in the top right */
             .header-bar { margin-top: 26px; }
             .day-title { font-size: 1.05rem; letter-spacing: 0.5px; }
-            .day-title .day-date { font-size: 0.9rem; }
+            .day-title .day-date { font-size: 0.9rem; padding: 2px 8px; }
         }
     </style>
 </head>
