@@ -229,15 +229,21 @@ git log --oneline -3
 
 ## 10. Cowork の作業環境に関する注記（重要）
 
-2026-09時点、CoworkからこのPC（熊谷さんのWindows機）への**シェル直接アクセス（`device_bash`）が機能しない**状態が続いている（"no Plan9 drive shares mounted" エラー）。そのため6章・6.1章に書かれている `git commit-tree` を使った低レベルコミット手順は**実行不可能**（シェルが使えないため）。
+**2026-10-27 更新**: このPC（熊谷さんのWindows機）への**シェル直接アクセス（`device_bash`）が復旧し、使用可能になった**（2026-09時点に発生していた "no Plan9 drive shares mounted" エラーは解消）。これに伴い、熊谷さんと協議の上でワークフローを以下のように更新した。
 
-現在の実際のワークフローは以下の通り:
+### 10.1 現在のワークフロー（2026-10-27〜）
 
-1. Cowork が `device_stage_files` / `device_commit_files`（ファイル転送のみ、シェルなし）を使ってファイルの読み書きを行う。
-2. Cowork は **一切 commit しない**。ファイルを編集するだけ。
-3. 熊谷さんが GitHub Desktop を開き、**ご自身で commit → push** する。Coworkはコミットメッセージ案を提示するのみ。
+1. Cowork が `device_stage_files`/`device_commit_files`（ファイル転送）または `device_bash`（直接編集）でファイルの読み書きを行う。
+2. **Cowork が commit まで実行する**。ただし通常の `git add`/`git commit` ではなく、**6.1章に記載の low-level 手順（`git commit-tree` 等）を使う**（理由は10.2参照）。
+3. **push は熊谷さんが GitHub Desktop で「Push origin」を押して行う**。Coworkは push を一切行わない。これは技術的制約ではなく**意図的な方針**で、`device_bash` が復旧した現在も変更しない（本番 (jl1gix.com) への反映タイミングを熊谷さんが完全にコントロールできるようにするため）。
 
-この制約が将来的に解消され `device_bash` が使えるようになった場合でも、**push は熊谷さんご自身が行う方針は変わらない**（誤って本番に反映されるのを防ぐため）。6.1章の手順は `device_bash` が復旧した場合の参考として残しているが、現状は使えない。
+この方針は 2026-10-27 に熊谷さんへ直接確認した上で決定したもの（「commitだけClaudeが実行」を選択）。
+
+### 10.2 なぜ `git add`/`git commit` を直接使わないか
+
+`device_bash` の仕様上、**マウント済み接続フォルダ内でのファイル削除はデフォルトで禁止**されており、`rm`/`unlink` は `Operation not permitted` で失敗する。通常の `git commit` は内部で `.git/index.lock` を作成→削除する流れのため、この削除が失敗すると孤立したロックファイルが残留し、以降の `git` コマンドが軒並み `File exists` エラーでブロックされてしまう（6.1章に記載の過去のトラブルと同一の原因）。
+
+`device_request_delete_permission` で都度削除権限をリクエストする方法もあるが、毎回熊谷さんに許可プロンプトが出てしまい「Push ボタン1回で完結」という理想から外れる。そのため**ロックを生成しない6.1章の low-level 手順を今後も使い続ける**方針とした。
 
 ---
 
