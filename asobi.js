@@ -679,6 +679,14 @@ function startTxGame() {
 }
 
 function nextTxWord() {
+    // 次の単語に進む際、前の単語で表示されていた「正確重視」のミス表示（赤点滅）を消す。
+    // ※やり直し回数(accuracyResetCount)自体はリセットしない。表示だけ毎単語クリアし、
+    //   その単語でまたミスした場合に再度表示される。
+    const variantStatusEl = document.getElementById('variant-status');
+    if (variantStatusEl) {
+        variantStatusEl.classList.add('hidden');
+        variantStatusEl.textContent = '';
+    }
     const raw = pickCurrentWord();
     txWord = raw.split('');
     txCharIndex = 0; txMorseInput = '';
