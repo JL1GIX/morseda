@@ -456,6 +456,9 @@ function updateNavLinks() {
     if (alltimeLink) alltimeLink.href = 'ranking-asobi.html' + qs;
     const todayLink = document.getElementById('nav-today-link');
     if (todayLink) todayLink.href = 'ranking-asobi-today.html' + qs;
+    // 現在選択中のタブをURLのクエリ文字列にも反映する。リロード時に下の初期化処理が
+    // このURLを読み直すため、選択中のタブを保ったままリロードできる。
+    history.replaceState(null, '', window.location.pathname + qs);
 }
 
 function jstDateStr(d) {

@@ -434,6 +434,9 @@ function updateNavLinks() {
     if (todayLink) todayLink.href = '/ranking-asobi-today-en.html' + qs;
     const yesterdayLink = document.getElementById('nav-yesterday-link');
     if (yesterdayLink) yesterdayLink.href = '/ranking-asobi-yesterday-en.html' + qs;
+    // Keep the current tab selection reflected in the URL's query string, so a
+    // reload re-reads it in the init block below and restores the same tabs.
+    history.replaceState(null, '', window.location.pathname + qs);
 }
 
 async function loadRanking(mode, minutes, page) {

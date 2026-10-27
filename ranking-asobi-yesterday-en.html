@@ -456,6 +456,9 @@ function updateNavLinks() {
     if (alltimeLink) alltimeLink.href = '/ranking-asobi-en.html' + qs;
     const todayLink = document.getElementById('nav-today-link');
     if (todayLink) todayLink.href = '/ranking-asobi-today-en.html' + qs;
+    // Keep the current tab selection reflected in the URL's query string, so a
+    // reload re-reads it in the init block below and restores the same tabs.
+    history.replaceState(null, '', window.location.pathname + qs);
 }
 
 function jstDateStr(d) {
