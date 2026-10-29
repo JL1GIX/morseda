@@ -127,7 +127,9 @@ function generateRST() {
 function updateRxUrlState() {
     const params = new URLSearchParams(window.location.search);
     const beginnerCheck = document.getElementById('beginner-mode-check');
+    const timeSelect = document.getElementById('time-select');
     params.set('beginner', (beginnerCheck && beginnerCheck.checked) ? '1' : '0');
+    if (timeSelect) params.set('time', timeSelect.value);
     history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
 }
 
@@ -778,6 +780,9 @@ async function setNickname() {
     const params = new URLSearchParams(window.location.search);
     const beginnerCheck = document.getElementById('beginner-mode-check');
     if (beginnerCheck && params.get('beginner') === '1') beginnerCheck.checked = true;
+    const timeSelect = document.getElementById('time-select');
+    const timeParam = params.get('time');
+    if (timeSelect && ['60', '180', '300'].includes(timeParam)) timeSelect.value = timeParam;
 })();
 
 // ── Initialize WPM readout on page load ─────────────────────────────────────────

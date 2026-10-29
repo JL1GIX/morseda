@@ -319,8 +319,10 @@ function updateTxUrlState() {
     const params = new URLSearchParams(window.location.search);
     const beginnerCheck = document.getElementById('beginner-mode-check');
     const morseBoardCheck = document.getElementById('morse-board-mode-check');
+    const timeSelect = document.getElementById('time-select');
     params.set('beginner', (beginnerCheck && beginnerCheck.checked) ? '1' : '0');
     params.set('morseboard', (morseBoardCheck && morseBoardCheck.checked) ? '1' : '0');
+    if (timeSelect) params.set('time', timeSelect.value);
     history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
 }
 function updateTxModeDesc() {
@@ -1207,6 +1209,9 @@ async function setNickname() {
     if (beginnerCheck && params.get('beginner') === '1') beginnerCheck.checked = true;
     const morseBoardCheck = document.getElementById('morse-board-mode-check');
     if (morseBoardCheck && params.get('morseboard') === '1') morseBoardCheck.checked = true;
+    const timeSelect = document.getElementById('time-select');
+    const timeParam = params.get('time');
+    if (timeSelect && ['60', '180', '300'].includes(timeParam)) timeSelect.value = timeParam;
 })();
 
 // ── Initialize mode description on page load ───────────────────────────────────

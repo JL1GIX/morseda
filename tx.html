@@ -663,7 +663,7 @@
             <div class="settings-grid" style="margin:18px 0 18px;">
                 <div class="setting-item" id="time-setting-item">
                     <span class="setting-label">⏱ 制限時間</span>
-                    <select id="time-select">
+                    <select id="time-select" onchange="updateTxUrlState()">
                         <option value="60">1分間</option>
                         <option value="180">3分間</option>
                         <option value="300">5分間</option>
