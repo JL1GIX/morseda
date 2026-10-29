@@ -122,6 +122,15 @@ function generateRST() {
     return '599' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
 }
 
+// 初心者モードのチェックボックス状態をURLのクエリ文字列に反映する。
+// リロード時に下の初期化処理がこのURLを読み直すため、設定を保ったままリロードできる。
+function updateRxUrlState() {
+    const params = new URLSearchParams(window.location.search);
+    const beginnerCheck = document.getElementById('beginner-mode-check');
+    params.set('beginner', (beginnerCheck && beginnerCheck.checked) ? '1' : '0');
+    history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+}
+
 // ── Audio unlock + prepare ─────────────────────────────────────────────────────
 function unlockAndPrepare() {
     stopSosCheck();
@@ -763,6 +772,13 @@ async function setNickname() {
         alert(t('setFailAlert'));
     }
 }
+
+// Initial load — URLパラメータがあればチェックボックス(初心者モード)の設定を復元
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    const beginnerCheck = document.getElementById('beginner-mode-check');
+    if (beginnerCheck && params.get('beginner') === '1') beginnerCheck.checked = true;
+})();
 
 // ── Initialize WPM readout on page load ─────────────────────────────────────────
 updateWpmReadout('wpm-select', 'wpm-readout-val', 'wpm-readout-band');

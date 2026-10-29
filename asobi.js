@@ -355,12 +355,25 @@ function applySelectorVisibility() {
     const rankLinkA = document.getElementById('asobi-ranking-link-a');
     if (rankLinkA) rankLinkA.href = asobiRankingBase();
 }
+// 現在選択中のタブ(単語種別/プレイスタイル)とチェックボックス(初心者モード/Morse Board)を
+// URLのクエリ文字列に反映する。リロード時に下の初期化処理がこのURLを読み直すため、設定を保ったままリロードできる。
+function updateAsobiUrlState() {
+    const params = new URLSearchParams(window.location.search);
+    params.set('wc', wordCategory);
+    params.set('variant', gameVariant);
+    const beginnerCheck = document.getElementById('beginner-mode-check');
+    const morseBoardCheck = document.getElementById('morse-board-mode-check');
+    params.set('beginner', (beginnerCheck && beginnerCheck.checked) ? '1' : '0');
+    params.set('morseboard', (morseBoardCheck && morseBoardCheck.checked) ? '1' : '0');
+    history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+}
 function selectWordCategory(cat) {
     wordCategory = cat;
     document.getElementById('wc-general').classList.toggle('active', cat === 'GENERAL');
     document.getElementById('wc-callsign').classList.toggle('active', cat === 'CALLSIGN');
     applySelectorVisibility();
     updateTxModeDesc();
+    updateAsobiUrlState();
 }
 function selectGameVariant(variant) {
     gameVariant = variant;
@@ -369,6 +382,7 @@ function selectGameVariant(variant) {
     document.getElementById('var-oneshot').classList.toggle('active', variant === 'ONESHOT');
     applySelectorVisibility();
     updateTxModeDesc();
+    updateAsobiUrlState();
 }
 
 // ── プレイ中のモード別ステータス表示（正確重視: やり直し回数） ───────────────────────
@@ -1426,6 +1440,28 @@ async function setNickname() {
         alert(t('setFailAlert'));
     }
 }
+
+// Initial load — URLパラメータがあれば単語種別・プレイスタイル・チェックボックスの設定を復元
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    const wcParam = params.get('wc');
+    const variantParam = params.get('variant');
+    if (wcParam === 'GENERAL' || wcParam === 'CALLSIGN') {
+        wordCategory = wcParam;
+        document.getElementById('wc-general').classList.toggle('active', wcParam === 'GENERAL');
+        document.getElementById('wc-callsign').classList.toggle('active', wcParam === 'CALLSIGN');
+    }
+    if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(variantParam)) {
+        gameVariant = variantParam;
+        document.getElementById('var-normal').classList.toggle('active', variantParam === 'NORMAL');
+        document.getElementById('var-accuracy').classList.toggle('active', variantParam === 'ACCURACY');
+        document.getElementById('var-oneshot').classList.toggle('active', variantParam === 'ONESHOT');
+    }
+    const beginnerCheck = document.getElementById('beginner-mode-check');
+    if (beginnerCheck && params.get('beginner') === '1') beginnerCheck.checked = true;
+    const morseBoardCheck = document.getElementById('morse-board-mode-check');
+    if (morseBoardCheck && params.get('morseboard') === '1') morseBoardCheck.checked = true;
+})();
 
 // ── Initialize mode description on page load ───────────────────────────────────
 applySelectorVisibility();

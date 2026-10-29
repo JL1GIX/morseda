@@ -313,6 +313,16 @@ function saveKeyCustomize() {
     updateTxModeDesc();
     closeKeyCustomize();
 }
+// 初心者モード／Morse Boardモードのチェックボックス状態をURLのクエリ文字列に反映する。
+// リロード時に下の初期化処理がこのURLを読み直すため、設定を保ったままリロードできる。
+function updateTxUrlState() {
+    const params = new URLSearchParams(window.location.search);
+    const beginnerCheck = document.getElementById('beginner-mode-check');
+    const morseBoardCheck = document.getElementById('morse-board-mode-check');
+    params.set('beginner', (beginnerCheck && beginnerCheck.checked) ? '1' : '0');
+    params.set('morseboard', (morseBoardCheck && morseBoardCheck.checked) ? '1' : '0');
+    history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+}
 function updateTxModeDesc() {
     const morseBoardModeCheck = document.getElementById('morse-board-mode-check');
     const isMorseBoard = Boolean(morseBoardModeCheck && morseBoardModeCheck.checked);
@@ -1189,6 +1199,15 @@ async function setNickname() {
         alert(t('setFailAlert'));
     }
 }
+
+// Initial load — URLパラメータがあればチェックボックス(初心者モード/Morse Board)の設定を復元
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    const beginnerCheck = document.getElementById('beginner-mode-check');
+    if (beginnerCheck && params.get('beginner') === '1') beginnerCheck.checked = true;
+    const morseBoardCheck = document.getElementById('morse-board-mode-check');
+    if (morseBoardCheck && params.get('morseboard') === '1') morseBoardCheck.checked = true;
+})();
 
 // ── Initialize mode description on page load ───────────────────────────────────
 updateTxModeDesc();

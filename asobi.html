@@ -809,12 +809,12 @@
                     <div class="wpm-band-labels"><span>初心者</span><span>中級者</span><span>上級者</span></div>
                 </div>
                 <div class="setting-item checkbox-item">
-                    <input type="checkbox" id="beginner-mode-check">
+                    <input type="checkbox" id="beginner-mode-check" onchange="updateAsobiUrlState()">
                     <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">🔰</span>
                     <label for="beginner-mode-check">初心者モード（現在打つ文字のモールスを表示）</label>
                 </div>
                 <div class="setting-item checkbox-item">
-                    <input type="checkbox" id="morse-board-mode-check" onchange="updateTxModeDesc()">
+                    <input type="checkbox" id="morse-board-mode-check" onchange="updateTxModeDesc();updateAsobiUrlState()">
                     <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">⌨️</span>
                     <label for="morse-board-mode-check">Morse Boardモード</label>
                 </div>

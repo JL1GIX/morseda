@@ -681,12 +681,12 @@
                     <div class="wpm-band-labels"><span>Beginner</span><span>Intermediate</span><span>Advanced</span></div>
                 </div>
                 <div class="setting-item checkbox-item">
-                    <input type="checkbox" id="beginner-mode-check">
+                    <input type="checkbox" id="beginner-mode-check" onchange="updateTxUrlState()">
                     <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">🔰</span>
                     <label for="beginner-mode-check">Beginner Mode (shows the Morse for the current character)</label>
                 </div>
                 <div class="setting-item checkbox-item">
-                    <input type="checkbox" id="morse-board-mode-check" onchange="updateTxModeDesc()">
+                    <input type="checkbox" id="morse-board-mode-check" onchange="updateTxModeDesc();updateTxUrlState()">
                     <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">⌨️</span>
                     <label for="morse-board-mode-check">Morse Board Mode</label>
                 </div>
