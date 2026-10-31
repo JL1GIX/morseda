@@ -71,7 +71,7 @@
         .header-bar::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(to left, transparent, var(--primary-dim)); }
         h1 { margin: 0; letter-spacing: 6px; font-size: 1.3rem; color: var(--primary); text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5); }
         .subtitle { font-size: 0.6rem; color: var(--primary-dim); letter-spacing: 4px; margin-bottom: 16px; opacity: 0.9; text-align: center; }
-        .intro { font-size: 0.85rem; color: var(--primary-dim); margin-bottom: 16px; line-height: 1.55; }
+        .intro { font-size: 0.95rem; color: var(--code-color); margin-bottom: 18px; line-height: 1.6; }
         a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
         a:hover { opacity: 0.7; }
         .updated { font-size: 0.68rem; color: var(--primary-dim); opacity: 0.6; margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--border); }
@@ -79,7 +79,7 @@
 
         .legends-grid {
             column-count: 2;
-            column-gap: 20px;
+            column-gap: 22px;
         }
         .phrase-card {
             display: inline-block;
@@ -92,8 +92,8 @@
             border: 1px solid var(--border);
             border-left: 3px solid var(--primary);
             border-radius: 4px;
-            padding: 13px 15px;
-            margin: 0 0 14px;
+            padding: 16px 18px;
+            margin: 0 0 16px;
             transition: box-shadow 0.2s, border-color 0.2s;
         }
         .phrase-card:hover {
@@ -105,10 +105,10 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
         .phrase-code {
-            font-size: 1.15rem;
+            font-size: 1.3rem;
             font-weight: bold;
             letter-spacing: 2px;
             color: var(--primary);
@@ -119,8 +119,8 @@
             display: inline-flex;
             align-items: center;
             flex-wrap: wrap;
-            gap: 7px;
-            min-height: 7px;
+            gap: 8px;
+            min-height: 8px;
         }
         .code-letter {
             display: inline-flex;
@@ -128,49 +128,49 @@
             gap: 4px;
         }
         .morse-dot {
-            width: 6px; height: 6px;
+            width: 7px; height: 7px;
             border-radius: 50%;
             background: var(--code-color);
             box-shadow: 0 0 4px rgba(238,247,242,0.5);
             flex-shrink: 0;
         }
         .morse-dash {
-            width: 16px; height: 6px;
+            width: 19px; height: 7px;
             border-radius: 3px;
             background: var(--code-color);
             box-shadow: 0 0 4px rgba(238,247,242,0.5);
             flex-shrink: 0;
         }
         .phrase-title {
-            font-size: 0.84rem;
+            font-size: 0.95rem;
             font-weight: bold;
             letter-spacing: 0.5px;
             color: var(--primary);
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
         .phrase-card p {
-            font-size: 0.8rem;
-            color: var(--primary-dim);
-            line-height: 1.5;
+            font-size: 0.92rem;
+            color: var(--code-color);
+            line-height: 1.58;
             margin-bottom: 0;
         }
         .history-quote {
             font-style: italic;
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: var(--code-color);
             border-left: 2px solid var(--primary-dim);
             padding-left: 10px;
-            margin: 5px 0 7px;
-            opacity: 0.92;
-            line-height: 1.4;
+            margin: 6px 0 8px;
+            opacity: 0.95;
+            line-height: 1.45;
         }
         .history-quote-attr {
             display: block;
             font-style: normal;
-            font-size: 0.65rem;
+            font-size: 0.72rem;
             color: var(--primary-dim);
             margin-top: 4px;
-            opacity: 0.8;
+            opacity: 0.85;
         }
         @media (max-width: 760px) {
             .legends-grid { column-count: 1; }
@@ -193,7 +193,16 @@
 
     <div class="legends-grid">
         <div class="phrase-card">
-            <div class="phrase-title">1844 — Where it all began</div>
+            <div class="phrase-head">
+                <span class="phrase-code">1844</span>
+                <span class="code-line">
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dash"></span></span>
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
+                </span>
+            </div>
+            <div class="phrase-title">Where it all began</div>
             <p class="history-quote">"What hath God wrought"<span class="history-quote-attr">— Samuel Morse, May 24, 1844, the first-ever telegraph message</span></p>
             <p>Sent from Washington, D.C. to Baltimore, this was the first message ever transmitted by electrical telegraph. Quoting a line from the Bible, Morse's invention — turning letters into electrical pulses and sending them across distance — took the first step toward a communication network that would one day connect the entire world.</p>
         </div>
@@ -263,8 +272,56 @@
         </div>
 
         <div class="phrase-card">
-            <div class="phrase-title">VOR / NDB — Still guiding pilots through the sky, even in the GPS era</div>
+            <div class="phrase-head">
+                <span class="phrase-code">VOR / NDB</span>
+                <span class="code-line">
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dash"></span></span>
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span></span>
+                    <span style="width:1px;height:16px;background:var(--border);margin:0 1px;"></span>
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dot"></span></span>
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+                </span>
+            </div>
+            <div class="phrase-title">Still guiding pilots through the sky, even in the GPS era</div>
             <p>Aviation navigation beacons (VOR and NDB stations) continuously transmit their own 2-3 letter identifier in Morse code to this day. Pilots listen for this faint tone through their headset to confirm they're tuned to the correct beacon — not just trusting the instrument readout. Even in an age of GPS, Morse is still quietly on duty keeping the skies safe.</p>
+        </div>
+
+        <div class="phrase-card">
+            <div class="phrase-head">
+                <span class="phrase-code">DE</span>
+                <span class="code-line">
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+                    <span class="code-letter"><span class="morse-dot"></span></span>
+                </span>
+            </div>
+            <div class="phrase-title">The prosign that means "from"</div>
+            <p>"DE" is the prosign for "from," sent right before your own callsign after a CQ call. "CQ CQ DE JL1GIX" means "Calling any station, this is JL1GIX." Every contact with a stranger starts with these two small letters.</p>
+        </div>
+
+        <div class="phrase-card">
+            <div class="phrase-head">
+                <span class="phrase-code">R</span>
+                <span class="code-line">
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span></span>
+                </span>
+            </div>
+            <div class="phrase-title">The secret radio origin of "Roger"</div>
+            <p>The word "Roger," familiar from movies and radio chatter, was originally just the phonetic alphabet word for the letter "R." In Morse communication "R" meant "received" — when voice radio took over, operators kept saying "Roger" to mean the same thing, and it's been radio slang for "understood" ever since.</p>
+        </div>
+
+        <div class="phrase-card">
+            <div class="phrase-head">
+                <span class="phrase-code">QSL</span>
+                <span class="code-line">
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+                </span>
+            </div>
+            <div class="phrase-title">A postcard that proves you were really heard</div>
+            <p>"QSL" is shorthand (a Q-code) for "I confirm receipt." In amateur radio culture, operators who've made contact exchange postcard-like "QSL cards" as a keepsake proof of the conversation. It's a small, lasting tradition that turns an invisible radio wave into something you can hold in your hand.</p>
         </div>
 
         <div class="phrase-card">
