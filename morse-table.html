@@ -33,6 +33,7 @@
             --panel: #0e1f16;
             --border: #1e5c38;
             --success: #00ee77;
+            --code-color: #ffb74d;
         }
         * { box-sizing: border-box; }
         body {
@@ -164,13 +165,28 @@
             text-shadow: 0 0 10px rgba(0,238,119,0.5);
             line-height: 1;
         }
-        .morse-code {
-            font-size: 1.3rem;
-            font-weight: 900;
-            color: var(--primary);
-            letter-spacing: 3px;
-            line-height: 1;
-            text-shadow: 0 0 8px rgba(0,123,67,0.7);
+        .morse-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2.5px;
+            margin: 3px 0;
+            min-height: 10px;
+        }
+        .morse-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--code-color);
+            box-shadow: 0 0 7px var(--code-color);
+            flex-shrink: 0;
+        }
+        .morse-dash {
+            width: 15px; height: 8px;
+            border-radius: 4px;
+            background: var(--code-color);
+            box-shadow: 0 0 7px var(--code-color);
+            flex-shrink: 0;
         }
         .morse-sym {
             font-size: 0.65rem;
@@ -307,7 +323,7 @@ const SYM_NAMES = {
 };
 
 function codeToDisplay(code) {
-    return code.split('').map(s => s === '.' ? '・' : '―').join('');
+    return code.split('').map(s => s === '.' ? '<span class="morse-dot"></span>' : '<span class="morse-dash"></span>').join('');
 }
 
 function renderGrid(containerId, data, nameMap) {
@@ -319,7 +335,7 @@ function renderGrid(containerId, data, nameMap) {
         const nameLabel = nameMap ? `<div class="morse-sym">${nameMap[ch] || ''}</div>` : '';
         cell.innerHTML = `
             <div class="morse-char">${ch}</div>
-            <div class="morse-code">${display}</div>
+            <div class="morse-visual">${display}</div>
             ${nameLabel}
         `;
         grid.appendChild(cell);
