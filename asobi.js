@@ -554,6 +554,14 @@ function startWordTimer(word) {
     const track = document.getElementById('word-timer-track');
     const fill  = document.getElementById('word-timer-fill');
     if (!track || !fill) return;
+    // 初心者モードでは単語ごとの制限時間(QSBで落ちる仕組み)を撤廃する
+    if (beginnerMode) {
+        track.classList.add('hidden');
+        fill.style.transition = 'none';
+        fill.style.transform = 'scaleX(1)';
+        return;
+    }
+    track.classList.remove('hidden');
     const limitMs = getWordTimeLimitMs(word);
     fill.style.transition = 'none';
     fill.style.transform = 'scaleX(1)';
