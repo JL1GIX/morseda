@@ -231,6 +231,14 @@ document.addEventListener('keydown', (e) => {
             unlockAndPrepare();
             return;
         }
+        // ロビー画面（Morse Board）: ？打鍵（・・－－・・）でモールス打のトップ画面へ戻る
+        // ※morseBoardMode変数はゲーム開始時にしか同期されないため、ロビーではチェックボックスを直接見る
+        const lobbyMorseBoardOn = document.getElementById('morse-board-mode-check')?.checked;
+        if (!typing && !_capturingFor && lobbyMorseBoardOn && e.key === '?') {
+            e.preventDefault();
+            location.href = (LANG === 'en') ? '/index-en.html' : 'https://jl1gix.com';
+            return;
+        }
         // ロビー画面: Escキーでモールス打のトップ画面へ（制御キーなので入力中でも有効）
         // 英語モードで開いている場合は英語版トップ（index-en.html）へ戻す
         if (e.code === 'Escape') {
