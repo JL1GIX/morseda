@@ -754,7 +754,7 @@ async function autoRegister(retryCount = 0) {
 }
 
 async function setNickname() {
-    const nickname = document.getElementById('nickname-input').value.replace(/[^A-Z0-9]/g, '');
+    const nickname = document.getElementById('nickname-input').value.replace(/\//g, '').trim();
     if (!nickname) return;  // 未入力なら何もしない（初期登録のnonameのまま）
     if (!_registeredId) return;
     const btn = document.getElementById('submit-score-btn');
