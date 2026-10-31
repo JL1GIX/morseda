@@ -45,8 +45,8 @@
             background: var(--bg);
             color: var(--primary);
             min-height: 100vh;
-            padding: 40px 20px;
-            line-height: 1.8;
+            padding: 26px 16px;
+            line-height: 1.6;
         }
         body::after {
             content: '';
@@ -57,107 +57,128 @@
             z-index: 9999;
         }
         .container {
-            max-width: 860px;
+            max-width: 1040px;
             margin: 0 auto;
             background: var(--panel);
             border: 1px solid var(--border);
             border-top: 2px solid var(--primary);
             border-radius: 4px;
-            padding: 40px;
+            padding: 28px 34px;
             box-shadow: 0 0 40px rgba(0,100,55,0.2);
         }
-        .header-bar { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .header-bar { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 12px; }
         .header-bar::before { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--primary-dim)); }
         .header-bar::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(to left, transparent, var(--primary-dim)); }
-        h1 { margin: 0; letter-spacing: 6px; font-size: 1.4rem; color: var(--primary); text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5); }
-        .subtitle { font-size: 0.6rem; color: var(--primary-dim); letter-spacing: 4px; margin-bottom: 28px; opacity: 0.9; text-align: center; }
-        .intro { font-size: 0.95rem; color: var(--primary-dim); margin-bottom: 30px; }
-        h2 { font-size: 1.15rem; letter-spacing: 2px; color: var(--primary); margin: 30px 0 12px; padding-left: 10px; border-left: 2px solid var(--primary); }
-        p, li { font-size: 1rem; color: var(--primary-dim); margin-bottom: 10px; }
+        h1 { margin: 0; letter-spacing: 6px; font-size: 1.3rem; color: var(--primary); text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5); }
+        .subtitle { font-size: 0.6rem; color: var(--primary-dim); letter-spacing: 4px; margin-bottom: 16px; opacity: 0.9; text-align: center; }
+        .intro { font-size: 0.85rem; color: var(--primary-dim); margin-bottom: 16px; line-height: 1.55; }
         a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
         a:hover { opacity: 0.7; }
-        .updated { font-size: 0.7rem; color: var(--primary-dim); opacity: 0.6; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
-        footer { margin: 44px auto 0; padding: 22px 0 6px; border-top: 1px solid #1e5c38; font-size: 0.65rem; letter-spacing: 1px; opacity: 0.55; text-align: center; width: 95%; max-width: 860px; }
+        .updated { font-size: 0.68rem; color: var(--primary-dim); opacity: 0.6; margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--border); }
+        footer { margin: 36px auto 0; padding: 22px 0 6px; border-top: 1px solid #1e5c38; font-size: 0.65rem; letter-spacing: 1px; opacity: 0.55; text-align: center; width: 95%; max-width: 1040px; }
 
+        .legends-grid {
+            column-count: 2;
+            column-gap: 20px;
+        }
         .phrase-card {
+            display: inline-block;
+            width: 100%;
+            vertical-align: top;
+            break-inside: avoid;
+            -webkit-column-break-inside: avoid;
+            page-break-inside: avoid;
             background: rgba(0,50,28,0.18);
             border: 1px solid var(--border);
             border-left: 3px solid var(--primary);
             border-radius: 4px;
-            padding: 22px 24px;
-            margin: 20px 0;
-            transition: box-shadow 0.25s, border-color 0.25s;
+            padding: 13px 15px;
+            margin: 0 0 14px;
+            transition: box-shadow 0.2s, border-color 0.2s;
         }
         .phrase-card:hover {
             border-color: var(--primary);
-            box-shadow: 0 0 22px rgba(0,192,96,0.25);
+            box-shadow: 0 0 16px rgba(0,192,96,0.22);
         }
-        .phrase-code {
-            font-size: 1.7rem;
-            font-weight: bold;
-            letter-spacing: 3px;
-            color: var(--primary);
-            text-shadow: 0 0 12px rgba(0,192,96,0.6);
-            margin-bottom: 10px;
-        }
-        .code-line {
+        .phrase-head {
             display: flex;
             align-items: center;
-            justify-content: flex-start;
             flex-wrap: wrap;
-            gap: 14px;
-            margin: 6px 0 16px;
-            min-height: 12px;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        .phrase-code {
+            font-size: 1.15rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0,192,96,0.55);
+            white-space: nowrap;
+        }
+        .code-line {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 7px;
+            min-height: 7px;
         }
         .code-letter {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
         .morse-dot {
-            width: 9px; height: 9px;
+            width: 6px; height: 6px;
             border-radius: 50%;
             background: var(--code-color);
-            box-shadow: 0 0 6px rgba(238,247,242,0.55);
+            box-shadow: 0 0 4px rgba(238,247,242,0.5);
             flex-shrink: 0;
         }
         .morse-dash {
-            width: 24px; height: 9px;
-            border-radius: 4px;
+            width: 16px; height: 6px;
+            border-radius: 3px;
             background: var(--code-color);
-            box-shadow: 0 0 6px rgba(238,247,242,0.55);
+            box-shadow: 0 0 4px rgba(238,247,242,0.5);
             flex-shrink: 0;
         }
         .phrase-title {
-            font-size: 1.02rem;
+            font-size: 0.84rem;
             font-weight: bold;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             color: var(--primary);
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
-        .phrase-card p { margin-bottom: 0; }
+        .phrase-card p {
+            font-size: 0.8rem;
+            color: var(--primary-dim);
+            line-height: 1.5;
+            margin-bottom: 0;
+        }
         .history-quote {
             font-style: italic;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             color: var(--code-color);
-            border-left: 3px solid var(--primary-dim);
-            padding-left: 14px;
-            margin: 10px 0 14px;
+            border-left: 2px solid var(--primary-dim);
+            padding-left: 10px;
+            margin: 5px 0 7px;
             opacity: 0.92;
+            line-height: 1.4;
         }
         .history-quote-attr {
             display: block;
             font-style: normal;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: var(--primary-dim);
-            margin-top: 6px;
+            margin-top: 4px;
             opacity: 0.8;
         }
+        @media (max-width: 760px) {
+            .legends-grid { column-count: 1; }
+        }
         @media (max-width: 700px) {
+            .container { padding: 20px 16px; }
             h1 { font-size: 1.2rem; letter-spacing: 4px; }
             .header-bar { margin-top: 26px; }
-            .phrase-code { font-size: 1.4rem; }
-            .code-line { gap: 10px; }
         }
     </style>
 </head>
@@ -170,83 +191,96 @@
 
     <p class="intro">You don't need to know radio to feel a chill down your spine over certain Morse signals. Here's a collection of codes and prosigns that were actually used at sea, in the sky, and across more than a century of real radio history.</p>
 
-    <div class="phrase-card">
-        <div class="phrase-title">1844 — Where it all began</div>
-        <p class="history-quote">"What hath God wrought"<span class="history-quote-attr">— Samuel Morse, May 24, 1844, the first-ever telegraph message</span></p>
-        <p>Sent from Washington, D.C. to Baltimore, this was the first message ever transmitted by electrical telegraph. Quoting a line from the Bible, Morse's invention — turning letters into electrical pulses and sending them across distance — took the first step toward a communication network that would one day connect the entire world.</p>
-    </div>
-
-    <div class="phrase-card">
-        <div class="phrase-code">CQD</div>
-        <div class="code-line">
-            <span class="code-letter"><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span></span>
-            <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
-            <span class="code-letter"><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+    <div class="legends-grid">
+        <div class="phrase-card">
+            <div class="phrase-title">1844 — Where it all began</div>
+            <p class="history-quote">"What hath God wrought"<span class="history-quote-attr">— Samuel Morse, May 24, 1844, the first-ever telegraph message</span></p>
+            <p>Sent from Washington, D.C. to Baltimore, this was the first message ever transmitted by electrical telegraph. Quoting a line from the Bible, Morse's invention — turning letters into electrical pulses and sending them across distance — took the first step toward a communication network that would one day connect the entire world.</p>
         </div>
-        <div class="phrase-title">The distress call that came before SOS</div>
-        <p>Before SOS was adopted, Marconi stations used this as their distress signal. In 1912, Titanic's wireless operator Jack Phillips kept sending both CQD and SOS right up to the moment the ship went down. SOS was still new at the time — his colleague Harold Bride is said to have joked, "Send SOS; it's your last chance to send it."</p>
-    </div>
 
-    <div class="phrase-card">
-        <div class="phrase-code">SOS</div>
-        <div class="code-line">
-            <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
-            <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dash"></span></span>
-            <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+        <div class="phrase-card">
+            <div class="phrase-head">
+                <span class="phrase-code">CQD</span>
+                <span class="code-line">
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span></span>
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+                </span>
+            </div>
+            <div class="phrase-title">The distress call that came before SOS</div>
+            <p>Before SOS was adopted, Marconi stations used this as their distress signal. In 1912, Titanic's wireless operator Jack Phillips kept sending both CQD and SOS right up to the moment the ship went down. SOS was still new at the time — his colleague Harold Bride is said to have joked, "Send SOS; it's your last chance to send it."</p>
         </div>
-        <div class="phrase-title">The universal distress signal</div>
-        <p>The most famous Morse code of all. Officially adopted as the international distress signal in 1908. It isn't short for "Save Our Ship" or "Save Our Souls" — it was simply chosen because three dots, three dashes, three dots is easy to send and unmistakable to hear. That simplicity alone has saved countless lives.</p>
-    </div>
 
-    <div class="phrase-card">
-        <div class="phrase-code">V</div>
-        <div class="code-line">
-            <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
+        <div class="phrase-card">
+            <div class="phrase-head">
+                <span class="phrase-code">SOS</span>
+                <span class="code-line">
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dash"></span></span>
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+                </span>
+            </div>
+            <div class="phrase-title">The universal distress signal</div>
+            <p>The most famous Morse code of all. Officially adopted as the international distress signal in 1908. It isn't short for "Save Our Ship" or "Save Our Souls" — it was simply chosen because three dots, three dashes, three dots is easy to send and unmistakable to hear. That simplicity alone has saved countless lives.</p>
         </div>
-        <div class="phrase-title">Beethoven's "Fate," and the symbol of victory</div>
-        <p>Three dots and a dash — the same rhythm that opens Beethoven's Symphony No. 5, "Fate." During World War II, the BBC broadcast this "V" across Nazi-occupied Europe as a signal for "Victory." Tapped out on church bells and whistled on street corners, it eventually fed into Churchill's own "V for Victory" hand sign.</p>
-    </div>
 
-    <div class="phrase-card">
-        <div class="phrase-code">CQ</div>
-        <div class="code-line">
-            <span class="code-letter"><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span></span>
-            <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
+        <div class="phrase-card">
+            <div class="phrase-head">
+                <span class="phrase-code">V</span>
+                <span class="code-line">
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
+                </span>
+            </div>
+            <div class="phrase-title">Beethoven's "Fate," and the symbol of victory</div>
+            <p>Three dots and a dash — the same rhythm that opens Beethoven's Symphony No. 5, "Fate." During World War II, the BBC broadcast this "V" across Nazi-occupied Europe as a signal for "Victory." Tapped out on church bells and whistled on street corners, it eventually fed into Churchill's own "V for Victory" hand sign.</p>
         </div>
-        <div class="phrase-title">"Is anybody out there?"</div>
-        <p>A general call to no one in particular — "calling any station." From the telegraph era to today's amateur radio, it's still the first word sent when reaching out to a stranger somewhere out there. The simplest possible call into the open sky.</p>
-    </div>
 
-    <div class="phrase-card">
-        <div class="phrase-code">73 / 88</div>
-        <div class="code-line">
-            <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
-            <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dash"></span></span>
-            <span style="width:1px;height:18px;background:var(--border);margin:0 2px;"></span>
-            <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
-            <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+        <div class="phrase-card">
+            <div class="phrase-head">
+                <span class="phrase-code">CQ</span>
+                <span class="code-line">
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span></span>
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
+                </span>
+            </div>
+            <div class="phrase-title">"Is anybody out there?"</div>
+            <p>A general call to no one in particular — "calling any station." From the telegraph era to today's amateur radio, it's still the first word sent when reaching out to a stranger somewhere out there. The simplest possible call into the open sky.</p>
         </div>
-        <div class="phrase-title">Telegraph-era slang that never went away</div>
-        <p>73 means "best regards," 88 means "love and kisses" — numeric shorthand born in the days of wired telegraphy. These abbreviations are still exchanged as a sign-off by amateur radio operators all over the world today.</p>
-    </div>
 
-    <div class="phrase-card">
-        <div class="phrase-code">VOR / NDB</div>
-        <div class="phrase-title">Still guiding pilots through the sky, even in the GPS era</div>
-        <p>Aviation navigation beacons (VOR and NDB stations) continuously transmit their own 2-3 letter identifier in Morse code to this day. Pilots listen for this faint tone through their headset to confirm they're tuned to the correct beacon — not just trusting the instrument readout. Even in an age of GPS, Morse is still quietly on duty keeping the skies safe.</p>
-    </div>
-
-    <div class="phrase-card">
-        <div class="phrase-code">K・AR・SK</div>
-        <div class="code-line">
-            <span class="code-letter"><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
-            <span class="code-letter"><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span></span>
-            <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
+        <div class="phrase-card">
+            <div class="phrase-head">
+                <span class="phrase-code">73 / 88</span>
+                <span class="code-line">
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dash"></span></span>
+                    <span style="width:1px;height:13px;background:var(--border);margin:0 1px;"></span>
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dot"></span></span>
+                </span>
+            </div>
+            <div class="phrase-title">Telegraph-era slang that never went away</div>
+            <p>73 means "best regards," 88 means "love and kisses" — numeric shorthand born in the days of wired telegraphy. These abbreviations are still exchanged as a sign-off by amateur radio operators all over the world today.</p>
         </div>
-        <div class="phrase-title">The three signals that opened, closed, and finally silenced an era</div>
-        <p>"K" means "go ahead, over." "AR" means "end of message." "SK" means "end of contact" — all prosigns, special codes formed by running two letters together without a gap. On January 31, 1997, as French coastal stations bid farewell to Morse-based distress watch, one of them sent this:</p>
-        <p class="history-quote">"CALLING all. This is our last cry before our eternal silence."<span class="history-quote-attr">— a French coastal radio station, January 31, 1997</span></p>
-        <p>Then, at 0000 UTC on February 1, 1999, the world's maritime communication officially shifted from Morse code to the satellite- and radio-based GMDSS. The code that had watched over ships for more than a century quietly stood down.</p>
+
+        <div class="phrase-card">
+            <div class="phrase-title">VOR / NDB — Still guiding pilots through the sky, even in the GPS era</div>
+            <p>Aviation navigation beacons (VOR and NDB stations) continuously transmit their own 2-3 letter identifier in Morse code to this day. Pilots listen for this faint tone through their headset to confirm they're tuned to the correct beacon — not just trusting the instrument readout. Even in an age of GPS, Morse is still quietly on duty keeping the skies safe.</p>
+        </div>
+
+        <div class="phrase-card">
+            <div class="phrase-head">
+                <span class="phrase-code">K・AR・SK</span>
+                <span class="code-line">
+                    <span class="code-letter"><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span></span>
+                    <span class="code-letter"><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dot"></span><span class="morse-dash"></span><span class="morse-dot"></span><span class="morse-dash"></span></span>
+                </span>
+            </div>
+            <div class="phrase-title">The three signals that opened, closed, and finally silenced an era</div>
+            <p>"K" means "go ahead, over." "AR" means "end of message." "SK" means "end of contact" — all prosigns, special codes formed by running two letters together without a gap. On January 31, 1997, as French coastal stations bid farewell to Morse-based distress watch, one of them sent this:</p>
+            <p class="history-quote">"CALLING all. This is our last cry before our eternal silence."<span class="history-quote-attr">— a French coastal radio station, January 31, 1997</span></p>
+            <p>Then, at 0000 UTC on February 1, 1999, the world's maritime communication officially shifted from Morse code to the satellite- and radio-based GMDSS. The code that had watched over ships for more than a century quietly stood down.</p>
+        </div>
     </div>
 
     <p class="updated">Last updated: 2026</p>
