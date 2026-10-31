@@ -303,8 +303,30 @@
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            font-size: 1.05rem;
-            padding: 12px 28px;
+            font-size: 1.15rem;
+            padding: 16px 38px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            background: rgba(0,192,96,0.14);
+            border: 2px solid var(--primary);
+            animation: start-btn-glow 1.8s ease-in-out infinite;
+        }
+        @keyframes start-btn-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0,192,96,0.3); }
+            50%      { box-shadow: 0 0 26px rgba(0,208,106,0.8), 0 0 48px rgba(0,208,106,0.25); }
+        }
+        .beginner-hint {
+            text-align: center;
+            font-size: 0.74rem;
+            color: var(--primary);
+            opacity: 0.88;
+            letter-spacing: 0.5px;
+            line-height: 1.7;
+            margin: 2px 0 14px;
+            padding: 8px 10px;
+            border: 1px dashed var(--primary-dim);
+            border-radius: 3px;
+            background: rgba(0,80,40,0.1);
         }
         .start-keycap {
             display: inline-flex;
@@ -632,6 +654,7 @@
                     コールサインとRSTを交互に受信せよ。<br>Enterで判定。正確にコピーせよ。
                 </p>
             </div>
+            <div class="beginner-hint">🔰 初めての方へ：設定はそのままで大丈夫です。まずは下の ▶ でスタート！</div>
             <div class="settings-grid" style="margin:18px 0 18px;">
                 <div class="setting-item">
                     <span class="setting-label">⏱ 制限時間</span>
