@@ -121,7 +121,7 @@ let txWordHasMistake = false; // 現在の単語で誤入力(ミス)が一度で
 let asobiMistakeCounts = {}; // 文字ごとの打ち間違え回数（リザルト画面の「ミスが多かった文字」表示用）
 let wordsCompleted = 0, wordsMissed = 0;
 let TX_CHAR_GAP = 280;
-let TX_DOT_TIME = 1.2 / 25; // 25 WPM デフォルト、設定で 20-30 から選択可能
+let TX_DOT_TIME = 1.2 / 15; // 15 WPM デフォルト、設定で 10-30 から選択可能
 // Iambic keyer state
 let dotHeld = false, dashHeld = false;
 // dotLatched/dashLatched: キーを「押した」事実を、keyup で即座に消さずkeyerStep()が

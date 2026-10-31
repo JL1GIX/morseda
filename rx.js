@@ -72,7 +72,7 @@ let timeLeft, initialSeconds, score = 0, currentWord = '', isPlaying = false;
 let timerId, audioLoopId, activeOscillators = [];
 let isWaitingNext = false, nextType = 'CALLSIGN';
 let currentWordIsCallsign = true; // 現在のcurrentWordがコールサインかどうか（カットナンバーはコンテストナンバーのみに適用）
-let DOT_TIME = 1.2 / 25; // 25 WPM default
+let DOT_TIME = 1.2 / 15; // 15 WPM default
 let beginnerMode = false;
 let gameStartTimer = null;
 const gameMode = 'RX';
