@@ -125,67 +125,37 @@
             opacity: 1.0;
             text-align: center;
         }
-        .sos-banner {
-            text-align: center;
-            margin: 2px auto 26px;
-            padding: 18px 16px 20px;
-            max-width: 480px;
-            background: rgba(0,80,40,0.15);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            box-shadow: 0 0 30px rgba(0,150,80,0.15);
-        }
-        .sos-label {
-            font-size: 0.65rem;
-            letter-spacing: 3px;
-            color: var(--primary-dim);
-            margin-bottom: 8px;
-            opacity: 0.85;
-        }
-        .sos-code {
-            font-size: 2.2rem;
-            font-weight: bold;
-            letter-spacing: 6px;
-            color: var(--primary);
-            text-shadow: 0 0 18px rgba(0,208,106,0.7), 0 0 40px rgba(0,208,106,0.35);
-            margin-bottom: 10px;
-        }
-        .sos-visual {
+        .sos-inline {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 14px;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin: 0 0 18px;
             flex-wrap: wrap;
         }
-        .sos-letter {
+        .sos-inline-code {
+            font-size: 0.95rem;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: var(--primary);
+            text-shadow: 0 0 8px rgba(0,208,106,0.5);
+        }
+        .sos-inline-visual {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
+            gap: 8px;
         }
-        .sos-dot, .sos-dash {
+        .sos-inline-letter {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .sos-inline-dot, .sos-inline-dash {
             background: var(--code-color);
-            box-shadow: 0 0 10px rgba(238,247,242,0.7);
-            animation: sos-blink 2.6s ease-in-out infinite;
+            box-shadow: 0 0 4px rgba(238,247,242,0.5);
         }
-        .sos-dot { width: 15px; height: 15px; border-radius: 50%; }
-        .sos-dash { width: 40px; height: 15px; border-radius: 6px; }
-        @keyframes sos-blink {
-            0%, 12% { opacity: 1; }
-            20%, 100% { opacity: 0.3; }
-        }
-        .sos-caption {
-            font-size: 0.7rem;
-            color: var(--primary-dim);
-            letter-spacing: 1px;
-            opacity: 0.85;
-        }
-        @media (max-width: 700px) {
-            .sos-code { font-size: 1.8rem; letter-spacing: 4px; }
-            .sos-dot { width: 11px; height: 11px; }
-            .sos-dash { width: 30px; height: 11px; }
-            .sos-visual { gap: 9px; }
-        }
+        .sos-inline-dot { width: 7px; height: 7px; border-radius: 50%; }
+        .sos-inline-dash { width: 18px; height: 7px; border-radius: 3px; }
         h2 {
             font-size: 0.82rem;
             letter-spacing: 3px;
@@ -334,15 +304,13 @@
     </div>
     <div class="subtitle">▸ MORSE CODE TABLE ◂</div>
 
-    <div class="sos-banner">
-        <div class="sos-label">THE ONE EVERYONE KNOWS</div>
-        <div class="sos-code">SOS</div>
-        <div class="sos-visual">
-            <span class="sos-letter"><span class="sos-dot" style="animation-delay:0s;"></span><span class="sos-dot" style="animation-delay:0.2s;"></span><span class="sos-dot" style="animation-delay:0.4s;"></span></span>
-            <span class="sos-letter"><span class="sos-dash" style="animation-delay:0.7s;"></span><span class="sos-dash" style="animation-delay:0.9s;"></span><span class="sos-dash" style="animation-delay:1.1s;"></span></span>
-            <span class="sos-letter"><span class="sos-dot" style="animation-delay:1.4s;"></span><span class="sos-dot" style="animation-delay:1.6s;"></span><span class="sos-dot" style="animation-delay:1.8s;"></span></span>
-        </div>
-        <div class="sos-caption">The universal distress signal — start here</div>
+    <div class="sos-inline">
+        <span class="sos-inline-code">SOS</span>
+        <span class="sos-inline-visual">
+            <span class="sos-inline-letter"><span class="sos-inline-dot"></span><span class="sos-inline-dot"></span><span class="sos-inline-dot"></span></span>
+            <span class="sos-inline-letter"><span class="sos-inline-dash"></span><span class="sos-inline-dash"></span><span class="sos-inline-dash"></span></span>
+            <span class="sos-inline-letter"><span class="sos-inline-dot"></span><span class="sos-inline-dot"></span><span class="sos-inline-dot"></span></span>
+        </span>
     </div>
 
     <div class="legend">
