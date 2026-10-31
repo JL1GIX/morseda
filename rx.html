@@ -39,6 +39,7 @@
             --error: #e74c3c;
             --success: #00ee77;
             --scope-bg: #050f08;
+            --code-color: #eef7f2;
         }
         html, body { scrollbar-gutter: stable; }
         * { box-sizing: border-box; }
@@ -197,17 +198,17 @@
             display: inline-block;
             width: 14px; height: 14px;
             border-radius: 50%;
-            background: var(--primary);
-            box-shadow: 0 0 10px var(--primary), 0 0 22px rgba(0,123,67,0.5);
+            background: var(--code-color);
+            box-shadow: 0 0 10px rgba(238,247,242,0.65), 0 0 20px rgba(238,247,242,0.35);
             flex-shrink: 0;
             animation: msym-in 0.07s ease-out;
         }
         .msym-dash {
             display: inline-block;
-            width: 38px; height: 14px;
+            width: 40px; height: 14px;
             border-radius: 7px;
-            background: var(--primary);
-            box-shadow: 0 0 10px var(--primary), 0 0 22px rgba(0,123,67,0.5);
+            background: var(--code-color);
+            box-shadow: 0 0 10px rgba(238,247,242,0.65), 0 0 20px rgba(238,247,242,0.35);
             flex-shrink: 0;
             animation: msym-in 0.07s ease-out;
         }
@@ -624,7 +625,7 @@
             #mobile-input { font-size: 2rem; }
             #scope-canvas { height: 90px; }
             .msym-dot  { width: 12px; height: 12px; }
-            .msym-dash { width: 30px; height: 12px; }
+            .msym-dash { width: 34px; height: 12px; }
             /* スマホ版: 音声チェックを絶対配置からその場のflow配置に変え、ゲーム説明文と被らないようにする */
             /* 注意: 要素自体がインラインstyleでposition:absoluteを持つため、!importantが必須 */
             #audio-check-item { position: static !important; justify-content: flex-end !important; margin-bottom: 10px !important; }

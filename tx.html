@@ -39,6 +39,7 @@
             --error: #e74c3c;
             --success: #00ee77;
             --scope-bg: #050f08;
+            --code-color: #eef7f2;
         }
         html, body { scrollbar-gutter: stable; }
         html.game-active, body.game-active {
@@ -202,17 +203,17 @@
             display: inline-block;
             width: 22px; height: 22px;
             border-radius: 50%;
-            background: var(--primary);
-            box-shadow: 0 0 12px var(--primary), 0 0 28px rgba(0,192,96,0.5);
+            background: var(--code-color);
+            box-shadow: 0 0 12px rgba(238,247,242,0.65), 0 0 26px rgba(238,247,242,0.35);
             flex-shrink: 0;
             animation: msym-in 0.07s ease-out;
         }
         .msym-dash-lg {
             display: inline-block;
-            width: 58px; height: 22px;
+            width: 62px; height: 22px;
             border-radius: 11px;
-            background: var(--primary);
-            box-shadow: 0 0 12px var(--primary), 0 0 28px rgba(0,192,96,0.5);
+            background: var(--code-color);
+            box-shadow: 0 0 12px rgba(238,247,242,0.65), 0 0 26px rgba(238,247,242,0.35);
             flex-shrink: 0;
             animation: msym-in 0.07s ease-out;
         }
@@ -319,7 +320,7 @@
         #game-screen.beginner-compact #scope-canvas { height: 100px; }
         #game-screen.beginner-compact #beginner-display.tx-beginner { min-height: 3.5rem; gap: 11px; margin-bottom: 9px; padding: 7px 13px; }
         #game-screen.beginner-compact .msym-dot-lg { width: 18px; height: 18px; }
-        #game-screen.beginner-compact .msym-dash-lg { width: 47px; height: 18px; }
+        #game-screen.beginner-compact .msym-dash-lg { width: 50px; height: 18px; }
         #game-screen.beginner-compact #tx-word-display { font-size: 1.75rem; min-height: 4.8rem; padding: 12px; letter-spacing: 5px; }
         #game-screen.beginner-compact #tx-morse-input { min-height: 3.2rem; margin-top: 7px; padding: 7px 12px; gap: 11px; }
         #game-screen.beginner-compact #status-msg { margin-top: 8px; font-size: 0.8rem; }
