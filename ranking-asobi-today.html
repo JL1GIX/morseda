@@ -459,6 +459,7 @@ function updateNavLinks() {
     // 現在選択中のタブをURLのクエリ文字列にも反映する。リロード時に下の初期化処理が
     // このURLを読み直すため、選択中のタブを保ったままリロードできる。
     history.replaceState(null, '', window.location.pathname + qs);
+    saveAsobiTabState();
 }
 
 function jstDateStr(d) {
@@ -575,6 +576,20 @@ function formatNickname(nick) {
     return upper || 'noname';
 }
 
+// タブ（単語種別・プレイスタイル・分数）の選択状態をlocalStorageに保存し、次回アクセス時に復元する。
+// リザルト画面からURLパラメータ付きで遷移してきた場合も、その選択を次回用に保存する。
+const ASOBI_STORAGE_WC = 'morseda_ranking_asobi_wc';
+const ASOBI_STORAGE_VARIANT = 'morseda_ranking_asobi_variant';
+const ASOBI_STORAGE_TIME = 'morseda_ranking_asobi_time';
+
+function saveAsobiTabState() {
+    try {
+        localStorage.setItem(ASOBI_STORAGE_WC, currentWordCat);
+        localStorage.setItem(ASOBI_STORAGE_VARIANT, currentVariant);
+        localStorage.setItem(ASOBI_STORAGE_TIME, String(currentMinutes));
+    } catch (e) {}
+}
+
 function switchWordCat(wc) {
     currentWordCat = wc;
     document.getElementById('tab-wc-general').classList.toggle('active', wc === 'GENERAL');
@@ -611,11 +626,20 @@ function changePage(delta) {
 (function() {
     const params = new URLSearchParams(window.location.search);
     const wc = params.get('wordcat');
-    if (wc === 'GENERAL' || wc === 'CALLSIGN') currentWordCat = wc;
     const variant = params.get('variant');
-    if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(variant)) currentVariant = variant;
     const timeParam = parseInt(params.get('time'));
+    let savedWc = null, savedVariant = null, savedTime = NaN;
+    try {
+        savedWc = localStorage.getItem(ASOBI_STORAGE_WC);
+        savedVariant = localStorage.getItem(ASOBI_STORAGE_VARIANT);
+        savedTime = parseInt(localStorage.getItem(ASOBI_STORAGE_TIME));
+    } catch (e) {}
+    if (wc === 'GENERAL' || wc === 'CALLSIGN') currentWordCat = wc;
+    else if (savedWc === 'GENERAL' || savedWc === 'CALLSIGN') currentWordCat = savedWc;
+    if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(variant)) currentVariant = variant;
+    else if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(savedVariant)) currentVariant = savedVariant;
     if ([1, 3, 5].includes(timeParam)) currentMinutes = timeParam;
+    else if ([1, 3, 5].includes(savedTime)) currentMinutes = savedTime;
 
     document.getElementById('tab-wc-general').classList.toggle('active', currentWordCat === 'GENERAL');
     document.getElementById('tab-wc-callsign').classList.toggle('active', currentWordCat === 'CALLSIGN');
