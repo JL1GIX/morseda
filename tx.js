@@ -35,6 +35,8 @@ const I18N = {
     }),
     dotLabel:  { ja: '・ 短点', en: '・ Dot' },
     dashLabel: { ja: '－ 長点', en: '－ Dash' },
+    paddleSideDot:  { ja: '左', en: 'LEFT' },
+    paddleSideDash: { ja: '右', en: 'RIGHT' },
     gameplayHintMorseBoard: { ja: 'クエスチョン（・・－－・・）', en: 'Question mark key (・・－－・・)' },
     gameplayHintEsc:        { ja: '（Escキー）', en: '(Esc key)' },
     resultHintMorseBoard:   { ja: '（Escキー / R打鍵）', en: '(Esc key / R key)' },
@@ -632,9 +634,17 @@ function updateTxBeginnerDisplay() {
     const code = MORSE_CODE[ch];
     if (!code) { beginnerDisplay.innerHTML = ''; beginnerDisplay.classList.remove('tx-beginner'); return; }
     beginnerDisplay.classList.add('tx-beginner');
-    beginnerDisplay.innerHTML = code.split('').map(sym =>
-        `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
-    ).join('');
+    beginnerDisplay.innerHTML = code.split('').map(sym => {
+        const isDot = sym === '.';
+        const symSpan = `<span class="${isDot ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`;
+        // Morse Boardモード時は、モールス未経験者でもどちらのパドル側を打てばよいか
+        // わかるように、各符号の下に左右どちらのパドルかを示すラベルを添える。
+        if (morseBoardMode) {
+            const label = t(isDot ? 'paddleSideDot' : 'paddleSideDash');
+            return `<span class="msym-key-wrap">${symSpan}<span class="msym-key-label">${label}</span></span>`;
+        }
+        return symSpan;
+    }).join('');
 }
 
 function renderTxInput() {

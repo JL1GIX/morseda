@@ -217,6 +217,21 @@
             flex-shrink: 0;
             animation: msym-in 0.07s ease-out;
         }
+        .msym-key-wrap {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+        .msym-key-label {
+            font-size: 0.62rem;
+            letter-spacing: 1px;
+            color: var(--primary-dim);
+            opacity: 0.85;
+            line-height: 1;
+            white-space: nowrap;
+        }
+        #game-screen.beginner-compact .msym-key-label { font-size: 0.56rem; }
         @keyframes msym-in {
             from { opacity: 0; transform: scaleX(0.2); }
             to   { opacity: 1; transform: scaleX(1); }
