@@ -792,8 +792,16 @@ async function autoRegister(retryCount = 0) {
         `<a href="${rankHref}" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:4px 14px; font-size:0.75rem; letter-spacing:1px; border-radius:2px;">${t('rankingLink')}</a>`;
 }
 
+// ニックネーム欄: 全角で入力されても自動で半角に変換し、アルファベットは大文字に統一
+function toHankakuUpperNick(s) {
+    s = s.replace(/[！-～]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+    s = s.replace(/\u3000/g, ' ');
+    s = s.replace(/\//g, '');
+    return s.toUpperCase();
+}
+
 async function setNickname() {
-    const nickname = document.getElementById('nickname-input').value.replace(/\//g, '').trim();
+    const nickname = toHankakuUpperNick(document.getElementById('nickname-input').value).trim();
     if (!nickname) return;  // 未入力なら何もしない（初期登録のnonameのまま）
     if (!_registeredId) return;
     const btn = document.getElementById('submit-score-btn');
