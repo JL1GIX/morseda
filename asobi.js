@@ -1472,9 +1472,12 @@ async function autoRegister(retryCount = 0) {
 
 // ニックネーム欄: 全角で入力されても自動で半角に変換し、アルファベットは大文字に統一
 function toHankakuUpperNick(s) {
+    // 全角英数字・記号を半角に変換
     s = s.replace(/[！-～]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
-    s = s.replace(/\u3000/g, ' ');
-    s = s.replace(/\//g, '');
+    // ランキング表示側(formatNickname)と同じ規則で、半角英数字以外(かな・漢字・記号など)は除去。
+    // ここで揃えておくことで、「入力時は通ったのにランキングではnonameになる」という
+    // 見た目と結果の不一致を防ぐ。
+    s = s.replace(/[^A-Za-z0-9]/g, '');
     return s.toUpperCase();
 }
 
