@@ -35,7 +35,7 @@ const I18N = {
     }),
     dotLabel:  { ja: '・ 短点', en: '・ Dot' },
     dashLabel: { ja: '－ 長点', en: '－ Dash' },
-    gameplayHintMorseBoard: { ja: 'ピリオド（・－・－・－）', en: 'Period key (・－・－・－)' },
+    gameplayHintMorseBoard: { ja: 'クエスチョン（・・－－・・）', en: 'Question mark key (・・－－・・)' },
     gameplayHintEsc:        { ja: '（Escキー）', en: '(Esc key)' },
     resultHintMorseBoard:   { ja: '（Escキー / R打鍵）', en: '(Esc key / R key)' },
     resultHintEsc:          { ja: '（Escキー）', en: '(Esc key)' },
@@ -730,8 +730,8 @@ function handleMorseBoardKey(e) {
     if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
     if (!e.key || e.key.length !== 1) return;
     const decoded = e.key.toUpperCase();
-    // ピリオド（・－・－・－）打鍵でプレイ中のロビーへの強制送還コマンドとする
-    if (decoded === '.') {
+    // クエスチョン（・・－－・・）打鍵でプレイ中のロビーへの強制送還コマンドとする
+    if (decoded === '?') {
         if (isPlaying) { e.preventDefault(); quitGame(); }
         return;
     }
