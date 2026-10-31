@@ -361,26 +361,48 @@
         .wpm-band-tag.wpm-band-intermediate { color: #ffd166; border-color: #a6791f; background: rgba(220,170,40,0.08); }
         .wpm-band-tag.wpm-band-advanced     { color: #ff6f6f; border-color: #a63333; background: rgba(220,60,60,0.08); }
         .wpm-range {
-            -webkit-appearance: none; appearance: none; width: 100%; height: 6px;
+            -webkit-appearance: none; appearance: none; width: 100%; height: 8px;
             background: linear-gradient(to right,
                 rgba(111,207,151,0.4) 0%, rgba(111,207,151,0.4) 33.3%,
                 rgba(255,209,102,0.4) 33.3%, rgba(255,209,102,0.4) 66.6%,
                 rgba(255,111,111,0.4) 66.6%, rgba(255,111,111,0.4) 100%);
-            border-radius: 3px; outline: none; cursor: pointer; margin: 6px 0; touch-action: none;
+            border-radius: 4px; outline: none; cursor: pointer; margin: 8px 0; touch-action: none;
         }
         .wpm-range::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
-            background: var(--primary); border: 2px solid #04170c;
-            box-shadow: 0 0 8px rgba(0,208,106,0.7); cursor: pointer;
+            -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%;
+            background: var(--primary); border: 3px solid #04170c;
+            box-shadow: 0 0 10px rgba(0,208,106,0.8), 0 2px 4px rgba(0,0,0,0.4); cursor: pointer;
         }
         .wpm-range::-moz-range-thumb {
-            width: 20px; height: 20px; border-radius: 50%; background: var(--primary);
-            border: 2px solid #04170c; box-shadow: 0 0 8px rgba(0,208,106,0.7); cursor: pointer;
+            width: 26px; height: 26px; border-radius: 50%; background: var(--primary);
+            border: 3px solid #04170c; box-shadow: 0 0 10px rgba(0,208,106,0.8), 0 2px 4px rgba(0,0,0,0.4); cursor: pointer;
         }
         .wpm-range::-moz-range-track { background: transparent; }
         .wpm-band-labels {
             display: flex; justify-content: space-between; font-size: 0.56rem;
             color: var(--primary-dim); letter-spacing: 1px; opacity: 0.85; margin-top: 2px;
+        }
+        .wpm-presets { display: flex; gap: 5px; margin-top: 9px; }
+        .wpm-preset-btn {
+            flex: 1;
+            padding: 5px 2px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            color: var(--primary-dim);
+            font-family: inherit;
+            font-size: 0.72rem;
+            letter-spacing: 0.5px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .wpm-preset-btn:hover { border-color: var(--primary-dim); color: var(--primary); }
+        .wpm-preset-btn.active {
+            background: rgba(0,192,96,0.15);
+            border-color: var(--primary);
+            color: var(--primary);
+            text-shadow: 0 0 6px rgba(0,192,96,0.6);
         }
         .settings-grid {
             display: grid;
@@ -403,42 +425,87 @@
             display: block;
             opacity: 1.0;
         }
-        .checkbox-item {
+        .time-tabs { display: flex; gap: 6px; }
+        .time-tab {
+            flex: 1;
+            padding: 9px 4px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--primary-dim);
+            font-family: inherit;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.15s;
+        }
+        .time-tab.active {
+            background: rgba(0,192,96,0.12);
+            border-color: var(--primary);
+            color: var(--primary);
+            text-shadow: 0 0 8px rgba(0,192,96,0.6);
+            box-shadow: 0 0 10px rgba(0,192,96,0.15), inset 0 0 8px rgba(0,192,96,0.08);
+        }
+        .time-tab:hover:not(.active) { border-color: var(--primary-dim); color: var(--primary); }
+        .time-tab:active { transform: scale(0.97); }
+        .toggle-item {
             grid-column: 1 / -1;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             cursor: pointer;
         }
-        .checkbox-item input[type="checkbox"] {
-            appearance: none;
-            width: 18px; height: 18px;
-            border: 1px solid var(--primary-dim);
-            background: rgba(0,0,0,0.6);
-            cursor: pointer;
-            position: relative;
-            flex-shrink: 0;
-            border-radius: 1px;
-        }
-        .checkbox-item input[type="checkbox"]:checked {
-            background: rgba(0,123,67,0.2);
-            border-color: var(--primary);
-        }
-        .checkbox-item input[type="checkbox"]:checked::after {
-            content: '✓';
-            position: absolute;
-            top: -3px; left: 2px;
-            color: var(--primary);
-            font-size: 14px;
-            text-shadow: 0 0 6px var(--primary);
-        }
-        .checkbox-item label {
+        .toggle-icon { font-size: 1.1rem; line-height: 1; flex-shrink: 0; }
+        .toggle-text {
+            flex: 1;
             font-size: 0.78rem;
             color: var(--primary);
             cursor: pointer;
             letter-spacing: 0.5px;
             line-height: 1.5;
         }
+        .toggle-item input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 1px; height: 1px;
+            pointer-events: none;
+        }
+        .toggle-switch {
+            flex-shrink: 0;
+            width: 40px; height: 22px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.55);
+            border: 1px solid var(--primary-dim);
+            position: relative;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--primary-dim);
+            transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        .toggle-item input[type="checkbox"]:checked ~ .toggle-switch {
+            background: rgba(0,123,67,0.28);
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(0,192,96,0.25);
+        }
+        .toggle-item input[type="checkbox"]:checked ~ .toggle-switch::after {
+            transform: translateX(18px);
+            background: var(--primary);
+            box-shadow: 0 0 8px rgba(0,208,106,0.9);
+        }
+        .toggle-item:hover .toggle-switch { border-color: var(--primary); }
+        .toggle-item input[type="checkbox"]:focus-visible ~ .toggle-switch {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        .toggle-switch.toggle-switch-sm { width: 30px; height: 17px; border-radius: 9px; }
+        .toggle-switch.toggle-switch-sm::after { width: 12px; height: 12px; top: 1.5px; left: 2px; }
+        .toggle-item input[type="checkbox"]:checked ~ .toggle-switch.toggle-switch-sm::after { transform: translateX(13px); }
         .signal-indicators {
             display: flex;
             gap: 5px;
@@ -533,11 +600,12 @@
     <div id="start-screen">
         <div id="mode-settings" style="position:relative;">
             <!-- 音声チェック：右上 -->
-            <div id="audio-check-item" style="display:flex;position:absolute;top:0;right:0;align-items:center;gap:5px;font-size:0.72rem;color:var(--primary-dim);letter-spacing:1px;cursor:pointer;">
-                <input type="checkbox" id="audio-check" onchange="toggleSosCheck(this.checked)" style="margin:0;">
+            <label id="audio-check-item" class="toggle-item" for="audio-check" style="display:flex;position:absolute;top:0;right:0;align-items:center;gap:6px;font-size:0.72rem;color:var(--primary-dim);letter-spacing:1px;cursor:pointer;">
                 <span style="font-size:0.95rem;line-height:1;">🔊</span>
-                <label for="audio-check" style="cursor:pointer;white-space:nowrap;">Audio Check</label>
-            </div>
+                <span style="white-space:nowrap;">Audio Check</span>
+                <input type="checkbox" id="audio-check" onchange="toggleSosCheck(this.checked)">
+                <span class="toggle-switch toggle-switch-sm"></span>
+            </label>
             <!-- モード説明 -->
             <div style="display:flex;align-items:flex-start;gap:10px;margin:15px 0;">
                 <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:0;flex:1;">
@@ -547,11 +615,12 @@
             <div class="settings-grid" style="margin:18px 0 18px;">
                 <div class="setting-item">
                     <span class="setting-label">⏱ Time Limit</span>
-                    <select id="time-select" onchange="updateRxUrlState()">
-                        <option value="60">1 min</option>
-                        <option value="180">3 min</option>
-                        <option value="300">5 min</option>
-                    </select>
+                    <div class="time-tabs" id="time-tabs">
+                        <button type="button" class="time-tab active" data-value="60" onclick="selectTimeTab(this,'updateRxUrlState')">1 min</button>
+                        <button type="button" class="time-tab" data-value="180" onclick="selectTimeTab(this,'updateRxUrlState')">3 min</button>
+                        <button type="button" class="time-tab" data-value="300" onclick="selectTimeTab(this,'updateRxUrlState')">5 min</button>
+                    </div>
+                    <input type="hidden" id="time-select" value="60">
                 </div>
                 <div class="setting-item">
                     <span class="setting-label">📡 Morse Speed</span>
@@ -563,12 +632,18 @@
                         oninput="updateWpmReadout('wpm-select','wpm-readout-val','wpm-readout-band')"
                         onchange="onWpmSelectChange()" aria-label="Morse speed (WPM)">
                     <div class="wpm-band-labels"><span>Beginner</span><span>Intermediate</span><span>Advanced</span></div>
+            <div class="wpm-presets" id="wpm-presets">
+                <button type="button" class="wpm-preset-btn active" data-value="15" onclick="selectWpmPreset(this,'wpm-select','wpm-readout-val','wpm-readout-band')">🐢 15</button>
+                <button type="button" class="wpm-preset-btn" data-value="20" onclick="selectWpmPreset(this,'wpm-select','wpm-readout-val','wpm-readout-band')">🚶 20</button>
+                <button type="button" class="wpm-preset-btn" data-value="25" onclick="selectWpmPreset(this,'wpm-select','wpm-readout-val','wpm-readout-band')">🏃 25</button>
+            </div>
                 </div>
-                <div class="setting-item checkbox-item">
+                <label class="setting-item toggle-item" for="beginner-mode-check">
+                    <span class="toggle-icon">🔰</span>
+                    <span class="toggle-text">Beginner Mode (shows the Morse for the character being sent, in real time)</span>
                     <input type="checkbox" id="beginner-mode-check" onchange="updateRxUrlState()">
-                    <span style="font-size:1.1rem;line-height:1;flex-shrink:0;">🔰</span>
-                    <label for="beginner-mode-check">Beginner Mode (shows the Morse for the character being sent, in real time)</label>
-                </div>
+                    <span class="toggle-switch"></span>
+                </label>
             </div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
                 <button class="start-key-hint" onclick="unlockAndPrepare()"><span class="start-keycap">A</span>Press to start</button>

@@ -93,6 +93,45 @@ function updateWpmReadout(selId, valId, bandId) {
         bandEl.textContent = t('wpmBand_' + key);
         bandEl.className = 'wpm-band-tag wpm-band-' + key;
     }
+    if (selId === 'wpm-select') syncWpmPresets('wpm-select', 'wpm-presets');
+}
+
+// ── 制限時間セグメントボタン：<select>に見せかけたボタン群をクリックしたときの処理 ──
+function selectTimeTab(btn, onChangeFnName) {
+    const group = btn.closest('.time-tabs');
+    if (group) group.querySelectorAll('.time-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const hidden = document.getElementById('time-select');
+    if (hidden) hidden.value = btn.dataset.value;
+    if (typeof window[onChangeFnName] === 'function') window[onChangeFnName]();
+}
+// URL復元などでtime-selectの値が外部から変わったとき、ボタンの見た目(active)を同期する
+function syncTimeTabs() {
+    const hidden = document.getElementById('time-select');
+    const group = document.getElementById('time-tabs');
+    if (!hidden || !group) return;
+    group.querySelectorAll('.time-tab').forEach(b => {
+        b.classList.toggle('active', b.dataset.value === hidden.value);
+    });
+}
+// ── WPMクイック選択：スライダーと連動するワンタップ代表速度ボタン ──────────
+function selectWpmPreset(btn, selId, valId, bandId) {
+    const group = btn.closest('.wpm-presets');
+    if (group) group.querySelectorAll('.wpm-preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    sel.value = btn.dataset.value;
+    updateWpmReadout(selId, valId, bandId);
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+}
+function syncWpmPresets(selId, groupId) {
+    const sel = document.getElementById(selId);
+    const group = document.getElementById(groupId);
+    if (!sel || !group) return;
+    group.querySelectorAll('.wpm-preset-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.value === sel.value);
+    });
 }
 // 初心者帯(WPM)では、符号入力後の「文字区切り」判定までの猶予（TX_CHAR_GAP）を通常より少し長めに取る。
 // 初心者は次の符号を打ち始めるまでの反応が遅れがちで、通常倍率のままだと文字の途中で区切られてしまい
@@ -1487,6 +1526,7 @@ async function setNickname() {
     const timeSelect = document.getElementById('time-select');
     const timeParam = params.get('time');
     if (timeSelect && ['60', '180', '300'].includes(timeParam)) timeSelect.value = timeParam;
+    syncTimeTabs();
 })();
 
 // ── Initialize mode description on page load ───────────────────────────────────
@@ -1494,3 +1534,4 @@ applySelectorVisibility();
 updateTxModeDesc();
 updateWpmReadout('wpm-select', 'wpm-readout-val', 'wpm-readout-band');
 updateWpmReadout('free-wpm-select', 'free-wpm-readout-val', 'free-wpm-readout-band');
+syncTimeTabs();
