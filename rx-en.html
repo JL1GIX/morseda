@@ -630,6 +630,25 @@
             /* 注意: 要素自体がインラインstyleでposition:absoluteを持つため、!importantが必須 */
             #audio-check-item { position: static !important; justify-content: flex-end !important; margin-bottom: 10px !important; }
         }
+    
+        .mode-desc-row { margin: 15px 0; }
+        @media (min-width: 701px) and (max-height: 820px) {
+            .header-bar { margin-bottom: 8px; }
+            h1 { font-size: 1.5rem; letter-spacing: 5px; }
+            .subtitle { margin-bottom: 8px; }
+            #game-container { padding: 10px 20px 12px; margin: 4px 0 10px; }
+            .mode-desc-row { margin: 8px 0 5px !important; }
+            #mode-description { line-height: 1.4 !important; }
+            .beginner-hint { margin: 2px 0 5px; padding: 4px 8px; font-size: 0.68rem; line-height: 1.4; }
+            .settings-grid { margin: 6px 0; gap: 5px; }
+            .setting-item { padding: 6px 9px; }
+            .setting-label { margin-bottom: 3px; }
+            .wpm-readout { margin-bottom: 3px; }
+            .wpm-range { margin: 3px 0; }
+            .wpm-band-labels { margin-top: 0; }
+            .wpm-presets { margin-top: 3px; }
+            .start-key-hint { padding: 8px 24px; font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -650,13 +669,13 @@
                 <span class="toggle-switch toggle-switch-sm"></span>
             </label>
             <!-- モード説明 -->
-            <div style="display:flex;align-items:flex-start;gap:10px;margin:15px 0;">
+            <div class="mode-desc-row" style="display:flex;align-items:flex-start;gap:10px;">
                 <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:0;flex:1;">
                     Copy the alternating callsign and RST report.<br>Press Enter to judge. Copy accurately.
                 </p>
             </div>
             <div class="beginner-hint">🔰 First time? The defaults are fine as-is — just hit ▶ START below!</div>
-            <div class="settings-grid" style="margin:18px 0 18px;">
+            <div class="settings-grid">
                 <div class="setting-item">
                     <span class="setting-label">⏱ Time Limit</span>
                     <div class="time-tabs" id="time-tabs">
