@@ -761,6 +761,28 @@
             .header-bar { margin-top: 26px; }
             #scope-canvas { height: 90px; }
         }
+    
+        @media (min-width: 701px) and (max-height: 820px) {
+            .header-bar { margin-bottom: 8px; }
+            h1 { font-size: 1.5rem; letter-spacing: 5px; }
+            .subtitle { margin-bottom: 8px; }
+            #game-container { padding: 10px 20px 12px; margin: 4px 0 10px; }
+            .mode-desc-row { margin: 5px 0 !important; }
+            #mode-description { line-height: 1.4 !important; }
+            #key-customize-wrap { flex-direction: row !important; align-items: center !important; gap: 6px !important; padding-top: 0 !important; }
+            #key-customize-btn { padding: 3px 10px; font-size: 0.68rem; }
+            #key-assign-display { padding: 2px 6px !important; font-size: 0.54rem !important; line-height: 1.2 !important; }
+            .beginner-hint { margin: 2px 0 5px; padding: 4px 8px; font-size: 0.68rem; line-height: 1.4; }
+            .settings-grid { margin: 6px 0; gap: 5px; }
+            .setting-item { padding: 6px 9px; }
+            .setting-label { margin-bottom: 3px; }
+            .wpm-readout { margin-bottom: 3px; }
+            .wpm-range { margin: 3px 0; }
+            .wpm-band-labels { margin-top: 0; }
+            .wpm-presets { margin-top: 3px; }
+            #free-mode-link { margin-top: 2px; }
+            .start-key-hint { padding: 8px 24px; font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -774,7 +796,7 @@
     <div id="start-screen">
         <div id="mode-settings" style="position:relative;">
             <!-- モード説明 + キー設定ボタン -->
-            <div style="display:flex;align-items:flex-start;gap:10px;margin:15px 0;">
+            <div class="mode-desc-row" style="display:flex;align-items:flex-start;gap:10px;">
                 <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:0;flex:1;"></p>
                 <div id="key-customize-wrap" style="flex-shrink:0;padding-top:3px; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
                     <button id="key-customize-btn" onclick="openKeyCustomize()">⌨ Key Settings</button>
@@ -782,7 +804,7 @@
                 </div>
             </div>
             <div class="beginner-hint">🔰 First time? The defaults are fine as-is — just hit ▶ START below!</div>
-            <div class="settings-grid" style="margin:18px 0 18px;">
+            <div class="settings-grid">
                 <div class="setting-item" id="time-setting-item">
                     <span class="setting-label">⏱ Time Limit</span>
                     <div class="time-tabs" id="time-tabs">
