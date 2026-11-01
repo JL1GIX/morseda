@@ -818,15 +818,15 @@
                 <div class="setting-item" id="wpm-setting-item">
                     <span class="setting-label">📡 Morse Speed</span>
                     <div class="wpm-readout">
-                        <span class="wpm-readout-num" id="wpm-readout-val">25</span><span>WPM</span>
+                        <span class="wpm-readout-num" id="wpm-readout-val">30</span><span>WPM</span>
                         <span class="wpm-band-tag wpm-band-advanced" id="wpm-readout-band">Advanced</span>
                     </div>
-                    <input type="range" class="wpm-range" id="wpm-select" min="10" max="30" step="1" value="15"
+                    <input type="range" class="wpm-range" id="wpm-select" min="10" max="30" step="1" value="30"
                         oninput="updateWpmReadout('wpm-select','wpm-readout-val','wpm-readout-band')"
                         aria-label="Morse speed (WPM)">
                     <div class="wpm-band-labels"><span>Beginner</span><span>Intermediate</span><span>Advanced</span></div>
             <div class="wpm-presets" id="wpm-presets">
-                <button type="button" class="wpm-preset-btn active" data-value="15" onclick="selectWpmPreset(this,'wpm-select','wpm-readout-val','wpm-readout-band')">🐢 15</button>
+                <button type="button" class="wpm-preset-btn" data-value="15" onclick="selectWpmPreset(this,'wpm-select','wpm-readout-val','wpm-readout-band')">🐢 15</button>
                 <button type="button" class="wpm-preset-btn" data-value="20" onclick="selectWpmPreset(this,'wpm-select','wpm-readout-val','wpm-readout-band')">🚶 20</button>
                 <button type="button" class="wpm-preset-btn" data-value="25" onclick="selectWpmPreset(this,'wpm-select','wpm-readout-val','wpm-readout-band')">🏃 25</button>
             </div>
@@ -913,10 +913,10 @@
         <div id="free-wpm-row" style="display:flex;flex-direction:column;align-items:stretch;gap:2px;width:100%;max-width:320px;margin:0 auto;">
             <div class="wpm-readout">
                 <span class="setting-label" style="margin-bottom:0;">📡 Morse Speed</span>
-                <span class="wpm-readout-num" id="free-wpm-readout-val">25</span><span>WPM</span>
+                <span class="wpm-readout-num" id="free-wpm-readout-val">30</span><span>WPM</span>
                 <span class="wpm-band-tag wpm-band-advanced" id="free-wpm-readout-band">Advanced</span>
             </div>
-            <input type="range" class="wpm-range" id="free-wpm-select" min="10" max="30" step="1" value="15"
+            <input type="range" class="wpm-range" id="free-wpm-select" min="10" max="30" step="1" value="30"
                 oninput="updateWpmReadout('free-wpm-select','free-wpm-readout-val','free-wpm-readout-band')"
                 onchange="changeFreeWpm()" aria-label="Morse speed (WPM)">
             <div class="wpm-band-labels"><span>Beginner</span><span>Intermediate</span><span>Advanced</span></div>
