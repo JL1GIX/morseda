@@ -513,6 +513,10 @@ function pickWord() {
     return w;
 }
 
+// コンテストナンバーの「カットナンバー」表記: 1→A(・－)、0→O(－－－)/T(－)。
+// 送信モードと同様、コンテストナンバー部分では本来の数字の符号に加えて、
+// これらのカットナンバーでも正解とする（コールサイン部分は対象外）。表示は常に本来の符号。
+const CUT_NUMBER_ACCEPT = { '1': ['A'], '0': ['O', 'T'], '9': ['N'] };
 // ── コールサイン+コンテストナンバー（送信モードの生成ロジックを移植）────────────────
 // tx.js の generateCallsign()/generateRST() と同一ロジック。コールサイン→ナンバー→コールサイン…と交互に出題する。
 function generateCallsign() {
@@ -535,8 +539,11 @@ function generateRST() {
     return '5NN' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
 }
 let nextAsobiCallType = 'CALLSIGN';
+// 現在出題中の単語がコールサインかどうか(falseならコンテストナンバー＝カットナンバー許容対象)
+let asobiCurrentIsCallsign = true;
 function pickCallsignWord() {
     const isCallsign = (nextAsobiCallType === 'CALLSIGN');
+    asobiCurrentIsCallsign = isCallsign;
     nextAsobiCallType = isCallsign ? 'RST' : 'CALLSIGN';
     return isCallsign ? generateCallsign() : generateRST();
 }
@@ -959,7 +966,10 @@ function decodeTxChar() {
 function evaluateTxChar(decoded) {
     const expected = txWord[txCharIndex];
     const txArea   = document.getElementById('tx-area');
-    const isCorrect = (decoded === expected);
+    // コールサイン+ナンバーのコンテストナンバー部分のみ、カットナンバーも正解として許容する
+    // (送信モードと同じ挙動。コールサイン部分や「身近な単語」カテゴリでは対象外)
+    const cutAlts = (wordCategory === 'CALLSIGN' && !asobiCurrentIsCallsign && CUT_NUMBER_ACCEPT[expected]) || [];
+    const isCorrect = (decoded === expected) || cutAlts.includes(decoded);
     if (isCorrect) {
         txCharIndex++;
         score++;
