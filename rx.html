@@ -42,6 +42,10 @@
             --code-color: #eef7f2;
         }
         html, body { scrollbar-gutter: stable; }
+        /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
+        @media (min-width: 701px) {
+            html { font-size: clamp(16px, 0.65vw + 11px, 20px); }
+        }
         * { box-sizing: border-box; }
         body {
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
@@ -78,7 +82,7 @@
             border-radius: 4px;
             box-shadow: 0 0 50px rgba(0,100,55,0.35), 0 0 100px rgba(0,80,40,0.12), inset 0 1px 0 rgba(0,123,67,0.18);
             width: 95%;
-            max-width: 960px;
+            max-width: 1200px;
             text-align: center;
             position: relative;
             z-index: 2;
@@ -405,28 +409,6 @@
             display: flex; justify-content: space-between; font-size: 0.56rem;
             color: var(--primary-dim); letter-spacing: 1px; opacity: 0.85; margin-top: 2px;
         }
-        .wpm-presets { display: flex; gap: 5px; margin-top: 9px; }
-        .wpm-preset-btn {
-            flex: 1;
-            padding: 5px 2px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border);
-            color: var(--primary-dim);
-            font-family: inherit;
-            font-size: 0.72rem;
-            letter-spacing: 0.5px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.15s;
-            white-space: nowrap;
-        }
-        .wpm-preset-btn:hover { border-color: var(--primary-dim); color: var(--primary); }
-        .wpm-preset-btn.active {
-            background: rgba(0,192,96,0.15);
-            border-color: var(--primary);
-            color: var(--primary);
-            text-shadow: 0 0 6px rgba(0,192,96,0.6);
-        }
         .settings-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -646,7 +628,6 @@
             .wpm-readout { margin-bottom: 3px; }
             .wpm-range { margin: 3px 0; }
             .wpm-band-labels { margin-top: 0; }
-            .wpm-presets { margin-top: 3px; }
             .start-key-hint { padding: 8px 24px; font-size: 1rem; }
         }
     </style>
@@ -695,11 +676,6 @@
                         oninput="updateWpmReadout('wpm-select','wpm-readout-val','wpm-readout-band')"
                         onchange="onWpmSelectChange()" aria-label="モールス速度(WPM)">
                     <div class="wpm-band-labels"><span>初心者</span><span>中級者</span><span>上級者</span></div>
-            <div class="wpm-presets" id="wpm-presets">
-                <button type="button" class="wpm-preset-btn" data-value="15" onclick="selectWpmPreset(this,'wpm-select','wpm-readout-val','wpm-readout-band')">🐢 15</button>
-                <button type="button" class="wpm-preset-btn" data-value="20" onclick="selectWpmPreset(this,'wpm-select','wpm-readout-val','wpm-readout-band')">🚶 20</button>
-                <button type="button" class="wpm-preset-btn" data-value="25" onclick="selectWpmPreset(this,'wpm-select','wpm-readout-val','wpm-readout-band')">🏃 25</button>
-            </div>
                 </div>
                 <label class="setting-item toggle-item" for="beginner-mode-check">
                     <span class="toggle-icon">🔰</span>

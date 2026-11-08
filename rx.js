@@ -64,7 +64,6 @@ function updateWpmReadout(selId, valId, bandId) {
         bandEl.textContent = t('wpmBand_' + key);
         bandEl.className = 'wpm-band-tag wpm-band-' + key;
     }
-    if (selId === 'wpm-select') syncWpmPresets('wpm-select', 'wpm-presets');
 }
 
 // ── 制限時間セグメントボタン：<select>に見せかけたボタン群をクリックしたときの処理 ──
@@ -83,25 +82,6 @@ function syncTimeTabs() {
     if (!hidden || !group) return;
     group.querySelectorAll('.time-tab').forEach(b => {
         b.classList.toggle('active', b.dataset.value === hidden.value);
-    });
-}
-// ── WPMクイック選択：スライダーと連動するワンタップ代表速度ボタン ──────────
-function selectWpmPreset(btn, selId, valId, bandId) {
-    const group = btn.closest('.wpm-presets');
-    if (group) group.querySelectorAll('.wpm-preset-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const sel = document.getElementById(selId);
-    if (!sel) return;
-    sel.value = btn.dataset.value;
-    updateWpmReadout(selId, valId, bandId);
-    sel.dispatchEvent(new Event('change', { bubbles: true }));
-}
-function syncWpmPresets(selId, groupId) {
-    const sel = document.getElementById(selId);
-    const group = document.getElementById(groupId);
-    if (!sel || !group) return;
-    group.querySelectorAll('.wpm-preset-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.value === sel.value);
     });
 }
 
