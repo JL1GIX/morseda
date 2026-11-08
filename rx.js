@@ -112,7 +112,7 @@ let toneStrength = 0;
 let toneSchedule = [];
 let charSchedule = [];
 // SOS check state
-let _sosCtx = null, _sosTimer = null;
+let _sosCtx = null, _sosTimer = null, _sosCompressor = null, _sosNoiseNodes = null;
 // DOM refs
 const mobileInput = document.getElementById('mobile-input');
 const displayFrame = document.getElementById('input-display');
@@ -225,6 +225,8 @@ function startGame() {
 }
 
 // ── 音声チェック（SOS ループ）────────────────────────────────────────────────────
+// WPMスライダーと同様、雑音(QRN)レベルを変更した際も、音声チェックがONなら
+// その場で選択中のレベルの雑音入りSOSに流し直して確認できるようにする。
 function toggleSosCheck(on) { if (on) startSosCheck(); else stopSosCheck(); }
 function onWpmSelectChange() {
     updateWpmReadout('wpm-select', 'wpm-readout-val', 'wpm-readout-band');
@@ -235,17 +237,116 @@ function onWpmSelectChange() {
         startSosCheck();
     }
 }
+function onNoiseSelectChange() {
+    updateRxUrlState();
+    // 音声チェックが ON のとき、選択された雑音レベルを反映してSOSを流し直す
+    const cb = document.getElementById('audio-check');
+    if (cb && cb.checked) {
+        stopSosCheck();
+        startSosCheck();
+    }
+}
+
+function getSosNoiseLevel() {
+    const sel = document.getElementById('noise-select');
+    return sel ? (parseInt(sel.value) || 0) : 0;
+}
+
+// 雑音ONのときだけ本編と同じAGC相当のコンプレッサーを経由させ、
+// SOSトーン＋雑音が混ざっても音割れしないようにする(本編の仕組みと同じ)。
+function setupSosRouting() {
+    const level = getSosNoiseLevel();
+    if (level > 0) {
+        _sosCompressor = _sosCtx.createDynamicsCompressor();
+        const now = _sosCtx.currentTime;
+        _sosCompressor.threshold.setValueAtTime(-24, now);
+        _sosCompressor.knee.setValueAtTime(10, now);
+        _sosCompressor.ratio.setValueAtTime(4, now);
+        _sosCompressor.attack.setValueAtTime(0.02, now);
+        _sosCompressor.release.setValueAtTime(0.25, now);
+        _sosCompressor.connect(_sosCtx.destination);
+    } else {
+        _sosCompressor = null;
+    }
+}
+function sosDestination() { return _sosCompressor || (_sosCtx ? _sosCtx.destination : null); }
+
+function startSosNoiseAudio() {
+    stopSosNoiseAudio();
+    const level = getSosNoiseLevel();
+    if (!level || level <= 0 || !_sosCtx) return;
+    const ctx = _sosCtx;
+    const dest = sosDestination();
+    const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * 4), ctx.sampleRate);
+    fillPinkNoise(buf.getChannelData(0));
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const bandpass = ctx.createBiquadFilter();
+    bandpass.type = 'bandpass';
+    bandpass.frequency.value = CW_TONE_FREQ;
+    bandpass.Q.value = 1.4;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.value = NOISE_LEVEL_GAIN[level] || 0;
+    src.connect(bandpass); bandpass.connect(noiseGain); noiseGain.connect(dest);
+    src.start(0);
+    _sosNoiseNodes = { src, bandpass, noiseGain, crashTimer: null, level };
+    scheduleSosStaticCrashes();
+}
+
+function stopSosNoiseAudio() {
+    if (_sosNoiseNodes) {
+        if (_sosNoiseNodes.crashTimer) clearTimeout(_sosNoiseNodes.crashTimer);
+        try { _sosNoiseNodes.src.stop(); } catch (e) {}
+        try { _sosNoiseNodes.src.disconnect(); } catch (e) {}
+        try { _sosNoiseNodes.bandpass.disconnect(); } catch (e) {}
+        try { _sosNoiseNodes.noiseGain.disconnect(); } catch (e) {}
+    }
+    _sosNoiseNodes = null;
+}
+
+function scheduleSosStaticCrashes() {
+    if (!_sosNoiseNodes || !_sosCtx) return;
+    const level = _sosNoiseNodes.level;
+    const base = NOISE_CRASH_BASE_MS[level] || 9000;
+    const jitter = base * (0.6 + Math.random() * 0.8);
+    _sosNoiseNodes.crashTimer = setTimeout(() => {
+        playSosStaticCrash(level);
+        scheduleSosStaticCrashes();
+    }, jitter);
+}
+
+function playSosStaticCrash(level) {
+    if (!_sosCtx) return;
+    const ctx = _sosCtx;
+    const dest = sosDestination();
+    if (!dest) return;
+    const dur = 0.05 + Math.random() * 0.06;
+    const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * dur), ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const gain = ctx.createGain();
+    gain.gain.value = NOISE_CRASH_GAIN[level] || 0;
+    src.connect(gain); gain.connect(dest);
+    src.start();
+}
 
 function startSosCheck() {
     stopSosCheck();
     const AC = window.AudioContext || window.webkitAudioContext;
     _sosCtx = new AC();
+    setupSosRouting();
     _sosLoop();
+    startSosNoiseAudio();
 }
 
 function stopSosCheck() {
     if (_sosTimer) { clearTimeout(_sosTimer); _sosTimer = null; }
+    stopSosNoiseAudio();
     if (_sosCtx)   { try { _sosCtx.close(); } catch(e){} _sosCtx = null; }
+    _sosCompressor = null;
 }
 
 function _sosLoop() {
@@ -257,24 +358,14 @@ function _sosLoop() {
     const elGap = dotT;
     const ltGap = dotT * 3;
     const wdGap = dotT * 7;
-    const freq  = 750;
     // SOS はプロサイン：文字間隔なし、要素間隔のみでつなげて送出
     const sosSymbols = '...---...'.split('');
     let t = _sosCtx.currentTime + 0.05;
     let offset = 0;
+    const dest = sosDestination();
     sosSymbols.forEach((sym) => {
         const dur = sym === '.' ? dotT : dashT;
-        const osc = _sosCtx.createOscillator();
-        const gn  = _sosCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        gn.gain.setValueAtTime(0, t + offset);
-        gn.gain.linearRampToValueAtTime(0.5, t + offset + 0.006);
-        gn.gain.setValueAtTime(0.5, t + offset + dur - 0.006);
-        gn.gain.linearRampToValueAtTime(0, t + offset + dur + 0.006);
-        osc.connect(gn); gn.connect(_sosCtx.destination);
-        osc.start(t + offset);
-        osc.stop(t + offset + dur + 0.05);
+        scheduleCwTone(_sosCtx, dest, t + offset, dur, 0.5, 0.05);
         offset += dur + elGap;
     });
     offset += (wdGap - elGap);
