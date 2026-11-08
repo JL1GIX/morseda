@@ -748,21 +748,42 @@ function onTxKeyUp(e) {
     }
 }
 
+// ── CW音色生成: レイズドコサイン(無線機のキークリック防止回路と同じ原理)で
+// 音の立ち上がり・立ち下がりをなめらかにし、デジタル合成特有の硬さを減らして
+// 実機の受信音/サイドトーンに近い、丸みのある自然な音色にする。
+const CW_TONE_FREQ = 750;
+const CW_CURVE_STEPS = 24;
+const CW_RISE_SEC = 0.006;
+const CW_FALL_SEC = 0.009;
+const CW_FALL_LEAD = 0.003;
+function scheduleCwTone(ctx, dest, startTime, dur, peak, stopMargin) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = CW_TONE_FREQ;
+    const rise = new Float32Array(CW_CURVE_STEPS);
+    const fall = new Float32Array(CW_CURVE_STEPS);
+    for (let i = 0; i < CW_CURVE_STEPS; i++) {
+        const shaped = 0.5 - 0.5 * Math.cos(Math.PI * i / (CW_CURVE_STEPS - 1));
+        rise[i] = peak * shaped;
+        fall[CW_CURVE_STEPS - 1 - i] = peak * shaped;
+    }
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.setValueCurveAtTime(rise, startTime, CW_RISE_SEC);
+    gain.gain.setValueAtTime(peak, startTime + dur - CW_FALL_LEAD);
+    gain.gain.setValueCurveAtTime(fall, startTime + dur - CW_FALL_LEAD, CW_FALL_SEC);
+    osc.connect(gain); gain.connect(dest);
+    osc.start(startTime);
+    osc.stop(startTime + dur + stopMargin);
+    return { osc, gain };
+}
+
 function playSidetone(isDash) {
     if (!audioCtx) return;
     const dur = isDash ? TX_DOT_TIME * 3 : TX_DOT_TIME;
     const t   = audioCtx.currentTime;
     const ms  = Date.now();
-    const osc = audioCtx.createOscillator();
-    const gn  = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = 750;
-    gn.gain.setValueAtTime(0, t);
-    gn.gain.linearRampToValueAtTime(0.4, t + 0.006);
-    gn.gain.setValueAtTime(0.4, t + dur - 0.003);
-    gn.gain.linearRampToValueAtTime(0, t + dur + 0.006);
-    osc.connect(gn); gn.connect(masterGain);
-    osc.start(t); osc.stop(t + dur + 0.01);
+    scheduleCwTone(audioCtx, masterGain, t, dur, 0.4, 0.01);
     toneSchedule.push({ onTime: ms, offTime: ms + dur * 1000 });
 }
 

@@ -523,6 +523,15 @@
             box-shadow: 0 0 10px rgba(0,255,140,1), 0 1px 2px rgba(0,0,0,0.4);
         }
         .toggle-item:hover .toggle-switch { border-color: var(--primary); }
+        .noise-setting-item {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .noise-setting-item .setting-label { margin-bottom: 0; }
         .toggle-item input[type="checkbox"]:focus-visible ~ .toggle-switch {
             outline: 2px solid var(--primary);
             outline-offset: 2px;
@@ -683,6 +692,17 @@
                     <input type="checkbox" id="beginner-mode-check" onchange="updateRxUrlState()">
                     <span class="toggle-switch"></span>
                 </label>
+                <div class="setting-item noise-setting-item">
+                    <span class="setting-label">📻 雑音(QRN)</span>
+                    <select id="noise-select" onchange="updateRxUrlState()" aria-label="受信雑音レベル">
+                        <option value="0" selected>オフ</option>
+                        <option value="1">レベル1</option>
+                        <option value="2">レベル2</option>
+                        <option value="3">レベル3</option>
+                        <option value="4">レベル4</option>
+                        <option value="5">レベル5</option>
+                    </select>
+                </div>
             </div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
                 <button class="start-key-hint" onclick="unlockAndPrepare()"><span class="start-keycap">A</span>キーでスタート</button>

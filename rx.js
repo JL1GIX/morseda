@@ -86,7 +86,9 @@ function syncTimeTabs() {
 }
 
 // ── State ──────────────────────────────────────────────────────────────────────
-let audioCtx = null, masterGain = null;
+let audioCtx = null, masterGain = null, compressorNode = null;
+let noiseLevel = 0; // 0=オフ, 1〜5=雑音レベル
+let noiseNodes = null;
 let timeLeft, initialSeconds, score = 0, currentWord = '', isPlaying = false;
 let timerId, audioLoopId, activeOscillators = [];
 let isWaitingNext = false, nextType = 'CALLSIGN';
@@ -141,14 +143,20 @@ function generateRST() {
     return '599' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
 }
 
-// 初心者モードのチェックボックス状態をURLのクエリ文字列に反映する。
+// 初心者モード・雑音レベルのチェックボックス/プルダウン状態をURLのクエリ文字列に反映する。
 // リロード時に下の初期化処理がこのURLを読み直すため、設定を保ったままリロードできる。
+const RX_NOISE_STORAGE = 'morseda_rx_noise_level';
 function updateRxUrlState() {
     const params = new URLSearchParams(window.location.search);
     const beginnerCheck = document.getElementById('beginner-mode-check');
     const timeSelect = document.getElementById('time-select');
+    const noiseSelect = document.getElementById('noise-select');
     params.set('beginner', (beginnerCheck && beginnerCheck.checked) ? '1' : '0');
     if (timeSelect) params.set('time', timeSelect.value);
+    if (noiseSelect) {
+        params.set('noise', noiseSelect.value);
+        try { localStorage.setItem(RX_NOISE_STORAGE, noiseSelect.value); } catch (e) {}
+    }
     history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
 }
 
@@ -172,8 +180,11 @@ function unlockAndPrepare() {
         audioCtx = new AC();
         masterGain = audioCtx.createGain();
         masterGain.gain.setValueAtTime(1, 0);
-        masterGain.connect(audioCtx.destination);
     }
+    stopNoiseAudio();
+    const noiseSelect = document.getElementById('noise-select');
+    noiseLevel = noiseSelect ? (parseInt(noiseSelect.value) || 0) : 0;
+    setupAudioRouting();
     const doResume = (audioCtx.state === 'suspended') ? audioCtx.resume() : Promise.resolve();
     const unlockBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
     const unlockSrc = audioCtx.createBufferSource();
@@ -181,6 +192,7 @@ function unlockAndPrepare() {
     unlockSrc.connect(masterGain);
     unlockSrc.start(0);
     audioCtx.onstatechange = () => { if (audioCtx.state === 'suspended') audioCtx.resume(); };
+    if (noiseLevel > 0) startNoiseAudio(noiseLevel);
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
     document.getElementById('game-start-overlay').classList.remove('hidden');
@@ -270,6 +282,147 @@ function _sosLoop() {
 }
 
 // ── Audio ──────────────────────────────────────────────────────────────────────
+
+// CW音色生成: レイズドコサイン(無線機のキークリック防止回路と同じ原理)で
+// 音の立ち上がり・立ち下がりをなめらかにし、デジタル合成特有の硬さを減らして
+// 実機の受信音に近い、丸みのある自然な音色にする。
+const CW_TONE_FREQ = 750;
+const CW_CURVE_STEPS = 24;
+const CW_RISE_SEC = 0.006;
+const CW_FALL_SEC = 0.009;
+const CW_FALL_LEAD = 0.003;
+function scheduleCwTone(ctx, dest, startTime, dur, peak, stopMargin) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = CW_TONE_FREQ;
+    const rise = new Float32Array(CW_CURVE_STEPS);
+    const fall = new Float32Array(CW_CURVE_STEPS);
+    for (let i = 0; i < CW_CURVE_STEPS; i++) {
+        const shaped = 0.5 - 0.5 * Math.cos(Math.PI * i / (CW_CURVE_STEPS - 1));
+        rise[i] = peak * shaped;
+        fall[CW_CURVE_STEPS - 1 - i] = peak * shaped;
+    }
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.setValueCurveAtTime(rise, startTime, CW_RISE_SEC);
+    gain.gain.setValueAtTime(peak, startTime + dur - CW_FALL_LEAD);
+    gain.gain.setValueCurveAtTime(fall, startTime + dur - CW_FALL_LEAD, CW_FALL_SEC);
+    osc.connect(gain); gain.connect(dest);
+    osc.start(startTime);
+    osc.stop(startTime + dur + stopMargin);
+    return { osc, gain };
+}
+
+// 出力ルーティングの切り替え: 雑音ONのときだけ、実機のAGC(自動利得制御)のように
+// 信号のピークをやわらかく抑えるコンプレッサーを経由させる。これにより
+// トーンと雑音が混ざっても音割れせず、受信機らしいまとまりのある音になる。
+// 雑音OFF時はコンプレッサーを通さず、モールス音をそのままクリアに再生する。
+function setupAudioRouting() {
+    try { masterGain.disconnect(); } catch (e) {}
+    if (compressorNode) { try { compressorNode.disconnect(); } catch (e) {} compressorNode = null; }
+    if (noiseLevel > 0) {
+        compressorNode = audioCtx.createDynamicsCompressor();
+        const now = audioCtx.currentTime;
+        compressorNode.threshold.setValueAtTime(-24, now);
+        compressorNode.knee.setValueAtTime(10, now);
+        compressorNode.ratio.setValueAtTime(4, now);
+        compressorNode.attack.setValueAtTime(0.02, now);
+        compressorNode.release.setValueAtTime(0.25, now);
+        masterGain.connect(compressorNode);
+        compressorNode.connect(audioCtx.destination);
+    } else {
+        masterGain.connect(audioCtx.destination);
+    }
+}
+
+// ── 受信雑音(QRN/バンドノイズ)生成 ─────────────────────────────────────────────
+// 実際のCW交信で聞こえる帯域雑音を、ピンクノイズをCWフィルタ相当の狭帯域
+// バンドパスに通して再現する。加えて、空電雑音(QRN)特有の「パチッ」という
+// 静電気バーストをランダムな間隔で重ね、よりリアルな受信音にする。
+// レベル5でも人の耳でモールスがはっきり聞き取れる範囲にゲインを抑えてある。
+const NOISE_LEVEL_GAIN  = [0, 0.3, 0.6, 1.0, 1.5, 2.0];
+const NOISE_CRASH_GAIN  = [0, 0.15, 0.25, 0.35, 0.5, 0.65];
+const NOISE_CRASH_BASE_MS = [0, 9000, 7800, 6600, 5400, 4200];
+
+function fillPinkNoise(data) {
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    for (let i = 0; i < data.length; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+        b6 = white * 0.115926;
+        data[i] = pink * 0.11;
+    }
+}
+
+function startNoiseAudio(level) {
+    stopNoiseAudio();
+    if (!level || level <= 0 || !audioCtx || !masterGain) return;
+    const ctx = audioCtx;
+    const noiseDurSec = 4;
+    const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * noiseDurSec), ctx.sampleRate);
+    fillPinkNoise(buf.getChannelData(0));
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    // CWフィルタ(狭帯域フィルタ)を通したような帯域雑音にするためのバンドパス
+    const bandpass = ctx.createBiquadFilter();
+    bandpass.type = 'bandpass';
+    bandpass.frequency.value = CW_TONE_FREQ;
+    bandpass.Q.value = 1.4;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.value = NOISE_LEVEL_GAIN[level] || 0;
+    src.connect(bandpass);
+    bandpass.connect(noiseGain);
+    noiseGain.connect(masterGain);
+    src.start(0);
+    noiseNodes = { src, bandpass, noiseGain, crashTimer: null, level };
+    scheduleStaticCrashes();
+}
+
+function stopNoiseAudio() {
+    if (noiseNodes) {
+        if (noiseNodes.crashTimer) clearTimeout(noiseNodes.crashTimer);
+        try { noiseNodes.src.stop(); } catch (e) {}
+        try { noiseNodes.src.disconnect(); } catch (e) {}
+        try { noiseNodes.bandpass.disconnect(); } catch (e) {}
+        try { noiseNodes.noiseGain.disconnect(); } catch (e) {}
+    }
+    noiseNodes = null;
+}
+
+function scheduleStaticCrashes() {
+    if (!noiseNodes || !audioCtx) return;
+    const level = noiseNodes.level;
+    const base = NOISE_CRASH_BASE_MS[level] || 9000;
+    const jitter = base * (0.6 + Math.random() * 0.8);
+    noiseNodes.crashTimer = setTimeout(() => {
+        playStaticCrash(level);
+        scheduleStaticCrashes();
+    }, jitter);
+}
+
+function playStaticCrash(level) {
+    if (!audioCtx || !masterGain) return;
+    const ctx = audioCtx;
+    const dur = 0.05 + Math.random() * 0.06;
+    const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * dur), ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const gain = ctx.createGain();
+    gain.gain.value = NOISE_CRASH_GAIN[level] || 0;
+    src.connect(gain);
+    gain.connect(masterGain);
+    src.start();
+}
+
 function killCurrentAudio() {
     if (audioLoopId) { clearTimeout(audioLoopId); audioLoopId = null; }
     if (audioCtx) {
@@ -326,17 +479,7 @@ function playMorse(text) {
         const charStartOffset = offset;
         code.split('').forEach(symbol => {
             const dur = (symbol === '.') ? DOT_TIME : DOT_TIME * 3;
-            const osc  = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = 750;
-            gain.gain.setValueAtTime(0, startTime + offset);
-            gain.gain.linearRampToValueAtTime(0.5, startTime + offset + 0.006);
-            gain.gain.setValueAtTime(0.5, startTime + offset + dur - 0.003);
-            gain.gain.linearRampToValueAtTime(0, startTime + offset + dur + 0.006);
-            osc.connect(gain); gain.connect(masterGain);
-            osc.start(startTime + offset);
-            osc.stop(startTime + offset + dur + 0.05);
+            const { osc, gain } = scheduleCwTone(audioCtx, masterGain, startTime + offset, dur, 0.5, 0.05);
             activeOscillators.push({ osc, gain });
             toneSchedule.push({ onTime: startMs + offset * 1000, offTime: startMs + (offset + dur) * 1000 });
             offset += dur + DOT_TIME;
@@ -684,7 +827,7 @@ function quitGame() {
     isPlaying = false; scopeRunning = false;
     document.getElementById('game-start-overlay').classList.add('hidden');
     if (gameStartTimer) { clearTimeout(gameStartTimer); gameStartTimer = null; }
-    clearInterval(timerId); killCurrentAudio();
+    clearInterval(timerId); killCurrentAudio(); stopNoiseAudio();
     score = 0;
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('start-screen').classList.remove('hidden');
@@ -697,7 +840,7 @@ function retryGame() {
 
 function endGame() {
     isPlaying = false; scopeRunning = false;
-    clearInterval(timerId); killCurrentAudio();
+    clearInterval(timerId); killCurrentAudio(); stopNoiseAudio();
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
         `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min`;
@@ -813,6 +956,18 @@ async function setNickname() {
     const timeSelect = document.getElementById('time-select');
     const timeParam = params.get('time');
     if (timeSelect && ['60', '180', '300'].includes(timeParam)) timeSelect.value = timeParam;
+    const noiseSelect = document.getElementById('noise-select');
+    if (noiseSelect) {
+        const noiseParam = params.get('noise');
+        let savedNoise = null;
+        try { savedNoise = localStorage.getItem(RX_NOISE_STORAGE); } catch (e) {}
+        const validLevels = ['0', '1', '2', '3', '4', '5'];
+        if (validLevels.includes(noiseParam)) {
+            noiseSelect.value = noiseParam;
+        } else if (validLevels.includes(savedNoise)) {
+            noiseSelect.value = savedNoise;
+        }
+    }
     syncTimeTabs();
 })();
 
