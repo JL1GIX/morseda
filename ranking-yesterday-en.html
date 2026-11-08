@@ -376,8 +376,9 @@
     </div>
 
     <div class="ranking-nav-links">
-        <a href="/ranking-en.html">🏆 All-Time Ranking</a>
-        <a href="/ranking-today-en.html">📅 Today's Ranking</a>
+        <a id="nav-alltime-link" href="/ranking-en.html">🏆 All-Time Ranking</a>
+        <a id="nav-today-link" href="/ranking-today-en.html">📅 Today's Ranking</a>
+        <a href="/ranking-asobi-yesterday-en.html">🎮 Fun Mode Ranking</a>
     </div>
 
     <div id="ranking-body">
@@ -545,12 +546,21 @@ function saveRankingTabState() {
 
 // 現在選択中のタブ(モード/分数)をURLのクエリ文字列にも反映する。
 // リロード時にinitの初期化処理がこのURLを読み直すため、選択中のタブを保ったままリロードできる。
+function updateNavLinkHrefs() {
+    const qs = `?mode=${currentMode}&time=${currentMinutes}`;
+    const alltimeLink = document.getElementById('nav-alltime-link');
+    if (alltimeLink) alltimeLink.href = '/ranking-en.html' + qs;
+    const todayLink = document.getElementById('nav-today-link');
+    if (todayLink) todayLink.href = '/ranking-today-en.html' + qs;
+}
+
 function updateUrlState() {
     const params = new URLSearchParams(window.location.search);
     params.set('mode', currentMode);
     params.set('time', currentMinutes);
     history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
     saveRankingTabState();
+    updateNavLinkHrefs();
 }
 
 function switchMode(mode) {

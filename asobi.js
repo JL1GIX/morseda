@@ -384,6 +384,19 @@ function applySelectorVisibility() {
     const rankLinkA = document.getElementById('asobi-ranking-link-a');
     if (rankLinkA) rankLinkA.href = asobiRankingBase();
 }
+// ロビー画面のタブ選択(単語種別/プレイスタイル)をlocalStorageにも保存する。
+// クエリ文字列なしで(他ページからのリンクやブックマーク経由で)アクセスした場合でも、
+// 前回選択していたタブを復元できるようにするため。
+const ASOBI_LOBBY_STORAGE_WC = 'morseda_asobi_lobby_wc';
+const ASOBI_LOBBY_STORAGE_VARIANT = 'morseda_asobi_lobby_variant';
+
+function saveAsobiLobbyTabState() {
+    try {
+        localStorage.setItem(ASOBI_LOBBY_STORAGE_WC, wordCategory);
+        localStorage.setItem(ASOBI_LOBBY_STORAGE_VARIANT, gameVariant);
+    } catch (e) {}
+}
+
 // 現在選択中のタブ(単語種別/プレイスタイル)とチェックボックス(初心者モード/Morse Board)を
 // URLのクエリ文字列に反映する。リロード時に下の初期化処理がこのURLを読み直すため、設定を保ったままリロードできる。
 function updateAsobiUrlState() {
@@ -397,6 +410,7 @@ function updateAsobiUrlState() {
     params.set('morseboard', (morseBoardCheck && morseBoardCheck.checked) ? '1' : '0');
     if (timeSelect) params.set('time', timeSelect.value);
     history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+    saveAsobiLobbyTabState();
 }
 function selectWordCategory(cat) {
     wordCategory = cat;
@@ -1516,17 +1530,26 @@ async function setNickname() {
     const params = new URLSearchParams(window.location.search);
     const wcParam = params.get('wc');
     const variantParam = params.get('variant');
+    let savedWc = null, savedVariant = null;
+    try {
+        savedWc = localStorage.getItem(ASOBI_LOBBY_STORAGE_WC);
+        savedVariant = localStorage.getItem(ASOBI_LOBBY_STORAGE_VARIANT);
+    } catch (e) {}
     if (wcParam === 'GENERAL' || wcParam === 'CALLSIGN') {
         wordCategory = wcParam;
-        document.getElementById('wc-general').classList.toggle('active', wcParam === 'GENERAL');
-        document.getElementById('wc-callsign').classList.toggle('active', wcParam === 'CALLSIGN');
+    } else if (savedWc === 'GENERAL' || savedWc === 'CALLSIGN') {
+        wordCategory = savedWc;
     }
+    document.getElementById('wc-general').classList.toggle('active', wordCategory === 'GENERAL');
+    document.getElementById('wc-callsign').classList.toggle('active', wordCategory === 'CALLSIGN');
     if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(variantParam)) {
         gameVariant = variantParam;
-        document.getElementById('var-normal').classList.toggle('active', variantParam === 'NORMAL');
-        document.getElementById('var-accuracy').classList.toggle('active', variantParam === 'ACCURACY');
-        document.getElementById('var-oneshot').classList.toggle('active', variantParam === 'ONESHOT');
+    } else if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(savedVariant)) {
+        gameVariant = savedVariant;
     }
+    document.getElementById('var-normal').classList.toggle('active', gameVariant === 'NORMAL');
+    document.getElementById('var-accuracy').classList.toggle('active', gameVariant === 'ACCURACY');
+    document.getElementById('var-oneshot').classList.toggle('active', gameVariant === 'ONESHOT');
     const beginnerCheck = document.getElementById('beginner-mode-check');
     if (beginnerCheck && params.get('beginner') === '1') beginnerCheck.checked = true;
     const morseBoardCheck = document.getElementById('morse-board-mode-check');
@@ -1546,6 +1569,7 @@ async function setNickname() {
     const timeParam = params.get('time');
     if (timeSelect && ['60', '180', '300'].includes(timeParam)) timeSelect.value = timeParam;
     syncTimeTabs();
+    saveAsobiLobbyTabState();
 })();
 
 // ── Initialize mode description on page load ───────────────────────────────────
