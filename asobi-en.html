@@ -44,7 +44,15 @@
         html, body { scrollbar-gutter: stable; }
         /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
         @media (min-width: 701px) {
-            html { font-size: clamp(16px, 0.65vw + 11px, 20px); }
+            html { font-size: clamp(17px, 0.70vw + 11.75px, 21px); }
+        }
+        /* 初心者モードのゲーム画面は表示要素が多く詰まっているため、全体の文字拡大の対象から外し、
+           以前から視認性と収まりの両方が確認できているサイズに固定する。ロビー画面・通常モードには
+           影響しない(#game-screen.beginner-compact かつ html.game-active の組み合わせのみに限定)。 */
+        @media (min-width: 701px) {
+            html.game-active:has(#game-screen.beginner-compact) {
+                font-size: clamp(14px, min(0.65vw + 11px, 1.333vh + 6px), 20px);
+            }
         }
         html.game-active, body.game-active {
             overscroll-behavior: none;
@@ -863,6 +871,10 @@
         .lobby-link-row #free-mode-link, .lobby-link-row #asobi-ranking-link { margin-top: 0; }
         .mode-desc-row { margin: 15px 0; }
         @media (min-width: 701px) and (max-height: 1010px) {
+            /* The lobby has many dense controls, so the vh-based scaling of the base font-size
+               is also applied in this lobby-only height tier, to avoid overflow on narrower
+               windows (around 1280px wide); the game screen and other height tiers are unaffected. */
+            html { font-size: clamp(15px, min(0.70vw + 11.75px, 1.4vh + 6.5px), 21px); }
             .header-bar { margin-bottom: 8px; }
             h1 { font-size: 1.5rem; letter-spacing: 5px; }
             .subtitle { margin-bottom: 8px; }
@@ -890,7 +902,7 @@
             /* Further lobby adjustments for even shorter window heights. Also pull the
                base font size down by window height (vh) here only -- normal-height
                screens (701-900px) and other screens are unaffected. */
-            html { font-size: clamp(14px, min(0.65vw + 11px, 1.333vh + 6px), 20px); }
+            html { font-size: clamp(15px, min(0.70vw + 11.75px, 1.4vh + 6.5px), 21px); }
             .header-bar { margin-bottom: 4px; }
             h1 { font-size: 1.3rem; }
             .subtitle { margin-bottom: 4px; }

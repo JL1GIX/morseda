@@ -44,7 +44,7 @@
         html, body { scrollbar-gutter: stable; }
         /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
         @media (min-width: 701px) {
-            html { font-size: clamp(16px, 0.65vw + 11px, 20px); }
+            html { font-size: clamp(17px, 0.70vw + 11.75px, 21px); }
         }
         * { box-sizing: border-box; }
         body {
@@ -651,7 +651,10 @@
             footer { margin-top: 18px !important; padding: 12px 0 6px !important; }
         }
         @media (min-width: 701px) and (max-height: 700px) {
-            /* Further adjustments for even shorter window heights */
+            /* Further adjustments for even shorter window heights. The base font-size's
+               vh-based scaling is applied only here (needed for extra shrinking on the
+               beginner-mode game screen); normal heights (701-900px) and the lobby are unaffected. */
+            html { font-size: clamp(15px, min(0.70vw + 11.75px, 1.4vh + 6.5px), 21px); }
             #game-container { padding: 8px 20px 10px; margin: 2px 0 6px; }
             #scope-canvas { height: 70px; }
             #beginner-display { min-height: 2.2rem; margin-bottom: 4px; padding: 4px 8px; }

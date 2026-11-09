@@ -48,7 +48,15 @@
         }
         /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
         @media (min-width: 701px) {
-            html { font-size: clamp(16px, 0.65vw + 11px, 20px); }
+            html { font-size: clamp(17px, 0.70vw + 11.75px, 21px); }
+        }
+        /* 初心者モードのゲーム画面は表示要素が多く詰まっているため、全体の文字拡大の対象から外し、
+           以前から視認性と収まりの両方が確認できているサイズに固定する。ロビー画面・通常モードには
+           影響しない(#game-screen.beginner-compact かつ html.game-active の組み合わせのみに限定)。 */
+        @media (min-width: 701px) {
+            html.game-active:has(#game-screen.beginner-compact) {
+                font-size: clamp(14px, min(0.65vw + 11px, 1.333vh + 6px), 20px);
+            }
         }
         * { box-sizing: border-box; }
         body {
@@ -791,7 +799,7 @@
                font size down by window height (vh) here only -- this is where the
                Beginner Mode game screen still needs the extra shrink; normal-height
                screens (701-900px) and the lobby are unaffected. */
-            html { font-size: clamp(14px, min(0.65vw + 11px, 1.333vh + 6px), 20px); }
+            html { font-size: clamp(15px, min(0.70vw + 11.75px, 1.4vh + 6.5px), 21px); }
             #game-container { padding: 8px 20px 10px; margin: 2px 0 6px; }
             #scope-canvas { height: 70px; }
             #beginner-display { min-height: 2.2rem; margin-bottom: 4px; padding: 4px 8px; }
