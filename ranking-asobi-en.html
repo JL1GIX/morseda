@@ -512,6 +512,18 @@ function formatNickname(nick) {
     return upper || 'noname';
 }
 
+// 新規訪問(リンクを踏んだ/URLを直接入力した)か、再訪問(リロード/戻る・進むボタン)かを判定する。
+// タブ保存されたローカル設定は再訪問時のみ復元し、新規訪問時は常にデフォルト設定から始める。
+function isReturningVisit() {
+    try {
+        const nav = performance.getEntriesByType('navigation')[0];
+        if (!nav) return false; // Navigation Timing API未対応時は安全側(新規扱い)に倒す
+        return nav.type === 'reload' || nav.type === 'back_forward';
+    } catch (e) {
+        return false;
+    }
+}
+
 // タブ（単語種別・プレイスタイル・分数）の選択状態をlocalStorageに保存し、次回アクセス時に復元する。
 // リザルト画面からURLパラメータ付きで遷移してきた場合も、その選択を次回用に保存する。
 const ASOBI_STORAGE_WC = 'morseda_ranking_asobi_wc';
@@ -574,12 +586,13 @@ function changePage(delta) {
         savedVariant = localStorage.getItem(ASOBI_STORAGE_VARIANT);
         savedTime = parseInt(localStorage.getItem(ASOBI_STORAGE_TIME));
     } catch (e) {}
+    const isReturning = isReturningVisit();
     if (wc === 'GENERAL' || wc === 'CALLSIGN') currentWordCat = wc;
-    else if (savedWc === 'GENERAL' || savedWc === 'CALLSIGN') currentWordCat = savedWc;
+    else if (isReturning && (savedWc === 'GENERAL' || savedWc === 'CALLSIGN')) currentWordCat = savedWc;
     if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(variant)) currentVariant = variant;
-    else if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(savedVariant)) currentVariant = savedVariant;
+    else if (isReturning && ['NORMAL', 'ACCURACY', 'ONESHOT'].includes(savedVariant)) currentVariant = savedVariant;
     if ([1, 3, 5].includes(timeParam)) currentMinutes = timeParam;
-    else if ([1, 3, 5].includes(savedTime)) currentMinutes = savedTime;
+    else if (isReturning && [1, 3, 5].includes(savedTime)) currentMinutes = savedTime;
 
     document.getElementById('tab-wc-general').classList.toggle('active', currentWordCat === 'GENERAL');
     document.getElementById('tab-wc-callsign').classList.toggle('active', currentWordCat === 'CALLSIGN');

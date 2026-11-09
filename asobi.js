@@ -384,6 +384,18 @@ function applySelectorVisibility() {
     const rankLinkA = document.getElementById('asobi-ranking-link-a');
     if (rankLinkA) rankLinkA.href = asobiRankingBase();
 }
+// 新規訪問(リンクを踏んだ/URLを直接入力した)か、再訪問(リロード/戻る・進むボタン)かを判定する。
+// タブ保存されたローカル設定は再訪問時のみ復元し、新規訪問時は常にデフォルト設定から始める。
+function isReturningVisit() {
+    try {
+        const nav = performance.getEntriesByType('navigation')[0];
+        if (!nav) return false; // Navigation Timing API未対応時は安全側(新規扱い)に倒す
+        return nav.type === 'reload' || nav.type === 'back_forward';
+    } catch (e) {
+        return false;
+    }
+}
+
 // ロビー画面のタブ選択(単語種別/プレイスタイル)をlocalStorageにも保存する。
 // クエリ文字列なしで(他ページからのリンクやブックマーク経由で)アクセスした場合でも、
 // 前回選択していたタブを復元できるようにするため。
@@ -1556,16 +1568,19 @@ async function setNickname() {
         savedWc = localStorage.getItem(ASOBI_LOBBY_STORAGE_WC);
         savedVariant = localStorage.getItem(ASOBI_LOBBY_STORAGE_VARIANT);
     } catch (e) {}
+    const isReturning = isReturningVisit();
     if (wcParam === 'GENERAL' || wcParam === 'CALLSIGN') {
         wordCategory = wcParam;
-    } else if (savedWc === 'GENERAL' || savedWc === 'CALLSIGN') {
+    } else if (isReturning && (savedWc === 'GENERAL' || savedWc === 'CALLSIGN')) {
+        // URL指定が無い場合、タブ保存の復元はリロード/戻る操作の時だけ行う。
+        // 新規にリンクを踏んで来た場合は常にデフォルトのタブから始める。
         wordCategory = savedWc;
     }
     document.getElementById('wc-general').classList.toggle('active', wordCategory === 'GENERAL');
     document.getElementById('wc-callsign').classList.toggle('active', wordCategory === 'CALLSIGN');
     if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(variantParam)) {
         gameVariant = variantParam;
-    } else if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(savedVariant)) {
+    } else if (isReturning && ['NORMAL', 'ACCURACY', 'ONESHOT'].includes(savedVariant)) {
         gameVariant = savedVariant;
     }
     document.getElementById('var-normal').classList.toggle('active', gameVariant === 'NORMAL');

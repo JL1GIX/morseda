@@ -143,6 +143,19 @@ function generateRST() {
     return '599' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
 }
 
+// 新規訪問(リンクを踏んだ/URLを直接入力した)か、再訪問(リロード/戻る・進むボタン)かを判定する。
+// タブ保存されたローカル設定は再訪問時のみ復元し、新規訪問時は常にデフォルト設定から始める。
+// (例: 前回雑音レベル5にしていても、新しくリンクを踏んで来たユーザーにはデフォルト=オフで見せる)
+function isReturningVisit() {
+    try {
+        const nav = performance.getEntriesByType('navigation')[0];
+        if (!nav) return false; // Navigation Timing API未対応時は安全側(新規扱い)に倒す
+        return nav.type === 'reload' || nav.type === 'back_forward';
+    } catch (e) {
+        return false;
+    }
+}
+
 // 初心者モード・雑音レベルのチェックボックス/プルダウン状態をURLのクエリ文字列に反映する。
 // リロード時に下の初期化処理がこのURLを読み直すため、設定を保ったままリロードできる。
 const RX_NOISE_STORAGE = 'morseda_rx_noise_level';
@@ -1055,7 +1068,9 @@ async function setNickname() {
         const validLevels = ['0', '1', '2', '3', '4', '5'];
         if (validLevels.includes(noiseParam)) {
             noiseSelect.value = noiseParam;
-        } else if (validLevels.includes(savedNoise)) {
+        } else if (validLevels.includes(savedNoise) && isReturningVisit()) {
+            // URL指定が無い場合、タブ保存の復元はリロード/戻る操作の時だけ行う。
+            // 新規にリンクを踏んで来た場合は常にデフォルト(オフ)から始める。
             noiseSelect.value = savedNoise;
         }
     }
