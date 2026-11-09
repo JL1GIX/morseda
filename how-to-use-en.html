@@ -122,7 +122,11 @@
     </ul>
 
     <h3>Audio Check</h3>
-    <p>Checking "🔊 Audio Check" at the top right loops the SOS pattern (・・・−−−・・・) so you can adjust your headphone or speaker volume and check the sound quality. Changing the WPM automatically adjusts the SOS playback speed to match.</p>
+    <p>Checking "🔊 Audio Check" at the top right loops the SOS pattern (・・・−−−・・・) so you can adjust your headphone or speaker volume and check the sound quality. Changing the WPM or the noise level automatically updates the Audio Check playback to match.</p>
+
+    <h3>Noise (QRN) Setting</h3>
+    <p>The "📻 Noise (QRN)" dropdown lets you choose Off or Level 1–5 for the amount of band noise. It adds a hiss/crackle on top of the CW tone, similar to interference and atmospheric static (QRN) on a real radio. Higher levels make copying harder, so start with Off or a low level and gradually raise it as you get more comfortable with the code, for more realistic copying practice. The noise setting also updates the Audio Check immediately, so you can hear what it sounds like before you start a game.</p>
+    <p>Note: reloading the page or returning via your browser's Back button keeps your last noise setting, but opening Receive Mode fresh from a link always starts from Off.</p>
 
     <h3>Starting the Game</h3>
     <p>Clicking "▶ START MISSION" plays a callsign and an RST report alternately, in audio.</p>
@@ -167,12 +171,28 @@
     <p>The RST is presented with a leading "5NN", like "5NN108H", and only keying 5NN counts as correct. For contest number digits, keying 1 as "1" or "A", 0 as "0", "O", or "T", and 9 as "9" or "N" all count as correct (cut numbers). Callsign digits, however, only count as correct when keyed as the actual digit.</p>
 
     <h2>5. Fun Mode</h2>
-    <p>Enter from "🎮 Fun Mode" on the home page. The controls are the same as Transmit Mode, but instead of callsigns and RST reports, the material is familiar English words like CAT or DOG.</p>
+    <p>Enter from "🎮 Fun Mode" on the home page. The controls (keyboard, paddle, decode timing) are the same as Transmit Mode. On the lobby screen, pick a "Word Category" and a "Play Style" before you start.</p>
+
+    <h3>Word Category</h3>
+    <ul>
+        <li><strong>🔤 Everyday Words</strong>: Familiar English words like CAT or DOG — a relaxed, casual mode</li>
+        <li><strong>📡 Callsign + Contest Number</strong>: Just like Transmit Mode, a callsign and an RST (contest number) are presented alternately. Cut numbers (1→A, 0→O/T, 9→N) count as correct here too, same as in Transmit Mode</li>
+    </ul>
+
+    <h3>Play Style</h3>
+    <ul>
+        <li><strong>Normal</strong>: The standard rule — a mistake has no penalty, and play simply moves on to the next word</li>
+        <li><strong>Accuracy Focus</strong>: A single mistake sends you back to the start of that word. The number of restarts is shown during play as "↺ Restarted ◯ time(s)"</li>
+        <li><strong>One Shot</strong>: A single mistake ends the game immediately — no second chances</li>
+    </ul>
+
+    <h3>Common Rules</h3>
     <ul>
         <li>Each word has its own time limit, and you must finish keying it before the "📡 SIGNAL" bar at the bottom runs out (if you don't make it, the signal fades (QSB), the word is lost, and play moves to the next word)</li>
         <li>The time limit adjusts automatically based on the word's length and your WPM setting</li>
         <li>Keying a word with zero mistakes extends your overall play time by 1 second (a "+1s" effect appears next to the TIME display)</li>
-        <li>As in Receive and Transmit modes, your score can be registered to the ranking</li>
+        <li>Beginner Mode (which shows the code for the next character) is available here too, just like Receive and Transmit modes</li>
+        <li>Your score is registered to the ranking separately for each Word Category / Play Style combination</li>
     </ul>
 
     <h2>6. Free Input Mode (inside Transmit Mode)</h2>
@@ -196,12 +216,14 @@
 
     <h3>Viewing the Ranking</h3>
     <p>From "Ranking" in the footer, you can view top scores broken down by mode (Receive/Transmit/Fun) and time limit (1/3/5 min). Your own standing is also shown as a percentile.</p>
+    <p>Tabs at the top of the Ranking screen let you switch between "All Time", "📅 Today's Ranking", and "📅 Yesterday's Ranking". The Receive & Transmit ranking and the Fun Mode ranking also link to each other from the top of each screen.</p>
 
     <h2>8. Troubleshooting</h2>
     <ul>
         <li><strong>No sound plays</strong>: Browser autoplay policies require an initial click. Audio is enabled the moment you press "▶ START MISSION". If you still hear nothing, check your browser's or OS's volume settings.</li>
         <li><strong>Transmit Mode isn't decoding my input</strong>: Uneven dot/dash length or spacing prevents recognition. Try lowering the WPM to keep a steady rhythm, aim for a dash about 3x a dot, and leave a bit more space between characters.</li>
         <li><strong>My score wasn't registered</strong>: Scores aren't registered if you QUIT mid-game. Play until the time limit runs out.</li>
+        <li><strong>Receive Mode is hard to copy</strong>: A higher "📻 Noise (QRN)" level is intentionally harder to copy. Lower it to Off or a low level and practice there first, then raise it gradually as you get more comfortable.</li>
     </ul>
 
     <h2>9. Keyboard Shortcuts</h2>
@@ -225,7 +247,7 @@
     <tr><td>During play (Morse Board)</td><td>Key question mark (・・－－・・)</td><td>Force return to the lobby</td></tr>
     </table>
 
-    <p class="updated">Last updated: 2026</p>
+    <p class="updated">Last updated: November 2026</p>
 </div>
 
 <footer>
