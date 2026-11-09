@@ -44,9 +44,7 @@
         html, body { scrollbar-gutter: stable; }
         /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
         @media (min-width: 701px) {
-            /* 画面の横幅だけでなく縦の高さにも応じてフォントサイズを抑え、
-               ウィンドウが低いときに内容が見切れないようにする */
-            html { font-size: clamp(14px, min(0.65vw + 11px, 1.333vh + 6px), 20px); }
+            html { font-size: clamp(16px, 0.65vw + 11px, 20px); }
         }
         html.game-active, body.game-active {
             overscroll-behavior: none;
@@ -889,7 +887,9 @@
             .start-key-hint { padding: 7px 22px; font-size: 0.98rem; }
         }
         @media (min-width: 701px) and (max-height: 700px) {
-            /* より低いウィンドウ高さ向けのロビー追加調整 */
+            /* より低いウィンドウ高さ向けのロビー追加調整。基準フォントサイズの縦幅(vh)連動も
+               ここでのみ行う(通常の高さ(701〜900px)やほかの画面の文字サイズには影響しない)。 */
+            html { font-size: clamp(14px, min(0.65vw + 11px, 1.333vh + 6px), 20px); }
             .header-bar { margin-bottom: 4px; }
             h1 { font-size: 1.3rem; }
             .subtitle { margin-bottom: 4px; }

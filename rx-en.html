@@ -44,9 +44,7 @@
         html, body { scrollbar-gutter: stable; }
         /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
         @media (min-width: 701px) {
-            /* Scale the font to window height as well as width, so content doesn't
-               get cut off when the window is short */
-            html { font-size: clamp(14px, min(0.65vw + 11px, 1.333vh + 6px), 20px); }
+            html { font-size: clamp(16px, 0.65vw + 11px, 20px); }
         }
         * { box-sizing: border-box; }
         body {

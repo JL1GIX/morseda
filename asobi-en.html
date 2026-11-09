@@ -44,9 +44,7 @@
         html, body { scrollbar-gutter: stable; }
         /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
         @media (min-width: 701px) {
-            /* Scale the font to window height as well as width, so content doesn't
-               get cut off when the window is short */
-            html { font-size: clamp(14px, min(0.65vw + 11px, 1.333vh + 6px), 20px); }
+            html { font-size: clamp(16px, 0.65vw + 11px, 20px); }
         }
         html.game-active, body.game-active {
             overscroll-behavior: none;
@@ -889,7 +887,10 @@
             .start-key-hint { padding: 7px 22px; font-size: 0.98rem; }
         }
         @media (min-width: 701px) and (max-height: 700px) {
-            /* Further lobby adjustments for even shorter window heights */
+            /* Further lobby adjustments for even shorter window heights. Also pull the
+               base font size down by window height (vh) here only -- normal-height
+               screens (701-900px) and other screens are unaffected. */
+            html { font-size: clamp(14px, min(0.65vw + 11px, 1.333vh + 6px), 20px); }
             .header-bar { margin-bottom: 4px; }
             h1 { font-size: 1.3rem; }
             .subtitle { margin-bottom: 4px; }

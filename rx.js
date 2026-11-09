@@ -143,22 +143,9 @@ function generateRST() {
     return '599' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
 }
 
-// 新規訪問(リンクを踏んだ/URLを直接入力した)か、再訪問(リロード/戻る・進むボタン)かを判定する。
-// タブ保存されたローカル設定は再訪問時のみ復元し、新規訪問時は常にデフォルト設定から始める。
-// (例: 前回雑音レベル5にしていても、新しくリンクを踏んで来たユーザーにはデフォルト=オフで見せる)
-function isReturningVisit() {
-    try {
-        const nav = performance.getEntriesByType('navigation')[0];
-        if (!nav) return false; // Navigation Timing API未対応時は安全側(新規扱い)に倒す
-        return nav.type === 'reload' || nav.type === 'back_forward';
-    } catch (e) {
-        return false;
-    }
-}
-
-// 初心者モード・雑音レベルのチェックボックス/プルダウン状態をURLのクエリ文字列に反映する。
-// リロード時に下の初期化処理がこのURLを読み直すため、設定を保ったままリロードできる。
-const RX_NOISE_STORAGE = 'morseda_rx_noise_level';
+// 初心者モード・制限時間・雑音レベルのチェックボックス/プルダウン状態をURLのクエリ文字列に反映する。
+// リロード時に下の初期化処理がこのURLを読み直すため、設定を保ったままリロードできる
+// (localStorageは使わないため、クエリ文字列の無い新規リンクからのアクセスでは常にデフォルトになる)。
 function updateRxUrlState() {
     const params = new URLSearchParams(window.location.search);
     const beginnerCheck = document.getElementById('beginner-mode-check');
@@ -166,10 +153,7 @@ function updateRxUrlState() {
     const noiseSelect = document.getElementById('noise-select');
     params.set('beginner', (beginnerCheck && beginnerCheck.checked) ? '1' : '0');
     if (timeSelect) params.set('time', timeSelect.value);
-    if (noiseSelect) {
-        params.set('noise', noiseSelect.value);
-        try { localStorage.setItem(RX_NOISE_STORAGE, noiseSelect.value); } catch (e) {}
-    }
+    if (noiseSelect) params.set('noise', noiseSelect.value);
     history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
 }
 
@@ -1067,18 +1051,15 @@ async function setNickname() {
     const timeSelect = document.getElementById('time-select');
     const timeParam = params.get('time');
     if (timeSelect && ['60', '180', '300'].includes(timeParam)) timeSelect.value = timeParam;
+    // 雑音レベルは初心者モード・制限時間と同じく、URLのクエリ文字列のみで状態を保持する
+    // (localStorageは使わない)。これによりリロード・戻るではURLに残ったパラメータから
+    // 設定が復元され、クエリ文字列の無い新規リンクからのアクセスでは常にデフォルト(オフ)になる。
     const noiseSelect = document.getElementById('noise-select');
     if (noiseSelect) {
         const noiseParam = params.get('noise');
-        let savedNoise = null;
-        try { savedNoise = localStorage.getItem(RX_NOISE_STORAGE); } catch (e) {}
         const validLevels = ['0', '1', '2', '3', '4', '5'];
         if (validLevels.includes(noiseParam)) {
             noiseSelect.value = noiseParam;
-        } else if (validLevels.includes(savedNoise) && isReturningVisit()) {
-            // URL指定が無い場合、タブ保存の復元はリロード/戻る操作の時だけ行う。
-            // 新規にリンクを踏んで来た場合は常にデフォルト(オフ)から始める。
-            noiseSelect.value = savedNoise;
         }
     }
     syncTimeTabs();
