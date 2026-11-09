@@ -48,7 +48,9 @@
         }
         /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
         @media (min-width: 701px) {
-            html { font-size: clamp(16px, 0.65vw + 11px, 20px); }
+            /* Scale the font to window height as well as width, so content doesn't
+               get cut off when the window is short */
+            html { font-size: clamp(14px, min(0.65vw + 11px, 1.333vh + 6px), 20px); }
         }
         * { box-sizing: border-box; }
         body {
@@ -745,7 +747,7 @@
         }
     
         .mode-desc-row { margin: 15px 0; }
-        @media (min-width: 701px) and (max-height: 820px) {
+        @media (min-width: 701px) and (max-height: 900px) {
             .header-bar { margin-bottom: 8px; }
             h1 { font-size: 1.5rem; letter-spacing: 5px; }
             .subtitle { margin-bottom: 8px; }
@@ -764,6 +766,39 @@
             .wpm-band-labels { margin-top: 0; }
             #free-mode-link { margin-top: 2px; }
             .start-key-hint { padding: 8px 24px; font-size: 1rem; }
+            /* Game screen: tighten margins around the transmit area/scope so
+               content doesn't overflow at common PC window heights */
+            .signal-indicators { margin-bottom: 6px; }
+            .stats { margin-bottom: 6px; padding: 6px 15px; }
+            #scope-container { margin-bottom: 6px; }
+            #scope-canvas { height: 95px; }
+            #beginner-display { min-height: 2.6rem; margin-bottom: 6px; padding: 5px 10px; }
+            #tx-word-display { font-size: 2.6rem; min-height: 5.4rem; padding: 10px 2px; }
+            #tx-morse-input { min-height: 2.8rem; margin-top: 6px; padding: 6px 12px; }
+            #game-key-assign-row { margin-bottom: 6px; }
+            /* With beginner mode ON, the dedicated beginner-compact rules win by
+               specificity, so re-declare at matching specificity to keep shrinking
+               with window height */
+            #game-screen.beginner-compact #tx-word-display { min-height: 4.2rem; font-size: 1.6rem; padding: 8px 12px; }
+            #game-screen.beginner-compact #tx-morse-input { min-height: 2.6rem; margin-top: 5px; padding: 5px 12px; }
+            #game-screen.beginner-compact #game-key-assign-row { margin-bottom: 5px; }
+            #status-msg { margin-top: 5px; }
+            .quit-btn { margin-top: 8px; }
+            #free-screen { gap: 8px; padding: 4px 0 8px; }
+            #free-morse-render { min-height: 1.8rem; }
+            footer { margin-top: 18px !important; padding: 12px 0 6px !important; }
+        }
+        @media (min-width: 701px) and (max-height: 700px) {
+            /* Further adjustments for even shorter window heights */
+            #game-container { padding: 8px 20px 10px; margin: 2px 0 6px; }
+            #scope-canvas { height: 70px; }
+            #beginner-display { min-height: 2.2rem; margin-bottom: 4px; padding: 4px 8px; }
+            #tx-word-display { font-size: 2.1rem; min-height: 4.4rem; }
+            #tx-morse-input { min-height: 2.3rem; }
+            #game-screen.beginner-compact #tx-word-display { min-height: 3.3rem; font-size: 1.3rem; padding: 7px 10px; }
+            #game-screen.beginner-compact #tx-morse-input { min-height: 2rem; margin-top: 4px; padding: 4px 10px; }
+            #game-screen.beginner-compact #beginner-display.tx-beginner { min-height: 2rem; margin-bottom: 3px; padding: 3px 8px; }
+            .stats { padding: 5px 15px; }
         }
     </style>
 </head>
