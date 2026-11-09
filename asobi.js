@@ -221,6 +221,13 @@ document.addEventListener('keydown', (e) => {
             unlockAndPrepare();
             return;
         }
+        // シークレットショートカット: Sキー（Morse Boardでsを打鍵した場合も同じキー入力として届く）
+        // でランキング(送信&受信)画面へ。使い方ページのショートカット一覧にのみ記載し、UI上には明示しない。
+        if (!typing && !_capturingFor && e.key.toUpperCase() === 'S') {
+            e.preventDefault();
+            location.href = (LANG === 'en') ? '/ranking-en.html' : '/ranking.html';
+            return;
+        }
         // ロビー画面（Morse Board）: ？打鍵（・・－－・・）でモールス打のトップ画面へ戻る
         // ※morseBoardMode変数はゲーム開始時にしか同期されないため、ロビーではチェックボックスを直接見る
         const lobbyMorseBoardOn = document.getElementById('morse-board-mode-check')?.checked;

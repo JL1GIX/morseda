@@ -676,6 +676,13 @@ document.addEventListener('keydown', (e) => {
             unlockAndPrepare();
             return;
         }
+        // シークレットショートカット: Sキーでランキング(送信&受信)画面へ。
+        // 使い方ページのショートカット一覧にのみ記載し、UI上には明示しない。
+        if (!typing && e.key.toUpperCase() === 'S') {
+            e.preventDefault();
+            location.href = (LANG === 'en') ? '/ranking-en.html' : '/ranking.html';
+            return;
+        }
         // ロビー画面: Escキーでモールス打のトップ画面へ（制御キーなので入力中でも有効）
         // 英語モードで開いている場合は英語版トップ（index-en.html）へ戻す
         if (e.code === 'Escape') {
