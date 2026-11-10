@@ -387,9 +387,6 @@ function applySelectorVisibility() {
     const beginnerItem = beginnerCheck ? beginnerCheck.closest('.setting-item') : null;
     if (beginnerItem) beginnerItem.classList.toggle('hidden', isOneShot);
     if (isOneShot && beginnerCheck) beginnerCheck.checked = false;
-    // 全サブモードにスコアがあるので、ランキングリンクは常に表示し、リンク先だけ切り替える
-    const rankLinkA = document.getElementById('asobi-ranking-link-a');
-    if (rankLinkA) rankLinkA.href = asobiRankingBase();
 }
 // 新規訪問(リンクを踏んだ/URLを直接入力した)か、再訪問(リロード/戻る・進むボタン)かを判定する。
 // タブ保存されたローカル設定は再訪問時のみ復元し、新規訪問時は常にデフォルト設定から始める。

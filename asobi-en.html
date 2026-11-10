@@ -44,7 +44,7 @@
         html, body { scrollbar-gutter: stable; }
         /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
         @media (min-width: 701px) {
-            html { font-size: clamp(17px, 0.70vw + 11.75px, 21px); }
+            html { font-size: clamp(18px, min(0.75vw + 12.5px, 1.35vh + 11.6px), 26px); }
         }
         /* 初心者モードのゲーム画面は表示要素が多く詰まっているため、全体の文字拡大の対象から外し、
            以前から視認性と収まりの両方が確認できているサイズに固定する。ロビー画面・通常モードには
@@ -786,14 +786,6 @@
             opacity: 0.75; transition: opacity 0.2s, border-color 0.2s, color 0.2s;
         }
         #free-mode-link button:hover { opacity: 1; border-color: var(--primary); color: var(--primary); box-shadow: none; }
-        /* Link to this sub-mode's own ranking page */
-        #asobi-ranking-link { display: block; text-align: center; margin-top: 6px; }
-        #asobi-ranking-link a {
-            display: inline-block; background: transparent; border: 1px solid var(--border); color: var(--primary-dim);
-            font-size: 0.75rem; padding: 6px 22px; letter-spacing: 2px; text-decoration: none;
-            opacity: 0.75; transition: opacity 0.2s, border-color 0.2s, color 0.2s; border-radius: 2px;
-        }
-        #asobi-ranking-link a:hover { opacity: 1; border-color: var(--primary); color: var(--primary); }
         /* キー設定 */
         #key-customize-btn {
             background: transparent; border: 1px solid rgba(30,92,56,0.6);
@@ -868,7 +860,7 @@
         }
     
         .lobby-link-row { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
-        .lobby-link-row #free-mode-link, .lobby-link-row #asobi-ranking-link { margin-top: 0; }
+        .lobby-link-row #free-mode-link { margin-top: 0; }
         .mode-desc-row { margin: 15px 0; }
         @media (min-width: 701px) and (max-height: 1150px) {
             /* The lobby has many dense controls, so the vh-based scaling of the base font-size
@@ -895,7 +887,7 @@
             .wpm-range { margin: 2px 0; }
             .wpm-band-labels { margin-top: 0; }
             .lobby-link-row { margin-top: 2px; }
-            #free-mode-link button, #asobi-ranking-link a { padding: 5px 18px; }
+            #free-mode-link button { padding: 5px 18px; }
             .start-key-hint { padding: 7px 22px; font-size: 0.98rem; }
         }
         @media (min-width: 701px) and (max-height: 700px) {
@@ -1028,9 +1020,6 @@
             <div class="lobby-link-row">
                 <div id="free-mode-link">
                 <button id="free-mode-btn" onclick="startFreeMode()">📝 Free Input Mode</button>
-                </div>
-                <div id="asobi-ranking-link">
-                <a id="asobi-ranking-link-a" href="#">🏆 View this mode's ranking</a>
                 </div>
             </div>
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:4px;">
