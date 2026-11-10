@@ -44,7 +44,7 @@
         html, body { scrollbar-gutter: stable; }
         /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
         @media (min-width: 701px) {
-            html { font-size: clamp(18px, min(0.75vw + 12.5px, 1.35vh + 11.6px), 26px); }
+            html { font-size: clamp(19px, min(0.78vw + 13px, 1.7vh + 10px), 32px); }
         }
         * { box-sizing: border-box; }
         body {
@@ -629,16 +629,16 @@
             h1 { font-size: 1.5rem; letter-spacing: 5px; }
             .subtitle { margin-bottom: 8px; }
             #game-container { padding: 10px 20px 12px; margin: 4px 0 10px; }
-            .mode-desc-row { margin: 8px 0 5px !important; }
-            #mode-description { line-height: 1.4 !important; }
-            .beginner-hint { margin: 2px 0 5px; padding: 4px 8px; font-size: 0.68rem; line-height: 1.4; }
-            .settings-grid { margin: 6px 0; gap: 5px; }
-            .setting-item { padding: 6px 9px; }
-            .setting-label { margin-bottom: 3px; }
-            .wpm-readout { margin-bottom: 3px; }
-            .wpm-range { margin: 3px 0; }
-            .wpm-band-labels { margin-top: 0; }
-            .start-key-hint { padding: 8px 24px; font-size: 1rem; }
+            .mode-desc-row { margin: 12px 0 8px !important; }
+            #mode-description { line-height: 1.5 !important; }
+            .beginner-hint { margin: 2px 0 10px; padding: 6px 10px; font-size: 0.72rem; line-height: 1.5; }
+            .settings-grid { margin: 12px 0; gap: 8px; }
+            .setting-item { padding: 9px 11px; }
+            .setting-label { margin-bottom: 5px; }
+            .wpm-readout { margin-bottom: 5px; }
+            .wpm-range { margin: 5px 0; }
+            .wpm-band-labels { margin-top: 1px; }
+            .start-key-hint { padding: 12px 30px; font-size: 1.08rem; }
             /* ゲーム画面: スコープ/受信表示まわりの余白を詰めて、PCの一般的なウィンドウ高さでも
                上下が見切れずに収まるようにする */
             .signal-indicators { margin-bottom: 6px; }

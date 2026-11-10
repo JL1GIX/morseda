@@ -44,7 +44,7 @@
         html, body { scrollbar-gutter: stable; }
         /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
         @media (min-width: 701px) {
-            html { font-size: clamp(18px, min(0.75vw + 12.5px, 1.35vh + 11.6px), 26px); }
+            html { font-size: clamp(19px, min(0.78vw + 13px, 1.7vh + 10px), 32px); }
         }
         /* 初心者モードのゲーム画面は表示要素が多く詰まっているため、全体の文字拡大の対象から外し、
            以前から視認性と収まりの両方が確認できているサイズに固定する。ロビー画面・通常モードには
@@ -873,15 +873,15 @@
             .subtitle { margin-bottom: 8px; }
             #game-container { padding: 10px 20px 12px; margin: 4px 0 10px; }
             .mode-tabs-label { margin: 1px 0 2px; }
-            .mode-tabs { margin-bottom: 4px; }
+            .mode-tabs { margin-bottom: 5px; }
             .mode-tab { padding: 4px 4px; }
-            .mode-desc-row { margin: 4px 0 !important; }
+            .mode-desc-row { margin: 5px 0 !important; }
             #mode-description { line-height: 1.4 !important; }
             #key-customize-wrap { flex-direction: row !important; align-items: center !important; gap: 6px !important; padding-top: 0 !important; }
             #key-customize-btn { padding: 3px 10px; font-size: 0.68rem; }
             #key-assign-display { padding: 2px 6px !important; font-size: 0.54rem !important; line-height: 1.2 !important; }
             .beginner-hint { margin: 2px 0 4px; padding: 4px 8px; font-size: 0.68rem; line-height: 1.3; }
-            .settings-grid { margin: 4px 0; gap: 4px; }
+            .settings-grid { margin: 5px 0; gap: 4px; }
             .setting-item { padding: 5px 9px; }
             .setting-label { margin-bottom: 2px; }
             .wpm-readout { margin-bottom: 2px; }

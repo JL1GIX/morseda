@@ -48,7 +48,7 @@
         }
         /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
         @media (min-width: 701px) {
-            html { font-size: clamp(18px, min(0.75vw + 12.5px, 1.35vh + 11.6px), 26px); }
+            html { font-size: clamp(19px, min(0.78vw + 13px, 1.7vh + 10px), 32px); }
         }
         /* 初心者モードのゲーム画面は表示要素が多く詰まっているため、全体の文字拡大の対象から外し、
            以前から視認性と収まりの両方が確認できているサイズに固定する。ロビー画面・通常モードには
@@ -754,25 +754,50 @@
         }
     
         .mode-desc-row { margin: 15px 0; }
+        @media (min-width: 701px) and (max-height: 1150px) {
+            /* Lobby screen has many controls, so the vh-based scaling of the base font-size
+               is also applied in this height tier for larger common viewports (e.g. 1920x1080),
+               to avoid overflow when the English or Morse Board labels run longer
+               (the game screen and shorter height tier are adjusted separately below). */
+            html { font-size: clamp(15px, min(0.70vw + 11.75px, 1.4vh + 6.5px), 21px); }
+            .header-bar { margin-bottom: 8px; }
+            h1 { font-size: 1.5rem; letter-spacing: 5px; }
+            .subtitle { margin-bottom: 8px; }
+            #game-container { padding: 10px 20px 12px; margin: 4px 0 10px; }
+            .mode-desc-row { margin: 7px 0 !important; }
+            #mode-description { line-height: 1.45 !important; }
+            #key-customize-wrap { flex-direction: row !important; align-items: center !important; gap: 6px !important; padding-top: 0 !important; }
+            #key-customize-btn { padding: 3px 10px; font-size: 0.68rem; }
+            #key-assign-display { padding: 2px 6px !important; font-size: 0.54rem !important; line-height: 1.2 !important; }
+            .beginner-hint { margin: 2px 0 7px; padding: 5px 9px; font-size: 0.68rem; line-height: 1.4; }
+            .settings-grid { margin: 8px 0; gap: 6px; }
+            .setting-item { padding: 7px 10px; }
+            .setting-label { margin-bottom: 3px; }
+            .wpm-readout { margin-bottom: 3px; }
+            .wpm-range { margin: 3px 0; }
+            .wpm-band-labels { margin-top: 1px; }
+            #free-mode-link { margin-top: 4px; }
+            .start-key-hint { padding: 9px 26px; font-size: 1.02rem; }
+        }
         @media (min-width: 701px) and (max-height: 900px) {
             .header-bar { margin-bottom: 8px; }
             h1 { font-size: 1.5rem; letter-spacing: 5px; }
             .subtitle { margin-bottom: 8px; }
             #game-container { padding: 10px 20px 12px; margin: 4px 0 10px; }
-            .mode-desc-row { margin: 5px 0 !important; }
-            #mode-description { line-height: 1.4 !important; }
+            .mode-desc-row { margin: 10px 0 !important; }
+            #mode-description { line-height: 1.5 !important; }
             #key-customize-wrap { flex-direction: row !important; align-items: center !important; gap: 6px !important; padding-top: 0 !important; }
             #key-customize-btn { padding: 3px 10px; font-size: 0.68rem; }
             #key-assign-display { padding: 2px 6px !important; font-size: 0.54rem !important; line-height: 1.2 !important; }
-            .beginner-hint { margin: 2px 0 5px; padding: 4px 8px; font-size: 0.68rem; line-height: 1.4; }
-            .settings-grid { margin: 6px 0; gap: 5px; }
-            .setting-item { padding: 6px 9px; }
-            .setting-label { margin-bottom: 3px; }
-            .wpm-readout { margin-bottom: 3px; }
-            .wpm-range { margin: 3px 0; }
-            .wpm-band-labels { margin-top: 0; }
-            #free-mode-link { margin-top: 2px; }
-            .start-key-hint { padding: 8px 24px; font-size: 1rem; }
+            .beginner-hint { margin: 2px 0 10px; padding: 6px 10px; font-size: 0.72rem; line-height: 1.5; }
+            .settings-grid { margin: 12px 0; gap: 8px; }
+            .setting-item { padding: 9px 11px; }
+            .setting-label { margin-bottom: 5px; }
+            .wpm-readout { margin-bottom: 5px; }
+            .wpm-range { margin: 5px 0; }
+            .wpm-band-labels { margin-top: 1px; }
+            #free-mode-link { margin-top: 4px; }
+            .start-key-hint { padding: 12px 30px; font-size: 1.08rem; }
             /* Game screen: tighten margins around the transmit area/scope so
                content doesn't overflow at common PC window heights */
             .signal-indicators { margin-bottom: 6px; }
