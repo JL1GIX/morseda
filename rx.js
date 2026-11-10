@@ -192,6 +192,8 @@ function unlockAndPrepare() {
     if (noiseLevel > 0) startNoiseAudio(noiseLevel);
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
+    document.documentElement.classList.add('game-active');
+    document.body.classList.add('game-active');
     document.getElementById('game-start-overlay').classList.remove('hidden');
     mobileInput.focus();
     initScope();
@@ -926,6 +928,8 @@ function quitGame() {
     score = 0;
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('start-screen').classList.remove('hidden');
+    document.documentElement.classList.remove('game-active');
+    document.body.classList.remove('game-active');
 }
 
 function retryGame() {
@@ -948,6 +952,8 @@ function endGame() {
     document.getElementById('score-reg-area').style.display = score > 0 ? '' : 'none';
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
+    document.documentElement.classList.remove('game-active');
+    document.body.classList.remove('game-active');
     if (score > 0) {
         autoRegister();
         setTimeout(() => {

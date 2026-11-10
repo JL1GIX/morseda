@@ -158,7 +158,7 @@
             padding: 8px 15px;
             border-radius: 2px;
         }
-        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; flex: 1; min-width: 0; }
         .stat-label { color: var(--primary-dim); font-size: 0.68rem; letter-spacing: 2px; opacity: 1.0; }
         .stat-value { color: var(--primary); font-size: 1.05rem; font-weight: bold; text-shadow: 0 0 10px rgba(0,123,67,0.9), 0 0 20px rgba(0,123,67,0.4); }
         /* 単語を制限時間内に打ち切った際の「+1秒」ボーナス演出 */
@@ -576,7 +576,7 @@
             from { opacity: 0.3; box-shadow: none; }
             to   { opacity: 1; box-shadow: 0 0 8px var(--primary); }
         }
-        #status-msg { font-size: 0.82rem; opacity: 1.0; margin-top: 10px; letter-spacing: 2px; }
+        #status-msg { font-size: 0.82rem; opacity: 1.0; margin-top: 10px; letter-spacing: 2px; line-height: 1.3; min-height: 1.3em; display: flex; align-items: center; justify-content: center; text-align: center; }
         /* お遊びモード: 単語ごとの制限時間を表す「Sメーター」風シグナルバー */
         #word-timer-track {
             display: flex;
@@ -867,7 +867,7 @@
             /* ロビー画面は選択項目が多く詰まっているため、基準フォントサイズの縦幅(vh)連動を
                このロビー専用の高さ区分にも適用し、幅の狭いウィンドウ(1280px前後など)でも
                見切れないようにする(ゲーム画面やほかの画面サイズ区分には影響しない)。 */
-            html { font-size: clamp(15px, min(0.70vw + 11.75px, 1.4vh + 6.5px), 21px); }
+            html { font-size: clamp(16px, min(0.72vw + 12px, 1.45vh + 7px), 23px); }
             .header-bar { margin-bottom: 8px; }
             h1 { font-size: 1.5rem; letter-spacing: 5px; }
             .subtitle { margin-bottom: 8px; }
