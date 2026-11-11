@@ -229,6 +229,10 @@
             flex-shrink: 0;
             animation: msym-in 0.07s ease-out;
         }
+        /* 符号表示枠(#tx-morse-input, #free-morse-render)が空のときに高さを確保するための
+           見えないプレースホルダー。符号1つ分と同じ高さを保つことで、1文字打ち終えて次の
+           文字に移るたびに枠の高さが上下するのを防ぐ。 */
+        .msym-placeholder { visibility: hidden; animation: none; }
         .msym-key-wrap {
             display: inline-flex;
             flex-direction: column;

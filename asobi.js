@@ -857,9 +857,23 @@ function renderTxInput() {
     // 打鍵のたびにinnerHTMLを総入れ替えすると、既に表示済みの符号まで出現アニメーションが
     // 再生され直してしまい、画面がガタついて見える原因になるため、新しく打った符号だけを
     // 追加する(リセット時や短くなった場合のみ総入れ替えする)。
+    // また、符号が0個の状態は枠の高さがmin-heightまで縮んでしまい、1文字分打ち終えて
+    // 次の文字に移るたびに枠が上下に戻る("がたつく")ため、符号が無いときも高さ確保用の
+    // 見えないプレースホルダーを1つ置き、枠の高さを常に符号表示時と同じに保つ。
     const render = document.getElementById('tx-input-render');
-    if (txMorseInput.length < render.children.length) render.innerHTML = '';
-    for (let i = render.children.length; i < txMorseInput.length; i++) {
+    const target = txMorseInput.length;
+    const hasPlaceholder = render.children.length === 1 && render.children[0].classList.contains('msym-placeholder');
+    if (target === 0) {
+        if (!hasPlaceholder) {
+            render.innerHTML = '';
+            const ph = document.createElement('span');
+            ph.className = 'msym-dot-lg msym-placeholder';
+            render.appendChild(ph);
+        }
+        return;
+    }
+    if (hasPlaceholder || target < render.children.length) render.innerHTML = '';
+    for (let i = render.children.length; i < target; i++) {
         const span = document.createElement('span');
         span.className = txMorseInput[i] === '.' ? 'msym-dot-lg' : 'msym-dash-lg';
         render.appendChild(span);

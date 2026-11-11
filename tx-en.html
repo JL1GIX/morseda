@@ -229,6 +229,10 @@
             flex-shrink: 0;
             animation: msym-in 0.07s ease-out;
         }
+        /* Invisible placeholder that keeps the symbol display box (#tx-morse-input,
+           #free-morse-render) at the same height when empty as when it holds a symbol,
+           so the box doesn't shrink/grow between characters. */
+        .msym-placeholder { visibility: hidden; animation: none; }
         .msym-key-wrap {
             display: inline-flex;
             flex-direction: column;
