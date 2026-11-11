@@ -643,9 +643,16 @@ function renderTxInput() {
         return;
     }
     box.style.display = '';
-    document.getElementById('tx-input-render').innerHTML = txMorseInput.split('').map(sym =>
-        `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
-    ).join('');
+    // 打鍵のたびにinnerHTMLを総入れ替えすると、既に表示済みの符号まで出現アニメーションが
+    // 再生され直してしまい、画面がガタついて見える原因になるため、新しく打った符号だけを
+    // 追加する(リセット時や短くなった場合のみ総入れ替えする)。
+    const render = document.getElementById('tx-input-render');
+    if (txMorseInput.length < render.children.length) render.innerHTML = '';
+    for (let i = render.children.length; i < txMorseInput.length; i++) {
+        const span = document.createElement('span');
+        span.className = txMorseInput[i] === '.' ? 'msym-dot-lg' : 'msym-dash-lg';
+        render.appendChild(span);
+    }
 }
 
 // ── Iambic keyer ───────────────────────────────────────────────────────────────
@@ -912,9 +919,15 @@ function decodeFreeChar() {
 }
 
 function renderFreeInput() {
-    document.getElementById('free-morse-render').innerHTML = txMorseInput.split('').map(sym =>
-        `<span class="${sym === '.' ? 'msym-dot-lg' : 'msym-dash-lg'}"></span>`
-    ).join('');
+    // renderTxInput()と同様、総入れ替えによる既存符号のアニメーション再生を避けるため
+    // 新しく打った符号だけを追加する。
+    const render = document.getElementById('free-morse-render');
+    if (txMorseInput.length < render.children.length) render.innerHTML = '';
+    for (let i = render.children.length; i < txMorseInput.length; i++) {
+        const span = document.createElement('span');
+        span.className = txMorseInput[i] === '.' ? 'msym-dot-lg' : 'msym-dash-lg';
+        render.appendChild(span);
+    }
 }
 
 function renderFreeText() {
