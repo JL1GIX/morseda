@@ -45,6 +45,10 @@
         /* PC版: 画面サイズに応じて基準フォントサイズを少し大きくし、謎の余白を減らして視認性を高める */
         @media (min-width: 701px) {
             html { font-size: clamp(19px, min(0.78vw + 13px, 1.7vh + 10px), 32px); }
+            /* Game screen has fewer rows than the lobby, so there's more vertical slack --
+               bump the base font-size only while playing (game-active) to make text/elements
+               a bit bigger and tighten the top/bottom whitespace. Doesn't affect the lobby. */
+            html.game-active { font-size: clamp(20px, min(0.82vw + 13.65px, 1.785vh + 10.5px), 34px); }
         }
         * { box-sizing: border-box; }
         body {
@@ -656,6 +660,7 @@
                vh-based scaling is applied only here (needed for extra shrinking on the
                beginner-mode game screen); normal heights (701-900px) and the lobby are unaffected. */
             html { font-size: clamp(15px, min(0.70vw + 11.75px, 1.4vh + 6.5px), 21px); }
+            html.game-active { font-size: clamp(17px, min(0.81vw + 13.5px, 1.61vh + 7.5px), 24px); }
             #game-container { padding: 8px 20px 10px; margin: 2px 0 6px; }
             #scope-canvas { height: 70px; }
             #beginner-display { min-height: 2.2rem; margin-bottom: 4px; padding: 4px 8px; }

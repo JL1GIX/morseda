@@ -51,7 +51,7 @@
            影響しない(#game-screen.beginner-compact かつ html.game-active の組み合わせのみに限定)。 */
         @media (min-width: 701px) {
             html.game-active:has(#game-screen.beginner-compact) {
-                font-size: clamp(14px, min(0.65vw + 11px, 1.333vh + 6px), 20px);
+                font-size: clamp(15px, min(0.72vw + 12.1px, 1.47vh + 6.6px), 22px);
             }
         }
         html.game-active, body.game-active {
@@ -872,6 +872,10 @@
                is also applied in this lobby-only height tier, to avoid overflow on narrower
                windows (around 1280px wide); the game screen and other height tiers are unaffected. */
             html { font-size: clamp(16px, min(0.72vw + 12px, 1.45vh + 7px), 23px); }
+            /* Game screen has fewer rows than the lobby, so there's more vertical slack --
+               bump the base font-size only while playing (game-active) to make text/elements
+               a bit bigger and tighten the top/bottom whitespace. Doesn't affect the lobby. */
+            html.game-active { font-size: clamp(21px, min(0.94vw + 15.6px, 1.885vh + 9.1px), 30px); }
             .header-bar { margin-bottom: 8px; }
             h1 { font-size: 1.5rem; letter-spacing: 5px; }
             .subtitle { margin-bottom: 8px; }
@@ -900,6 +904,7 @@
                base font size down by window height (vh) here only -- normal-height
                screens (701-900px) and other screens are unaffected. */
             html { font-size: clamp(15px, min(0.70vw + 11.75px, 1.4vh + 6.5px), 21px); }
+            html.game-active { font-size: clamp(17px, min(0.81vw + 13.5px, 1.61vh + 7.5px), 24px); }
             .header-bar { margin-bottom: 4px; }
             h1 { font-size: 1.3rem; }
             .subtitle { margin-bottom: 4px; }

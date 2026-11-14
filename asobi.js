@@ -532,7 +532,9 @@ const WORD_LIST = [
     'VOICE','SPACE','BRAVE','QUIET','SHARP','QUICK','FRESH','SWEET','YOUNG','THANK','SORRY','TODAY','NIGHT',
     'CANDY','JUICE','MONEY','PARTY','PIZZA','PLATE','SPOON','KNIFE','TOWEL',
     // 2026-10 追加分
-    'HANA','BORN','BLOOM'
+    'HANA','BORN','BLOOM',
+    // 2026-11 追加分
+    'DROP','ROSE','FLOWER','BURN','BLUE','JEANS','BAD','LOVE','BODY','STOP','COLD','ALL','GIRL','ARREST'
 ];
 let lastAsobiWord = '';
 function pickWord() {

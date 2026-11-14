@@ -55,7 +55,7 @@
            影響しない(#game-screen.beginner-compact かつ html.game-active の組み合わせのみに限定)。 */
         @media (min-width: 701px) {
             html.game-active:has(#game-screen.beginner-compact) {
-                font-size: clamp(14px, min(0.65vw + 11px, 1.333vh + 6px), 20px);
+                font-size: clamp(15px, min(0.72vw + 12.1px, 1.47vh + 6.6px), 22px);
             }
         }
         * { box-sizing: border-box; }
@@ -764,6 +764,10 @@
                Morse Board表示などで文言が長くなる場合でも見切れないようにする
                (ゲーム画面やより低い高さ区分の調整はこの下の区分で別途行う)。 */
             html { font-size: clamp(18px, min(0.77vw + 12.8px, 1.65vh + 9px), 30px); }
+            /* ゲーム画面はロビーより項目数が少なく余白に余裕があるため、プレイ中(game-active)
+               のみ基準フォントサイズを少し大きくし、文字や各要素を見やすくしつつ上下の余白を詰める。
+               ロビー画面の見切れ対策(上の通常指定)には影響しない。 */
+            html.game-active { font-size: clamp(22px, min(0.924vw + 15.36px, 1.98vh + 10.8px), 36px); }
             .header-bar { margin-bottom: 8px; }
             h1 { font-size: 1.5rem; letter-spacing: 5px; }
             .subtitle { margin-bottom: 8px; }
@@ -828,6 +832,7 @@
                ここでのみ行う(初心者モードのゲーム画面で追加の縮小が必要なため)。
                通常の高さ(701〜900px)やロビー画面には影響しない。 */
             html { font-size: clamp(15px, min(0.70vw + 11.75px, 1.4vh + 6.5px), 21px); }
+            html.game-active { font-size: clamp(17px, min(0.81vw + 13.5px, 1.61vh + 7.5px), 24px); }
             #game-container { padding: 8px 20px 10px; margin: 2px 0 6px; }
             #scope-canvas { height: 70px; }
             #beginner-display { min-height: 2.2rem; margin-bottom: 4px; padding: 4px 8px; }
