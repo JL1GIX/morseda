@@ -537,10 +537,36 @@ const WORD_LIST = [
     'DROP','ROSE','FLOWER','BURN','BLUE','JEANS','BAD','LOVE','BODY','STOP','COLD','ALL','GIRL','ARREST'
 ];
 let lastAsobiWord = '';
+// 「身近な単語」の出題を完全ランダムではなく、袋(bag)から1つずつ引く方式にする。
+// WORD_LISTをシャッフルして袋に入れ、引ききる(1周)までは同じ単語が再び出ないようにし、
+// 1周使い切ったら次の周として改めてシャッフルし直す(周ごとの並びはランダム)。
+let asobiWordBag = [];
+function shuffleWordList(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+function refillAsobiWordBag() {
+    asobiWordBag = shuffleWordList(WORD_LIST);
+    // 周の継ぎ目(前の周の最後の単語と新しい周の最初の単語)で連続しないよう調整
+    if (asobiWordBag.length > 1 && asobiWordBag[asobiWordBag.length - 1] === lastAsobiWord) {
+        const swapIdx = Math.floor(Math.random() * (asobiWordBag.length - 1));
+        const lastIdx = asobiWordBag.length - 1;
+        [asobiWordBag[lastIdx], asobiWordBag[swapIdx]] = [asobiWordBag[swapIdx], asobiWordBag[lastIdx]];
+    }
+}
+// 新しいゲーム開始時に呼び、袋を空にして次のpickWord()で新しい1周目から始まるようにする
+function resetAsobiWordBag() {
+    asobiWordBag = [];
+    lastAsobiWord = '';
+}
 function pickWord() {
     if (WORD_LIST.length <= 1) return WORD_LIST[0];
-    let w;
-    do { w = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)]; } while (w === lastAsobiWord);
+    if (asobiWordBag.length === 0) refillAsobiWordBag();
+    const w = asobiWordBag.pop();
     lastAsobiWord = w;
     return w;
 }
@@ -753,6 +779,7 @@ function startTxGame() {
     asobiMistakeCounts = {};
     accuracyResetCount = 0; oneShotEliminated = false;
     nextAsobiCallType = 'CALLSIGN';
+    resetAsobiWordBag();
     updateVariantStatusUI();
     // 前回プレイの短点・長点表示をクリア
     const _txMorseBox = document.getElementById('tx-morse-input');
