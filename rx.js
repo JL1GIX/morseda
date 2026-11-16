@@ -1010,7 +1010,9 @@ async function autoRegister(retryCount = 0) {
         const rankData = await rankRes.json();
         if (rankData.percentile !== undefined) pct = rankData.percentile;
     } catch (e) {}
-    const rankHref = (LANG === 'en' ? '/ranking-en.html' : '/ranking.html') + `?mode=${gameMode}&time=${minutes}`;
+    // hl: 今プレイして登録したスコアのID。ランキングページ側でこのIDの行を光らせて
+    // 自分の順位がすぐわかるようにする。
+    const rankHref = (LANG === 'en' ? '/ranking-en.html' : '/ranking.html') + `?mode=${gameMode}&time=${minutes}&hl=${encodeURIComponent(_registeredId)}`;
     regResult.innerHTML =
         `<span style="color:var(--success);">${t('regDone')}</span>　${t('topPct', pct)}　` +
         `<a href="${rankHref}" style="color:var(--primary); text-decoration:none; border:1px solid var(--border); padding:4px 14px; font-size:0.75rem; letter-spacing:1px; border-radius:2px;">${t('rankingLink')}</a>`;
