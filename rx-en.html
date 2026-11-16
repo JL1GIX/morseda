@@ -50,6 +50,13 @@
                a bit bigger and tighten the top/bottom whitespace. Doesn't affect the lobby. */
             html.game-active { font-size: clamp(20px, min(0.82vw + 13.65px, 1.785vh + 10.5px), 34px); }
         }
+        @media (min-width: 701px) and (min-height: 901px) {
+            /* We widened the card's top/bottom padding, so while actively playing
+               (game-active), temporarily tighten the footer's top margin so tighter
+               combos (beginner mode + noise, etc.) still don't overflow. Doesn't
+               affect the lobby or result screens. */
+            html.game-active footer { margin-top: 4px !important; padding-top: 10px !important; }
+        }
         * { box-sizing: border-box; }
         body {
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
@@ -62,7 +69,7 @@
                symmetric top/bottom whitespace on taller viewports. Top is now capped to a small
                fixed value; any leftover vertical space just sits below the footer instead. */
             justify-content: flex-start;
-            padding-top: 16px;
+            padding-top: 36px;
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
@@ -86,7 +93,7 @@
             background: var(--panel);
             border: 1px solid var(--border);
             border-top: 2px solid var(--primary);
-            padding: 20px;
+            padding: 28px 20px;
             border-radius: 4px;
             box-shadow: 0 0 50px rgba(0,100,55,0.35), 0 0 100px rgba(0,80,40,0.12), inset 0 1px 0 rgba(0,123,67,0.18);
             width: 95%;
@@ -94,7 +101,7 @@
             text-align: center;
             position: relative;
             z-index: 2;
-            margin-top: 20px;
+            margin-top: 28px;
         }
         #game-container::before {
             content: '◈';

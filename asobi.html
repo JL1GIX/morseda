@@ -70,7 +70,7 @@
                上下に均等な余白が際限なく増えてしまうため、上寄せに変更し上側の余白を
                小さい固定値に抑える(余った縦スペースはフッターの下に収まるだけになる)。 */
             justify-content: flex-start;
-            padding-top: 16px;
+            padding-top: 36px;
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
@@ -94,7 +94,7 @@
             background: var(--panel);
             border: 1px solid var(--border);
             border-top: 2px solid var(--primary);
-            padding: 20px;
+            padding: 28px 20px;
             border-radius: 4px;
             box-shadow: 0 0 50px rgba(0,100,55,0.35), 0 0 100px rgba(0,80,40,0.12), inset 0 1px 0 rgba(0,123,67,0.18);
             width: 95%;
@@ -102,7 +102,7 @@
             text-align: center;
             position: relative;
             z-index: 2;
-            margin: 8px 0 28px;
+            margin: 20px 0 28px;
         }
         #game-container::before {
             content: '◈';
@@ -883,7 +883,7 @@
             .header-bar { margin-bottom: 8px; }
             h1 { font-size: 1.5rem; letter-spacing: 5px; }
             .subtitle { margin-bottom: 8px; }
-            #game-container { padding: 10px 20px 12px; margin: 4px 0 10px; }
+            #game-container { padding: 22px 20px 20px; margin: 14px 0 18px; }
             .mode-tabs-label { margin: 1px 0 2px; }
             .mode-tabs { margin-bottom: 5px; }
             .mode-tab { padding: 4px 4px; }
@@ -926,6 +926,9 @@
                上下が見切れずに収まるようにする */
             body { padding-top: 6px; }
             footer { margin-top: 14px !important; }
+            /* 上のロビー用区分(max-height:1150px)で広げたカードの余白を、
+               この高さ区分では元の詰めた値に戻す(見切れ防止) */
+            #game-container { padding: 10px 20px 12px; margin: 4px 0 10px; }
             .signal-indicators { margin-bottom: 6px; }
             #game-key-assign-row { margin-bottom: 6px; }
             #variant-status { margin-bottom: 6px; }
