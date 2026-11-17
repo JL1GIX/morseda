@@ -50,7 +50,12 @@
                ロビー画面には影響しない。 */
             html.game-active { font-size: clamp(20px, min(0.82vw + 13.65px, 1.785vh + 10.5px), 34px); }
         }
-        @media (min-width: 701px) and (min-height: 901px) {
+        @media (min-width: 701px) and (min-height: 1050px) {
+            /* カードの上下余白をさらに広げる(ウィンドウ高さ1050px以上の余裕がある場合のみ)。
+               901〜1049pxの高さ区分は下の.900pxティアで詰めた値のまま据え置き、
+               この間での見切れを防止する。 */
+            body { padding-top: 28px; }
+            #game-container { padding: 24px 20px; margin-top: 22px; }
             /* カード上下の余白を広げた分、プレイ中(game-active)はフッターの上余白を
                一時的に詰めて、縦に余裕の少ない組み合わせ(初心者モード+雑音など)でも
                見切れないようにする。ロビー/リザルト画面には影響しない。 */
@@ -68,7 +73,7 @@
                上下に均等な余白が際限なく増えてしまうため、上寄せに変更し上側の余白を
                小さい固定値に抑える(余った縦スペースはフッターの下に収まるだけになる)。 */
             justify-content: flex-start;
-            padding-top: 36px;
+            padding-top: 16px;
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
@@ -92,7 +97,7 @@
             background: var(--panel);
             border: 1px solid var(--border);
             border-top: 2px solid var(--primary);
-            padding: 28px 20px;
+            padding: 20px;
             border-radius: 4px;
             box-shadow: 0 0 50px rgba(0,100,55,0.35), 0 0 100px rgba(0,80,40,0.12), inset 0 1px 0 rgba(0,123,67,0.18);
             width: 95%;
@@ -100,7 +105,7 @@
             text-align: center;
             position: relative;
             z-index: 2;
-            margin-top: 28px;
+            margin-top: 20px;
         }
         #game-container::before {
             content: '◈';
@@ -638,7 +643,7 @@
         }
     
         .mode-desc-row { margin: 15px 0; }
-        @media (min-width: 701px) and (max-height: 900px) {
+        @media (min-width: 701px) and (max-height: 1049px) {
             body { padding-top: 6px; }
             .header-bar { margin-bottom: 8px; }
             h1 { font-size: 1.5rem; letter-spacing: 5px; }

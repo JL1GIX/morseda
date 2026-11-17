@@ -50,11 +50,15 @@
                a bit bigger and tighten the top/bottom whitespace. Doesn't affect the lobby. */
             html.game-active { font-size: clamp(20px, min(0.82vw + 13.65px, 1.785vh + 10.5px), 34px); }
         }
-        @media (min-width: 701px) and (min-height: 901px) {
-            /* We widened the card's top/bottom padding, so while actively playing
-               (game-active), temporarily tighten the footer's top margin so tighter
-               combos (beginner mode + noise, etc.) still don't overflow. Doesn't
-               affect the lobby or result screens. */
+        @media (min-width: 701px) and (min-height: 1050px) {
+            /* Widen the card's top/bottom padding further, but only once the window
+               has real headroom (height >= 1050px). The 901-1049px tier below keeps
+               the tighter values so that range doesn't overflow. */
+            body { padding-top: 28px; }
+            #game-container { padding: 24px 20px; margin-top: 22px; }
+            /* While actively playing (game-active), temporarily tighten the footer's
+               top margin so tighter combos (beginner mode + noise, etc.) still don't
+               overflow. Doesn't affect the lobby or result screens. */
             html.game-active footer { margin-top: 4px !important; padding-top: 10px !important; }
         }
         * { box-sizing: border-box; }
@@ -69,7 +73,7 @@
                symmetric top/bottom whitespace on taller viewports. Top is now capped to a small
                fixed value; any leftover vertical space just sits below the footer instead. */
             justify-content: flex-start;
-            padding-top: 36px;
+            padding-top: 16px;
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
@@ -93,7 +97,7 @@
             background: var(--panel);
             border: 1px solid var(--border);
             border-top: 2px solid var(--primary);
-            padding: 28px 20px;
+            padding: 20px;
             border-radius: 4px;
             box-shadow: 0 0 50px rgba(0,100,55,0.35), 0 0 100px rgba(0,80,40,0.12), inset 0 1px 0 rgba(0,123,67,0.18);
             width: 95%;
@@ -101,7 +105,7 @@
             text-align: center;
             position: relative;
             z-index: 2;
-            margin-top: 28px;
+            margin-top: 20px;
         }
         #game-container::before {
             content: '◈';
@@ -639,7 +643,7 @@
         }
     
         .mode-desc-row { margin: 15px 0; }
-        @media (min-width: 701px) and (max-height: 900px) {
+        @media (min-width: 701px) and (max-height: 1049px) {
             body { padding-top: 6px; }
             .header-bar { margin-bottom: 8px; }
             h1 { font-size: 1.5rem; letter-spacing: 5px; }

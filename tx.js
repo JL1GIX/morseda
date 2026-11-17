@@ -459,6 +459,43 @@ function generateRST() {
     return '5NN' + areas[Math.floor(Math.random() * areas.length)] + ['H','M','L','P'][Math.floor(Math.random()*4)];
 }
 
+// ── 縦方向の余白自動調整 ─────────────────────────────────────────────────────────
+// CSSの固定余白(padding-top等)は「初心者モード+雑音あり」のような最も縦に
+// コンテンツが多い組み合わせでも画面からの見切れが起きないよう、安全側の
+// 小さい値にしてある。そのぶん、それより軽い通常の状態(標準ロビー画面など)
+// では画面下部に大きな余白が残ってしまう。
+// ここでは実際に描画された内容の高さを測り、ウィンドウに本当に余裕がある
+// 場合だけ、その余裕分だけ上側の余白を追加する(CSSの安全な最小値より
+// 小さくすることは絶対にしない)。ロビー/ゲーム/リザルトの画面切り替えや
+// ウィンドウリサイズのたびに呼び直すことで、どの状態でも下に大きな空白が
+// 残らないようにする。
+let _vfillResizeTimer = null;
+function adjustVerticalFill() {
+    if (window.innerWidth <= 700) return; // モバイル専用レイアウトは対象外
+    const body = document.body;
+    const prevMinHeight = body.style.minHeight;
+    body.style.minHeight = '0';
+    body.style.paddingTop = ''; // 前回追加した分を外し、CSS本来の基準値に戻す
+    void body.offsetHeight; // 強制リフローで現在の実測値を取得
+    const cssBaseline = parseFloat(getComputedStyle(body).paddingTop) || 0;
+    // document.documentElement.scrollHeight はビューポート高さ未満にはならない
+    // (ルート要素の仕様上の下限)ため、body自身の実測値を使う。
+    const contentHeight = body.scrollHeight;
+    body.style.minHeight = prevMinHeight;
+    const leftover = window.innerHeight - contentHeight;
+    if (leftover > 4) {
+        body.style.paddingTop = (cssBaseline + Math.min(leftover, 480)) + 'px';
+    }
+}
+function scheduleAdjustVerticalFill() {
+    requestAnimationFrame(adjustVerticalFill);
+}
+window.addEventListener('resize', () => {
+    clearTimeout(_vfillResizeTimer);
+    _vfillResizeTimer = setTimeout(scheduleAdjustVerticalFill, 150);
+});
+window.addEventListener('load', scheduleAdjustVerticalFill);
+
 // ── Audio unlock + prepare ─────────────────────────────────────────────────────
 function unlockAndPrepare() {
     gameMode = 'TX';
@@ -496,6 +533,7 @@ function unlockAndPrepare() {
     document.getElementById('game-screen').classList.remove('hidden');
     updateKeyAssignRow('game-key-assign-row');
     setGameplayViewportLock(true);
+    adjustVerticalFill();
     document.getElementById('game-start-overlay').classList.remove('hidden');
     document.getElementById('tx-target-text').textContent = '';
     document.getElementById('tx-input-render').textContent = '';
@@ -529,6 +567,9 @@ function startGame() {
     masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
     timerId = setInterval(tick, 1000);
     startTxGame();
+    // startTxGame()内で初心者モード時にモールス入力欄が表示状態に変わるなど、
+    // ここまでの表示だけでは測れなかった高さ変化があるため再計算する。
+    adjustVerticalFill();
 }
 
 // ── Audio helpers ──────────────────────────────────────────────────────────────
@@ -884,6 +925,7 @@ function startFreeMode() {
     document.getElementById('free-screen').classList.remove('hidden');
     updateKeyAssignRow('free-key-assign-row');
     setGameplayViewportLock(true);
+    adjustVerticalFill();
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     if (isTouch) document.getElementById('free-paddle-area').classList.add('visible');
     doResume.then(() => { setTimeout(launchFreeMode, 300); })
@@ -985,6 +1027,7 @@ function quitFreeMode() {
     document.getElementById('free-screen').classList.add('hidden');
     document.getElementById('start-screen').classList.remove('hidden');
     updateTxModeDesc();
+    adjustVerticalFill();
 }
 
 // ── IC-7300 Spectrum Scope ─────────────────────────────────────────────────────
@@ -1174,6 +1217,7 @@ function quitGame() {
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('start-screen').classList.remove('hidden');
     updateTxModeDesc();
+    adjustVerticalFill();
 }
 
 function retryGame() {
@@ -1181,6 +1225,7 @@ function retryGame() {
     document.getElementById('result-screen').classList.add('hidden');
     document.getElementById('start-screen').classList.remove('hidden');
     updateTxModeDesc();
+    adjustVerticalFill();
 }
 
 // ミスが多かった文字を多い順に並べてリザルト画面に表示する
@@ -1222,6 +1267,7 @@ function endGame() {
     document.getElementById('score-reg-area').style.display = score > 0 ? '' : 'none';
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
+    adjustVerticalFill();
     if (score > 0) {
         autoRegister();
         setTimeout(() => {
