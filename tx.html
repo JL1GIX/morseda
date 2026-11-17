@@ -66,11 +66,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* 以前はjustify-content:centerで上下中央に置いていたが、ビューポートが高いほど
-               上下に均等な余白が際限なく増えてしまうため、上寄せに変更し上側の余白を
-               小さい固定値に抑える(余った縦スペースはフッターの下に収まるだけになる)。 */
-            justify-content: flex-start;
-            padding-top: 36px;
+            /* カード自体を画面の上下中央に配置し、上下に程よい余白ができるようにする */
+            justify-content: center;
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
@@ -899,7 +896,7 @@
                 <label class="setting-item toggle-item" for="morse-board-mode-check">
                     <span class="toggle-icon">⌨️</span>
                     <span class="toggle-text">Morse Boardモード</span>
-                    <input type="checkbox" id="morse-board-mode-check" onchange="updateTxModeDesc();updateTxUrlState();adjustVerticalFill()">
+                    <input type="checkbox" id="morse-board-mode-check" onchange="updateTxModeDesc();updateTxUrlState()">
                     <span class="toggle-switch"></span>
                 </label>
             </div>
