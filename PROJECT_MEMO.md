@@ -134,6 +134,33 @@
 
 もし上記の修正後もズレが再発する場合、原因はサーバー側（`api.jl1gix.com`、このリポジトリ外）にある可能性が高く、`created_at` のシリアライズ形式そのものの確認が必要。
 
+### 4.4 残存していた「暗い計器窓」ゾーンの全廃止 + 彩度不足の是正 + ボタンホバーのグラデーション化 (2026-11 第4弾)
+
+§4.2のTier分け後も、ゲームプレイ中の各種「読み取り窓」(`#input-display`/`#mobile-input`、`#tx-word-display`/`#tx-morse-input`、`#free-input-block`/`#free-output-block`、`#beginner-display`+`.msym-dot`/`.msym-dash`(-lg)、`.tx-paddle-btn`、morse-table.htmlの`.morse-cell`、profile.htmlの`.profile-box`)と、ラウンド開始時の`#game-start-overlay`（「3・2・1・GO」演出）は、意図的に「暗い計器盤」として黒背景のまま残していた。熊谷さんより「モールス打はゲーム中などにまだ黒い箇所が残っている。基本的に黒は不要という前提で考えてほしい」との指摘を受け、これら全てを白/グレー基調に変換した。
+
+- 対象ファイル: `rx.html`/`rx-en.html`、`tx.html`/`tx-en.html`、`asobi.html`/`asobi-en.html`、`morse-table.html`/`morse-table-en.html`、`profile.html`/`profile-en.html`（計10ファイル）
+- `var(--primary-bright)`/`var(--success-bright)`/`var(--error-bright)`/`var(--code-color)`（いずれも暗い背景前提の鮮色トークン）を使っていた箇所を全て、白/グレー背景を前提にした`var(--primary)`/`var(--success)`/`var(--error)`/`var(--primary-dim)`へ置き換え、強いネオン風`text-shadow`のグロー演出は撤去（白背景ではグローは滲んで見えるだけで視認性を悪化させるため）。
+- `var(--scope-bg)`（暗緑`#0a1b12`）を使用していた箇所は全て撤去済み（このトークン自体は現在どのファイルからも参照されていない未使用トークンとして`:root`に残置）。
+- `asobi.html`/`asobi-en.html`の単語タイマーバー `#word-timer-bar-wrap` の背景も `rgba(0,0,0,0.35)` → 薄灰 `#ededed` に変更。
+
+**その後、上記変更を含む一連の白ベース化全体に対し、熊谷さんより追加フィードバックがあった:**
+
+> 「全体的に色が薄すぎる。007b43とかそれに合う色に引っ張られすぎなくていいので、ちゃんと目に残るような色を使ってほしい。『親しみやすいサイトにする』と言ったのは、見やすいサイトにすることでもある。黒は完全に廃止でいい（黒スコープ画面やSTART画面の黒背景は廃止）。あとinspired by 寿司打は全部灰色で。」
+
+これを受けて以下の是正を行った（全33ファイル共通の土台部分と、上記10ファイルの読み取り窓まわり）：
+
+- **グレーキャンバスの導入**: ルートトークン `--bg` を `#fafafa`（ほぼ白） → `#e4e7e6`（はっきりグレーと分かる階調）に全33ファイル一括変更。`--panel`（カード背景、白のまま）とのコントラストで「白カード on グレー地」のレイアウトになり、フッターに既に表示されている「Inspired by 寿司打」のテイストに寄せた。
+- **読み取り窓の背景を白(`--panel`)からグレー(`--bg`)へ**: `#input-display`、`#beginner-display`、`#tx-word-display`、`#tx-morse-input`、`#free-input-block`、`#free-output-block`、`.morse-cell`、`.profile-box` は、白いカード(`#game-container`等)の上に直接`var(--panel)`(白)を敷いていたため、カードと窓の区別がつかずコントラストが薄く見えていた。これらを`var(--bg)`（新グレー）に変更し、「カードに埋め込まれた計器」として視覚的に独立させた。`.tx-paddle-btn`（ボタン要素）は白背景のまま維持（ボタンはボタンらしく）。
+- **`#game-start-overlay`（3・2・1・GOカウントダウン）を薄い演出から鮮やかな演出へ**: 直前の黒廃止対応で一旦`var(--primary-soft)`（ごく薄いミント）の背景にしていたが、これが「色が薄すぎる」の指摘に該当したため、`var(--primary-dim)`→`var(--primary)`→`var(--primary-bright)`を使った**動くグラデーション全面フラッシュ**（白文字・濃い影付き）に変更。`@keyframes start-gradient-shift`でホバーと同系統のアニメーション文法を採用し、黒でも薄いパステルでもない、はっきり目に残る演出にした。
+- **`#tx-target-text .tx-char-next`**（次に打つ文字の表示）: `color: var(--primary-dim); opacity: 0.6` は薄すぎたため `color: var(--primary); opacity: 0.7` に変更。
+
+**index.htmlのボタンホバーをグラデーションアニメーションに変更**（熊谷さんより「ボタンにカーソルを乗せると真緑に染まるのが気持ち悪い、もっとグラデーションみたいに鮮やかなカーソルアニメーションにしてほしい」との依頼）:
+
+- `index.html`/`index-en.html`の`button`要素（受信モード/送信モード/お遊びモードの主要3ボタン）。従来の`button:hover { background: var(--primary); }`という単色べた塗りを廃止し、`::before`疑似要素に`linear-gradient(120deg, var(--primary-dim), var(--primary) 45%, var(--primary-bright) 70%, var(--primary))`（`background-size: 300% 300%`）を仕込み、ホバー中は`@keyframes btn-sheen`で`background-position`を連続的にアニメーションさせる、斜めに流れる光沢グラデーション演出にした。文字色は白、影も`rgba(0,123,67,0.4)`程度の緑系ドロップシャドウで統一。
+- `#game-start-overlay`のグラデーション演出と視覚的に同系統の手法（動くグラデーション + 白文字）を採用し、サイト内で一貫した「アクセントを使うときは鮮やかに動かす」というモーションの文法にした。
+
+この一連の調整により、「黒は使わない」「緑はアクセントとして sparingly に」という§4.2の方針自体は変えず、**アクセントとして使う緑・エラー/成功色を薄め過ぎない**、**背景はグレー地にして白カードとのコントラストで『見やすさ』と『親しみやすさ』を両立する**という2点を新たな方針として追加する。今後、新規要素を追加する際もこの基準（彩度を落とし過ぎない、地はグレー、カードは白、ここぞという箇所だけ動くグラデーション）に揃えること。
+
 ## 5. ゲーム仕様の要点
 
 - **モード**: 受信 (rx) / 送信 (tx)

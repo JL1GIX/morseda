@@ -30,7 +30,7 @@
             --primary: #007b43;
             --primary-dim: #19815a;
             --primary-bright: #00d06a;
-            --bg: #fafafa;
+            --bg: #e4e7e6;
             --panel: #ffffff;
             --border: #e5e5e5;
             --text: #262626;
@@ -169,8 +169,8 @@
             margin-bottom: 8px;
         }
         .morse-cell {
-            background: var(--scope-bg);
-            border: 1px solid rgba(30,92,56,0.6);
+            background: var(--bg);
+            border: 1px solid var(--border);
             border-radius: 3px;
             padding: 10px 12px;
             display: flex;
@@ -181,14 +181,14 @@
             cursor: default;
         }
         .morse-cell:hover {
-            background: #132a1c;
-            border-color: var(--primary-bright);
+            background: var(--primary-soft);
+            border-color: var(--primary);
         }
         .morse-char {
             font-size: 1.4rem;
             font-weight: bold;
-            color: var(--success-bright);
-            text-shadow: 0 0 10px rgba(0,238,119,0.5);
+            color: var(--primary);
+            text-shadow: none;
             line-height: 1;
         }
         .morse-visual {
@@ -203,20 +203,20 @@
         .morse-dot {
             width: 8px; height: 8px;
             border-radius: 50%;
-            background: var(--code-color);
-            box-shadow: 0 0 6px rgba(238,247,242,0.55);
+            background: var(--primary);
+            box-shadow: 0 0 5px rgba(0,123,67,0.3);
             flex-shrink: 0;
         }
         .morse-dash {
             width: 22px; height: 8px;
             border-radius: 4px;
-            background: var(--code-color);
-            box-shadow: 0 0 6px rgba(238,247,242,0.55);
+            background: var(--primary);
+            box-shadow: 0 0 5px rgba(0,123,67,0.3);
             flex-shrink: 0;
         }
         .morse-sym {
             font-size: 0.65rem;
-            color: var(--primary-bright);
+            color: var(--primary-dim);
             letter-spacing: 1px;
             opacity: 0.8;
         }

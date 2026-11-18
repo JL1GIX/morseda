@@ -35,7 +35,7 @@
             --primary-dim: #19815a;
             --primary-bright: #00d06a;
             --primary-soft: #e6f5ee;
-            --bg: #fafafa;
+            --bg: #e4e7e6;
             --panel: #ffffff;
             --border: #e5e5e5;
             --border-strong: #b0b0b0;
@@ -198,16 +198,16 @@
             gap: 8px;
             margin-bottom: 10px;
             padding: 8px 12px;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(0,123,67,0.25);
+            background: var(--bg);
+            border: 1px solid var(--border);
             border-radius: 2px;
         }
         .msym-dot {
             display: inline-block;
             width: 14px; height: 14px;
             border-radius: 50%;
-            background: var(--code-color);
-            box-shadow: 0 0 10px rgba(238,247,242,0.65), 0 0 20px rgba(238,247,242,0.35);
+            background: var(--primary);
+            box-shadow: 0 0 6px rgba(0,123,67,0.35);
             flex-shrink: 0;
             animation: msym-in 0.07s ease-out;
         }
@@ -215,8 +215,8 @@
             display: inline-block;
             width: 40px; height: 14px;
             border-radius: 7px;
-            background: var(--code-color);
-            box-shadow: 0 0 10px rgba(238,247,242,0.65), 0 0 20px rgba(238,247,242,0.35);
+            background: var(--primary);
+            box-shadow: 0 0 6px rgba(0,123,67,0.35);
             flex-shrink: 0;
             animation: msym-in 0.07s ease-out;
         }
@@ -228,16 +228,16 @@
             font-size: 2.2rem;
             letter-spacing: 5px;
             min-height: 7rem;
-            border: 1px solid var(--primary-bright);
-            border-top: 2px solid var(--primary-bright);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--primary);
             padding: 16px 12px;
-            background: rgba(0, 15, 8, 0.95);
+            background: var(--bg);
             display: flex;
             align-items: center;
             justify-content: center;
             text-transform: uppercase;
-            color: var(--primary-bright);
-            text-shadow: 0 0 12px rgba(0,123,67,0.9), 0 0 25px rgba(0,123,67,0.4);
+            color: var(--primary);
+            text-shadow: none;
             border-radius: 10px;
             position: relative;
         }
@@ -246,45 +246,45 @@
             position: absolute;
             top: -1px; left: -1px;
             width: 10px; height: 10px;
-            border-top: 2px solid var(--success-bright);
-            border-left: 2px solid var(--success-bright);
+            border-top: 2px solid var(--primary);
+            border-left: 2px solid var(--primary);
         }
         #input-display::after {
             content: '';
             position: absolute;
             bottom: -1px; right: -1px;
             width: 10px; height: 10px;
-            border-bottom: 2px solid var(--success-bright);
-            border-right: 2px solid var(--success-bright);
+            border-bottom: 2px solid var(--primary);
+            border-right: 2px solid var(--primary);
         }
         .flash-error { animation: error-flash 0.4s ease-in-out; }
         @keyframes error-flash {
-            0%, 100% { border-top-color: var(--primary-bright); border-color: var(--primary-bright); }
-            50% { border-color: var(--error-bright); border-top-color: var(--error-bright); box-shadow: 0 0 30px var(--error-bright), inset 0 0 20px rgba(231,76,60,0.1); }
+            0%, 100% { border-top-color: var(--primary); border-color: var(--border); }
+            50% { border-color: var(--error); border-top-color: var(--error); box-shadow: 0 0 16px rgba(192,57,43,0.3); }
         }
         .flash-correct { animation: correct-flash 0.4s ease-in-out; }
         @keyframes correct-flash {
-            0%, 100% { border-top-color: var(--primary-bright); border-color: var(--primary-bright); }
-            50% { border-color: var(--success-bright); border-top-color: var(--success-bright); box-shadow: 0 0 30px var(--success-bright), inset 0 0 20px rgba(0,255,133,0.08); }
+            0%, 100% { border-top-color: var(--primary); border-color: var(--border); }
+            50% { border-color: var(--success); border-top-color: var(--success); box-shadow: 0 0 16px rgba(21,128,61,0.3); }
         }
-        .cursor { display: inline-block; width: 2px; height: 32px; background: var(--primary-bright); animation: blink 1s infinite; margin-left: 5px; box-shadow: 0 0 12px var(--primary-bright), 0 0 25px rgba(0,123,67,0.5); }
+        .cursor { display: inline-block; width: 2px; height: 32px; background: var(--primary); animation: blink 1s infinite; margin-left: 5px; box-shadow: 0 0 6px rgba(0,123,67,0.4); }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         #mobile-input {
             background: transparent;
             border: none;
             outline: none;
-            color: var(--primary-bright);
+            color: var(--primary);
             font-family: inherit;
             font-size: 2rem;
             letter-spacing: 5px;
             text-transform: uppercase;
-            text-shadow: 0 0 12px rgba(0,123,67,0.9), 0 0 25px rgba(0,123,67,0.4);
+            text-shadow: none;
             width: 100%;
             text-align: center;
-            caret-color: var(--primary-bright);
+            caret-color: var(--primary);
             padding: 0;
         }
-        #mobile-input::selection { background: rgba(0,123,67,0.35); color: var(--primary-bright); }
+        #mobile-input::selection { background: rgba(0,123,67,0.18); color: var(--primary); }
         button {
             background: transparent;
             color: var(--primary);
@@ -562,13 +562,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--scope-bg);
+            background: linear-gradient(120deg, var(--primary-dim), var(--primary) 50%, var(--primary-bright));
+            background-size: 220% 220%;
+            animation: start-gradient-shift 1.6s ease-in-out infinite;
             color: #fff;
             font-size: clamp(3.5rem, 16vw, 9rem);
             font-weight: 700;
             letter-spacing: clamp(6px, 2vw, 20px);
             text-align: center;
-            text-shadow: 0 0 12px var(--primary), 0 0 45px var(--primary), 0 0 90px rgba(0, 208, 106, 0.7);
+            text-shadow: 0 3px 14px rgba(0,30,15,0.35);
+        }
+        @keyframes start-gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
         #result-screen h2 { letter-spacing: 6px; font-size: 1.4rem; text-shadow: none; }
         #final-result-text {
