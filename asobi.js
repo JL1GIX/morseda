@@ -1284,11 +1284,12 @@ function genSpectrum(active) {
 }
 
 function wfColor(v) {
-    if (v < 0.10) { const t = v / 0.10; return [0, Math.round(8 + t * 22), Math.round(18 + t * 28)]; }
-    if (v < 0.30) { const t = (v - 0.10) / 0.20; return [0, Math.round(30 + t * 80), Math.round(46 - t * 26)]; }
-    if (v < 0.58) { const t = (v - 0.30) / 0.28; return [Math.round(t * 40), Math.round(110 + t * 105), Math.round(20 - t * 18)]; }
-    if (v < 0.82) { const t = (v - 0.58) / 0.24; return [Math.round(40 + t * 185), Math.round(215 + t * 40), 2]; }
-    { const t = Math.min(1, (v - 0.82) / 0.18); return [Math.round(225 + t * 30), 255, Math.round(t * 210)]; }
+    // 白背景の水色スペクトラムに合わせたウォーターフォール配色（白→薄水色→スカイブルー→紺）
+    if (v < 0.10) { const t = v / 0.10; return [Math.round(255 - t * 25), Math.round(255 - t * 13), Math.round(255 - t * 3)]; }
+    if (v < 0.30) { const t = (v - 0.10) / 0.20; return [Math.round(230 - t * 60), Math.round(242 - t * 32), Math.round(252 - t * 12)]; }
+    if (v < 0.58) { const t = (v - 0.30) / 0.28; return [Math.round(170 - t * 100), Math.round(210 - t * 60), Math.round(240 - t * 25)]; }
+    if (v < 0.82) { const t = (v - 0.58) / 0.24; return [Math.round(70 - t * 50), Math.round(150 - t * 60), Math.round(215 - t * 45)]; }
+    { const t = Math.min(1, (v - 0.82) / 0.18); return [Math.round(20 - t * 15), Math.round(90 - t * 50), Math.round(170 - t * 60)]; }
 }
 
 function isToneOn() {
@@ -1319,26 +1320,26 @@ function startScopeAnimation() {
             waterfallRows.unshift(row);
             if (waterfallRows.length > FALL_H) waterfallRows.pop();
         }
-        ctx.fillStyle = '#01090404';
+        ctx.fillStyle = '#ffffff08';
         ctx.fillRect(0, 0, SCOPE_W, SCOPE_H);
-        ctx.fillStyle = '#010d05';
+        ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, SCOPE_W, SPEC_H);
         ctx.lineWidth = 0.5;
         for (let i = 1; i <= 4; i++) {
             const y = SPEC_H - (i / 4.5) * (SPEC_H - 14) - 4;
-            ctx.strokeStyle = i === 2 ? 'rgba(0,110,55,0.35)' : 'rgba(0,85,40,0.2)';
+            ctx.strokeStyle = i === 2 ? 'rgba(30,136,190,0.4)' : 'rgba(30,136,190,0.22)';
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(SCOPE_W, y); ctx.stroke();
         }
         const freqOffsets = [-1000, -500, 0, 500, 1000];
         freqOffsets.forEach(f => {
             const x = CW_X + f * PX_PER_HZ;
-            ctx.strokeStyle = f === 0 ? 'rgba(0,140,65,0.35)' : 'rgba(0,90,45,0.22)';
+            ctx.strokeStyle = f === 0 ? 'rgba(30,136,190,0.4)' : 'rgba(30,136,190,0.24)';
             ctx.lineWidth = f === 0 ? 0.8 : 0.5;
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, SPEC_H); ctx.stroke();
         });
-        ctx.fillStyle = 'rgba(0,123,67,0.10)';
+        ctx.fillStyle = 'rgba(3,155,229,0.10)';
         ctx.fillRect(FILT_X1, 0, FILT_X2 - FILT_X1, SPEC_H);
-        ctx.strokeStyle = 'rgba(0,160,80,0.38)';
+        ctx.strokeStyle = 'rgba(3,155,229,0.45)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(FILT_X1, 0); ctx.lineTo(FILT_X1, SPEC_H);
@@ -1347,9 +1348,9 @@ function startScopeAnimation() {
         const specTop = SPEC_H - 10;
         const fillGrad = ctx.createLinearGradient(0, 0, 0, SPEC_H);
         const fa = 0.22 + toneStrength * 0.38;
-        fillGrad.addColorStop(0,   `rgba(20,230,110,${fa})`);
-        fillGrad.addColorStop(0.45,`rgba(0,150,65,${fa * 0.55})`);
-        fillGrad.addColorStop(1,   'rgba(0,40,18,0)');
+        fillGrad.addColorStop(0,   `rgba(77,195,245,${fa})`);
+        fillGrad.addColorStop(0.45,`rgba(3,155,229,${fa * 0.55})`);
+        fillGrad.addColorStop(1,   'rgba(3,155,229,0)');
         ctx.fillStyle = fillGrad;
         ctx.beginPath(); ctx.moveTo(0, SPEC_H);
         for (let x = 0; x < SCOPE_W; x++) {
@@ -1358,9 +1359,9 @@ function startScopeAnimation() {
         }
         ctx.lineTo(SCOPE_W - 1, SPEC_H); ctx.closePath(); ctx.fill();
         const la = 0.65 + toneStrength * 0.35;
-        ctx.strokeStyle = `rgba(0,195,85,${la})`;
+        ctx.strokeStyle = `rgba(2,120,185,${la})`;
         ctx.lineWidth = 1.6;
-        ctx.shadowColor = `rgba(0,180,80,${toneStrength * 0.85})`;
+        ctx.shadowColor = `rgba(3,155,229,${toneStrength * 0.85})`;
         ctx.shadowBlur = 2 + toneStrength * 10;
         ctx.beginPath();
         for (let x = 0; x < SCOPE_W; x++) {
@@ -1370,13 +1371,13 @@ function startScopeAnimation() {
         ctx.stroke(); ctx.shadowBlur = 0;
         if (toneStrength > 0.2) {
             const peakY = SPEC_H - smoothSpectrum[CW_X] * specTop;
-            ctx.strokeStyle = `rgba(0,210,95,${toneStrength * 0.3})`;
+            ctx.strokeStyle = `rgba(2,120,185,${toneStrength * 0.3})`;
             ctx.lineWidth = 1; ctx.setLineDash([3, 4]);
             ctx.beginPath(); ctx.moveTo(CW_X, peakY + 2); ctx.lineTo(CW_X, SPEC_H); ctx.stroke();
             ctx.setLineDash([]);
-            ctx.fillStyle = `rgba(140,255,170,${toneStrength * 0.95})`;
+            ctx.fillStyle = `rgba(60,170,230,${toneStrength * 0.95})`;
             ctx.beginPath(); ctx.arc(CW_X, peakY, 2.8, 0, Math.PI * 2); ctx.fill();
-            ctx.strokeStyle = `rgba(0,230,100,${toneStrength * 0.5})`;
+            ctx.strokeStyle = `rgba(2,120,185,${toneStrength * 0.5})`;
             ctx.lineWidth = 1;
             ctx.beginPath(); ctx.arc(CW_X, peakY, 5, 0, Math.PI * 2); ctx.stroke();
         }
@@ -1385,23 +1386,23 @@ function startScopeAnimation() {
         freqOffsets.forEach(f => {
             const x = CW_X + f * PX_PER_HZ;
             const lbl = f === 0 ? '750Hz' : (f > 0 ? `+${f >= 1000 ? f/1000+'k' : f}` : `${f <= -1000 ? f/1000+'k' : f}`);
-            ctx.fillStyle = f === 0 ? `rgba(0,220,100,${0.5 + toneStrength * 0.5})` : 'rgba(0,150,65,0.45)';
+            ctx.fillStyle = f === 0 ? `rgba(2,120,185,${0.5 + toneStrength * 0.5})` : 'rgba(30,136,190,0.55)';
             ctx.fillText(lbl, x, SPEC_H - 2);
         });
         const cwAlpha = 0.5 + toneStrength * 0.5;
-        ctx.fillStyle = `rgba(0,220,100,${cwAlpha})`;
+        ctx.fillStyle = `rgba(2,120,185,${cwAlpha})`;
         ctx.beginPath();
         ctx.moveTo(CW_X - 4, SPEC_H + 1);
         ctx.lineTo(CW_X + 4, SPEC_H + 1);
         ctx.lineTo(CW_X, SPEC_H - 5);
         ctx.closePath(); ctx.fill();
         ctx.textAlign = 'right';
-        ctx.fillStyle = 'rgba(0,130,60,0.45)';
+        ctx.fillStyle = 'rgba(30,136,190,0.55)';
         ['S9+', 'S9', 'S7', 'S5'].forEach((lbl, i) => {
             const y = SPEC_H - ((3 - i) / 4.5) * (SPEC_H - 14) - 4;
             ctx.fillText(lbl, SCOPE_W - 2, y - 2);
         });
-        ctx.strokeStyle = 'rgba(0,110,55,0.6)';
+        ctx.strokeStyle = 'rgba(30,136,190,0.6)';
         ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(0, SPEC_H); ctx.lineTo(SCOPE_W, SPEC_H); ctx.stroke();
         const d = fallImgData.data;
@@ -1415,15 +1416,15 @@ function startScopeAnimation() {
             }
         }
         ctx.putImageData(fallImgData, 0, SPEC_H);
-        ctx.fillStyle = 'rgba(0,123,67,0.07)';
+        ctx.fillStyle = 'rgba(3,155,229,0.07)';
         ctx.fillRect(FILT_X1, SPEC_H, FILT_X2 - FILT_X1, FALL_H);
-        ctx.strokeStyle = 'rgba(0,150,75,0.22)';
+        ctx.strokeStyle = 'rgba(3,155,229,0.3)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(FILT_X1, SPEC_H); ctx.lineTo(FILT_X1, SPEC_H + FALL_H);
         ctx.moveTo(FILT_X2, SPEC_H); ctx.lineTo(FILT_X2, SPEC_H + FALL_H);
         ctx.stroke();
-        ctx.fillStyle = 'rgba(0,140,60,0.35)';
+        ctx.fillStyle = 'rgba(30,136,190,0.5)';
         ctx.font = '7px Consolas, monospace';
         ctx.textAlign = 'left';
         ctx.fillText('WFALL', 4, SPEC_H + 10);

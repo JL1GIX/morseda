@@ -35,15 +35,18 @@
             --primary-dim: #19815a;
             --primary-bright: #00d06a;
             --primary-soft: #e6f5ee;
-            --bg: #f6faf8;
+            --bg: #fafafa;
             --panel: #ffffff;
-            --border: #d7e9e0;
-            --border-strong: #3d9c66;
+            --border: #e5e5e5;
+            --border-strong: #b0b0b0;
+            --text: #262626;
+            --text-secondary: #707070;
             --error: #c0392b;
             --success: #15803d;
             --error-bright: #e74c3c;
             --success-bright: #00ee77;
             --scope-bg: #0a1b12;
+            --scope-bg-light: #ffffff;
             --code-color: #eef7f2;
         }
         html, body { scrollbar-gutter: stable; }
@@ -67,7 +70,7 @@
         body {
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             background: var(--bg);
-            color: var(--primary);
+            color: var(--text);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -77,9 +80,7 @@
             margin: 0;
             overflow-x: hidden;
             touch-action: manipulation;
-            background-image:
-                radial-gradient(ellipse at 50% 0%, rgba(10,125,68,0.05) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 100%, rgba(10,125,68,0.04) 0%, transparent 60%);
+            background-image: none;
         }
         body::after {
             content: '';
@@ -128,13 +129,13 @@
             content: '';
             flex: 1;
             height: 1px;
-            background: linear-gradient(to right, transparent, var(--primary-dim));
+            background: linear-gradient(to right, transparent, #d9d9d9);
         }
         .header-bar::after {
             content: '';
             flex: 1;
             height: 1px;
-            background: linear-gradient(to left, transparent, var(--primary-dim));
+            background: linear-gradient(to left, transparent, #d9d9d9);
         }
         h1 {
             margin: 0;
@@ -145,7 +146,7 @@
         }
         .subtitle {
             font-size: 0.8rem;
-            color: var(--primary-dim);
+            color: var(--text-secondary);
             letter-spacing: 5px;
             margin-bottom: 20px;
             opacity: 1.0;
@@ -155,17 +156,17 @@
             justify-content: space-around;
             margin-bottom: 12px;
             border: 1px solid var(--border);
-            background: var(--primary-soft);
+            background: #f5f5f5;
             padding: 8px 15px;
             border-radius: 8px;
         }
         .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; min-width: 0; }
-        .stat-label { color: var(--primary-dim); font-size: 0.68rem; letter-spacing: 2px; opacity: 1.0; }
+        .stat-label { color: var(--text-secondary); font-size: 0.68rem; letter-spacing: 2px; opacity: 1.0; }
         .stat-value { color: var(--primary); font-size: 1.05rem; font-weight: bold; }
         #scope-container {
             position: relative;
-            background: var(--scope-bg);
-            border: 1px solid #2a6040;
+            background: var(--scope-bg-light);
+            border: 1px solid var(--border);
             border-radius: 2px;
             margin-bottom: 12px;
             overflow: hidden;
@@ -174,7 +175,7 @@
             position: absolute;
             top: 5px; left: 8px;
             font-size: 0.58rem;
-            color: var(--primary-bright);
+            color: #0278b9;
             opacity: 1.0;
             letter-spacing: 2px;
             z-index: 2;
@@ -184,7 +185,7 @@
             position: absolute;
             top: 5px; right: 8px;
             font-size: 0.58rem;
-            color: var(--primary-bright);
+            color: #0278b9;
             opacity: 1.0;
             letter-spacing: 1px;
             z-index: 2;
@@ -194,9 +195,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.5) 100%), linear-gradient(to right, rgba(0,0,0,0.3) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.3) 100%);
-            pointer-events: none;
-            z-index: 1;
+            display: none;
         }
         #scope-canvas { display: block; width: 100%; height: 120px; }
         #beginner-display {
@@ -243,7 +242,7 @@
         .msym-key-label {
             font-size: 0.62rem;
             letter-spacing: 1px;
-            color: var(--primary-dim);
+            color: var(--text-secondary);
             opacity: 0.85;
             line-height: 1;
             white-space: nowrap;
@@ -324,7 +323,7 @@
         /* リザルト画面: キー操作で戻れることを示す小さなヒント */
         .result-key-hint {
             font-size: 0.68rem;
-            color: var(--primary-dim);
+            color: var(--text-secondary);
             opacity: 0.8;
             letter-spacing: 1px;
             margin-top: 6px;
@@ -346,7 +345,7 @@
         #game-screen.beginner-compact .quit-btn { margin-top: 11px; }
         select {
             background: var(--panel);
-            color: var(--primary);
+            color: var(--text);
             border: 1px solid var(--border-strong);
             font-size: 0.9rem;
             padding: 8px 30px 8px 10px;
@@ -355,7 +354,7 @@
             cursor: pointer;
             outline: none;
             appearance: none;
-            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23007b43' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23595959' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 10px center;
         }
@@ -394,7 +393,7 @@
         .wpm-range::-moz-range-track { background: transparent; }
         .wpm-band-labels {
             display: flex; justify-content: space-between; font-size: 0.56rem;
-            color: var(--primary-dim); letter-spacing: 1px; opacity: 0.85; margin-top: 2px;
+            color: var(--text-secondary); letter-spacing: 1px; opacity: 0.85; margin-top: 2px;
         }
         .settings-grid {
             display: grid;
@@ -413,7 +412,7 @@
         }
         .setting-label {
             font-size: 0.68rem;
-            color: var(--primary);
+            color: var(--text-secondary);
             letter-spacing: 2px;
             margin-bottom: 8px;
             display: block;
@@ -425,7 +424,7 @@
             padding: 9px 4px;
             background: transparent;
             border: 1px solid var(--border);
-            color: var(--primary-dim);
+            color: var(--text-secondary);
             font-family: inherit;
             font-size: 0.8rem;
             letter-spacing: 1px;
@@ -440,7 +439,7 @@
             text-shadow: 0 0 8px rgba(0,192,96,0.6);
             box-shadow: 0 0 10px rgba(0,192,96,0.15), inset 0 0 8px rgba(0,192,96,0.08);
         }
-        .time-tab:hover:not(.active) { border-color: var(--primary-dim); color: var(--primary); }
+        .time-tab:hover:not(.active) { border-color: var(--primary-dim); color: var(--primary-dim); }
         .time-tab:active { transform: scale(0.97); }
         .toggle-item {
             grid-column: 1 / -1;
@@ -453,7 +452,7 @@
         .toggle-icon { font-size: 1.1rem; line-height: 1; flex-shrink: 0; }
         .toggle-text {
             font-size: 0.78rem;
-            color: var(--primary);
+            color: var(--text);
             cursor: pointer;
             letter-spacing: 0.5px;
             line-height: 1.5;
@@ -532,7 +531,7 @@
             margin-bottom: 12px;
             flex-wrap: wrap;
         }
-        .sig-label { font-size: 0.58rem; color: var(--primary-dim); opacity: 1.0; letter-spacing: 1px; margin-right: 4px; }
+        .sig-label { font-size: 0.58rem; color: var(--text-secondary); opacity: 1.0; letter-spacing: 1px; margin-right: 4px; }
         .sig-dot { width: 7px; height: 7px; border-radius: 50%; background: #e3ece7; border: 1px solid #c7d7cd; }
         .sig-dot.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 6px var(--primary); }
         .sig-dot.blink-active { animation: sig-blink 0.6s infinite alternate; }
@@ -654,7 +653,7 @@
             box-shadow: 0 2px 10px rgba(16,40,28,0.08);
         }
         .share-area { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
-        .share-label { font-size: 0.65rem; letter-spacing: 3px; color: var(--primary-dim); opacity: 1.0; margin-bottom: 12px; }
+        .share-label { font-size: 0.65rem; letter-spacing: 3px; color: var(--text-secondary); opacity: 1.0; margin-bottom: 12px; }
         .share-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
         .share-btn {
             display: flex; align-items: center; gap: 7px;
@@ -673,9 +672,9 @@
         }
         #free-header {
             text-align: center; letter-spacing: 6px; font-size: 0.7rem;
-            color: var(--primary-dim); padding-bottom: 8px; border-bottom: 1px solid var(--border);
+            color: var(--text-secondary); padding-bottom: 8px; border-bottom: 1px solid var(--border);
         }
-        #free-header span { color: var(--primary); font-size: 1.0rem; letter-spacing: 8px; }
+        #free-header span { color: var(--text); font-size: 1.0rem; letter-spacing: 8px; }
         #free-input-block { background: rgba(0,0,0,0.4); border: 1px solid rgba(0,123,67,0.3); border-radius: 10px; padding: 10px 16px 12px; }
         #free-input-block .free-section-label {
             font-size: 0.58rem; color: var(--primary-bright); letter-spacing: 3px;
@@ -725,12 +724,12 @@
         #key-customize-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999; align-items: center; justify-content: center; }
         #key-customize-modal.open { display: flex; }
         .kc-box { background: var(--panel); border: 1px solid var(--border); border-top: 2px solid var(--primary); padding: 26px 28px; width: min(340px, 88vw); border-radius: 10px; box-shadow: 0 10px 40px rgba(16,40,28,0.3); }
-        .kc-title { font-size: 0.7rem; letter-spacing: 3px; color: var(--primary-dim); margin-bottom: 18px; text-align: center; }
+        .kc-title { font-size: 0.7rem; letter-spacing: 3px; color: var(--text-secondary); margin-bottom: 18px; text-align: center; }
         .kc-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 0; }
-        .kc-label { font-size: 0.78rem; letter-spacing: 2px; color: var(--primary-dim); flex-shrink: 0; }
+        .kc-label { font-size: 0.78rem; letter-spacing: 2px; color: var(--text-secondary); flex-shrink: 0; }
         .kc-key-btn {
             background: rgba(0,123,67,0.08); border: 1px solid var(--border);
-            color: var(--primary); font-family: inherit; font-size: 0.9rem;
+            color: var(--text); font-family: inherit; font-size: 0.9rem;
             letter-spacing: 2px; padding: 8px 0; width: 155px; cursor: pointer;
             text-align: center; transition: border-color 0.15s, background 0.15s;
         }
@@ -847,10 +846,10 @@
         <div id="mode-settings" style="position:relative;">
             <!-- モード説明 + キー設定ボタン -->
             <div class="mode-desc-row" style="display:flex;align-items:flex-start;gap:10px;">
-                <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:0;flex:1;"></p>
+                <p id="mode-description" style="color:var(--text);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:0;flex:1;"></p>
                 <div id="key-customize-wrap" style="flex-shrink:0;padding-top:3px; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
                     <button id="key-customize-btn" onclick="openKeyCustomize()">⌨ Key Settings</button>
-                    <div id="key-assign-display" style="font-size:0.6rem; line-height:1.4; color:var(--primary-dim); text-align:right; letter-spacing:1px; white-space:nowrap; border:1px solid var(--border); border-radius:4px; padding:6px 9px; background:var(--primary-soft);"></div>
+                    <div id="key-assign-display" style="font-size:0.6rem; line-height:1.4; color:var(--text-secondary); text-align:right; letter-spacing:1px; white-space:nowrap; border:1px solid var(--border); border-radius:4px; padding:6px 9px; background:#f5f5f5;"></div>
                 </div>
             </div>
             <div class="settings-grid">
@@ -994,7 +993,7 @@
         <h2>MISSION END</h2>
         <p id="final-result-text" style="margin: 20px 0;"></p>
         <div id="tx-mistake-area" class="hidden" style="margin:0 auto 20px; padding:12px 14px; border:1px solid var(--border); border-radius:10px; background:var(--primary-soft); max-width:380px;">
-            <div style="font-size:0.65rem; letter-spacing:2px; color:var(--primary-dim); margin-bottom:8px;">▸ Frequently Missed Characters ◂</div>
+            <div style="font-size:0.65rem; letter-spacing:2px; color:var(--text-secondary); margin-bottom:8px;">▸ Frequently Missed Characters ◂</div>
             <div id="tx-mistake-list" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
         </div>
         <div class="share-area">
@@ -1007,14 +1006,14 @@
             </div>
         </div>
         <div id="score-reg-area" style="margin-top:18px; border-top:1px solid var(--border); padding-top:14px;">
-            <div id="score-reg-result" style="margin-bottom:12px; font-size:0.85rem; line-height:2; color:var(--primary);"></div>
+            <div id="score-reg-result" style="margin-bottom:12px; font-size:0.85rem; line-height:2; color:var(--text);"></div>
             <div id="score-reg-form" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; align-items:center;">
                 <input type="text" id="nickname-input" placeholder="Nickname (up to 10 chars, no '/')" maxlength="10"
                     autocomplete="off" autocapitalize="characters" spellcheck="false"
                     oninput="if(!event.isComposing){this.value = toHankakuUpperNick(this.value);}"
                     onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();setNickname();}"
                     style="background:#ffffff; border:1px solid var(--border-strong); border-radius:6px;
-                           color:var(--primary); font-family:inherit; font-size:0.82rem;
+                           color:var(--text); font-family:inherit; font-size:0.82rem;
                            padding:8px 12px; width:230px; letter-spacing:1px; outline:none;">
                 <button onclick="setNickname()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">✏️ Set Name</button>
             </div>
@@ -1024,15 +1023,15 @@
     </div>
 </div>
 
-<footer style="margin-top:20px;padding:12px 0 28px;border-top:1px solid #d7e9e0;font-size:0.65rem;letter-spacing:1px;opacity:0.55;text-align:center;">
+<footer style="margin-top:20px;padding:12px 0 28px;border-top:1px solid #e5e5e5;font-size:0.65rem;letter-spacing:1px;opacity:0.55;text-align:center;">
     <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 20px;">
-        <a href="https://jl1gix.com/index-en.html" style="color:#007b43; text-decoration:none;">Top</a>
-        <a href="/ranking-en.html" style="color:#007b43; text-decoration:none;">Ranking</a>
-<a href="/how-to-use-en.html" style="color:#007b43; text-decoration:none;">How to Use</a>
-        <a href="/morse-table-en.html" style="color:#007b43; text-decoration:none;">Morse Code Table</a>
-<a href="/profile-en.html" style="color:#007b43; text-decoration:none;">About</a>
-        <a href="/privacy-en.html" style="color:#007b43; text-decoration:none;">Privacy</a>
-        <a href="/contact-en.html" style="color:#007b43; text-decoration:none;">Contact</a>
+        <a href="https://jl1gix.com/index-en.html" style="color:#404040; text-decoration:none;">Top</a>
+        <a href="/ranking-en.html" style="color:#404040; text-decoration:none;">Ranking</a>
+<a href="/how-to-use-en.html" style="color:#404040; text-decoration:none;">How to Use</a>
+        <a href="/morse-table-en.html" style="color:#404040; text-decoration:none;">Morse Code Table</a>
+<a href="/profile-en.html" style="color:#404040; text-decoration:none;">About</a>
+        <a href="/privacy-en.html" style="color:#404040; text-decoration:none;">Privacy</a>
+        <a href="/contact-en.html" style="color:#404040; text-decoration:none;">Contact</a>
     </div>
 </footer>
 
@@ -1058,24 +1057,24 @@
     </div>
 </div>
 <!-- ハンバーガーメニュー -->
-<button id="menu-btn" aria-label="Open menu" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(255,255,255,0.9);color:#007b43;border:1px solid #d7e9e0;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 2px 10px rgba(16,40,28,0.12);">☰</button>
-<a id="lang-switch-btn" href="/tx.html" onclick="setMorsedaLangPref('ja')" aria-label="Switch to Japanese" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(255,255,255,0.9);color:#007b43;border:1px solid #d7e9e0;border-radius:4px;padding:6px 12px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 2px 10px rgba(16,40,28,0.12);text-decoration:none;display:inline-block;">🌐 JA</a>
+<button id="menu-btn" aria-label="Open menu" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(255,255,255,0.9);color:#262626;border:1px solid #e5e5e5;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 2px 10px rgba(16,40,28,0.12);">☰</button>
+<a id="lang-switch-btn" href="/tx.html" onclick="setMorsedaLangPref('ja')" aria-label="Switch to Japanese" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(255,255,255,0.9);color:#262626;border:1px solid #e5e5e5;border-radius:4px;padding:6px 12px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 2px 10px rgba(16,40,28,0.12);text-decoration:none;display:inline-block;">🌐 JA</a>
 <div id="menu-overlay" onclick="document.getElementById('menu-panel').classList.remove('open');this.classList.remove('open');" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:998;"></div>
-<nav id="menu-panel" aria-label="Site menu" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#ffffff;border-right:1px solid #d7e9e0;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(16,40,28,0.15);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
-    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.9;">▸ Game</h3>
-    <a href="/index-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 Home</a>
-    <a href="/rx-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 Receive Mode</a>
-    <a href="/tx-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 Transmit Mode</a>
-    <a href="/asobi-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 Fun Mode</a>
-    <a href="/ranking-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 Ranking</a>
-    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.9;">▸ Learning</h3>
-    <a href="/how-to-use-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ How to Use</a>
-    <a href="/morse-table-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 Morse Code Table</a>
-    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.9;">▸ Other</h3>
-    <a href="/morse-board-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎹 About Morse Board</a>
-    <a href="/profile-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 About</a>
-    <a href="/privacy-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 Privacy</a>
-    <a href="/contact-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ Contact</a>
+<nav id="menu-panel" aria-label="Site menu" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#ffffff;border-right:1px solid #e5e5e5;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(16,40,28,0.15);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
+    <h3 style="color:#262626;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #e5e5e5;padding-bottom:6px;opacity:0.9;">▸ Game</h3>
+    <a href="/index-en.html" style="display:block;color:#262626;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 Home</a>
+    <a href="/rx-en.html" style="display:block;color:#262626;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 Receive Mode</a>
+    <a href="/tx-en.html" style="display:block;color:#262626;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 Transmit Mode</a>
+    <a href="/asobi-en.html" style="display:block;color:#262626;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 Fun Mode</a>
+    <a href="/ranking-en.html" style="display:block;color:#262626;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 Ranking</a>
+    <h3 style="color:#262626;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #e5e5e5;padding-bottom:6px;opacity:0.9;">▸ Learning</h3>
+    <a href="/how-to-use-en.html" style="display:block;color:#262626;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ How to Use</a>
+    <a href="/morse-table-en.html" style="display:block;color:#262626;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 Morse Code Table</a>
+    <h3 style="color:#262626;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #e5e5e5;padding-bottom:6px;opacity:0.9;">▸ Other</h3>
+    <a href="/morse-board-en.html" style="display:block;color:#262626;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎹 About Morse Board</a>
+    <a href="/profile-en.html" style="display:block;color:#262626;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 About</a>
+    <a href="/privacy-en.html" style="display:block;color:#262626;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 Privacy</a>
+    <a href="/contact-en.html" style="display:block;color:#262626;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ Contact</a>
 </nav>
 <style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(10,125,68,0.08);}nav#menu-panel a:hover{background:rgba(10,125,68,0.08);padding-left:6px;transition:padding 0.15s;}#lang-switch-btn:hover{background:rgba(10,125,68,0.08);}</style>
 </body>
