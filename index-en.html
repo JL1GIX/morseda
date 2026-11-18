@@ -28,14 +28,17 @@
     <meta name="twitter:site" content="@JL1GIX">
     <meta name="twitter:creator" content="@JL1GIX">
     <meta name="author" content="JL1GIX">
-    <meta name="theme-color" content="#080f0b">
+    <meta name="theme-color" content="#f6faf8">
         <style>
         :root {
-            --primary: #00d06a;
-            --primary-dim: #00b85a;
-            --bg: #080f0b;
-            --panel: #0e1f16;
-            --border: #1e5c38;
+            --primary: #007b43;
+            --primary-dim: #19815a;
+            --primary-bright: #00d06a;
+            --primary-soft: #e6f5ee;
+            --bg: #f6faf8;
+            --panel: #ffffff;
+            --border: #d7e9e0;
+            --border-strong: #3d9c66;
         }
         * { box-sizing: border-box; }
         body {
@@ -51,19 +54,14 @@
             overflow-x: hidden;
             touch-action: manipulation;
             background-image:
-                radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
+                radial-gradient(ellipse at 50% 0%, rgba(10,125,68,0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(10,125,68,0.04) 0%, transparent 60%);
         }
         body::after {
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: repeating-linear-gradient(
-                0deg, transparent, transparent 2px,
-                rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
-            );
-            pointer-events: none;
-            z-index: 9999;
+            display: none;
         }
         #game-container {
             background: var(--panel);
@@ -72,9 +70,9 @@
             padding: 20px;
             border-radius: 4px;
             box-shadow:
-                0 0 50px rgba(0,100,55,0.35),
-                0 0 100px rgba(0,80,40,0.12),
-                inset 0 1px 0 rgba(0,123,67,0.18);
+                0 4px 20px rgba(16,40,28,0.08),
+                0 1px 4px rgba(16,40,28,0.05),
+                inset 0 1px 0 rgba(255,255,255,0.6);
             width: 95%;
             max-width: 1200px;
             text-align: center;
@@ -121,7 +119,7 @@
             letter-spacing: 10px;
             font-size: 2.4rem;
             color: var(--primary);
-            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5), 0 0 80px rgba(0,123,67,0.2);
+            text-shadow: none;
         }
         .subtitle {
             font-size: 0.88rem;
@@ -146,9 +144,9 @@
             font-family: inherit;
         }
         button:hover {
-            background: rgba(0,123,67,0.2);
+            background: var(--primary);
             border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(0,123,67,0.35);
+            box-shadow: 0 2px 10px rgba(16,40,28,0.18);
             color: #fff;
         }
         .home-link-btn {
@@ -164,7 +162,7 @@
         .home-link-btn:hover {
             border-color: var(--primary);
             background: rgba(0,123,67,0.18);
-            box-shadow: 0 0 12px rgba(0,123,67,0.3);
+            box-shadow: 0 2px 10px rgba(16,40,28,0.18);
         }
         @media (max-width: 700px) {
             body { justify-content: flex-start; padding: 8px 0; }
@@ -269,7 +267,7 @@
 <footer style="
     margin-top: 44px;
     padding: 22px 0 6px;
-    border-top: 1px solid #1e5c38;
+    border-top: 1px solid #d7e9e0;
     font-size: 0.82rem;
     letter-spacing: 1.5px;
     opacity: 0.7;
@@ -289,26 +287,26 @@
 
 <script src="/index.js"></script>
 <!-- ハンバーガーメニュー -->
-<button id="menu-btn" aria-label="Open menu" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);">☰</button>
+<button id="menu-btn" aria-label="Open menu" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(255,255,255,0.9);color:#007b43;border:1px solid #d7e9e0;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 2px 10px rgba(16,40,28,0.12);">☰</button>
 <!-- 言語切替 -->
-<select id="lang-select" aria-label="Select language / 言語を選択" onchange="if(this.value==='ja'){setMorsedaLangPref('ja');location.href='/';}" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:6px 10px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);"><option value="ja">🌐 日本語</option><option value="en" selected>🌐 English</option></select>
+<select id="lang-select" aria-label="Select language / 言語を選択" onchange="if(this.value==='ja'){setMorsedaLangPref('ja');location.href='/';}" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(255,255,255,0.9);color:#007b43;border:1px solid #d7e9e0;border-radius:4px;padding:6px 10px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 2px 10px rgba(16,40,28,0.12);"><option value="ja">🌐 日本語</option><option value="en" selected>🌐 English</option></select>
 <div id="menu-overlay" onclick="document.getElementById('menu-panel').classList.remove('open');this.classList.remove('open');" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:998;"></div>
-<nav id="menu-panel" aria-label="Site menu" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#0e1f16;border-right:1px solid #1e5c38;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(0,0,0,0.6);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
-    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Game</h3>
-    <a href="/index-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 Home</a>
-    <a href="/rx-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 Receive Mode</a>
-    <a href="/tx-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 Transmit Mode</a>
-    <a href="/asobi-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 Fun Mode</a>
-    <a href="/ranking-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 Ranking</a>
-    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Learning</h3>
-    <a href="/how-to-use-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ How to Use</a>
-    <a href="/morse-table-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 Morse Code Table</a>
-    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Other</h3>
-    <a href="/morse-board-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎹 About Morse Board</a>
-    <a href="/profile-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 About</a>
-    <a href="/privacy-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 Privacy</a>
-    <a href="/contact-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ Contact</a>
+<nav id="menu-panel" aria-label="Site menu" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#ffffff;border-right:1px solid #d7e9e0;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(16,40,28,0.15);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
+    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.9;">▸ Game</h3>
+    <a href="/index-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 Home</a>
+    <a href="/rx-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 Receive Mode</a>
+    <a href="/tx-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 Transmit Mode</a>
+    <a href="/asobi-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 Fun Mode</a>
+    <a href="/ranking-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 Ranking</a>
+    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.9;">▸ Learning</h3>
+    <a href="/how-to-use-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ How to Use</a>
+    <a href="/morse-table-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 Morse Code Table</a>
+    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.9;">▸ Other</h3>
+    <a href="/morse-board-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎹 About Morse Board</a>
+    <a href="/profile-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 About</a>
+    <a href="/privacy-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 Privacy</a>
+    <a href="/contact-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ Contact</a>
 </nav>
-<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(0,100,55,0.25);}nav#menu-panel a:hover{background:rgba(0,100,55,0.15);padding-left:6px;transition:padding 0.15s;}#lang-select:hover{background:rgba(0,100,55,0.25);}#lang-select option{background:#0e1f16;color:#00c060;}</style>
+<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(10,125,68,0.08);}nav#menu-panel a:hover{background:rgba(10,125,68,0.08);padding-left:6px;transition:padding 0.15s;}#lang-select:hover{background:rgba(10,125,68,0.08);}#lang-select option{background:#ffffff;color:#007b43;}</style>
 </body>
 </html>

@@ -17,7 +17,7 @@
     <meta name="twitter:site" content="@JL1GIX">
     <meta name="twitter:creator" content="@JL1GIX">
     <meta name="author" content="JL1GIX">
-    <meta name="theme-color" content="#080f0b">
+    <meta name="theme-color" content="#f6faf8">
         <title>モールス符号表 - モールス打</title>
     <meta name="description" content="アルファベット・数字・記号のモールス符号一覧表。アマチュア無線のCW練習に役立つ符号表です。">
     <meta property="og:title" content="モールス符号表 - モールス打">
@@ -27,12 +27,15 @@
     <meta name="twitter:card" content="summary">
     <style>
         :root {
-            --primary: #00d06a;
-            --primary-dim: #00b85a;
-            --bg: #080f0b;
-            --panel: #0e1f16;
-            --border: #1e5c38;
-            --success: #00ee77;
+            --primary: #007b43;
+            --primary-dim: #19815a;
+            --primary-bright: #00d06a;
+            --bg: #f6faf8;
+            --panel: #ffffff;
+            --border: #d7e9e0;
+            --success: #15803d;
+            --success-bright: #00ee77;
+            --scope-bg: #0a1b12;
             --code-color: #eef7f2;
         }
         * { box-sizing: border-box; }
@@ -47,19 +50,14 @@
             margin: 0;
             padding: 20px 10px 40px;
             background-image:
-                radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
+                radial-gradient(ellipse at 50% 0%, rgba(10,125,68,0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(10,125,68,0.04) 0%, transparent 60%);
         }
         body::after {
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: repeating-linear-gradient(
-                0deg, transparent, transparent 2px,
-                rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
-            );
-            pointer-events: none;
-            z-index: 9999;
+            display: none;
         }
         .container {
             background: var(--panel);
@@ -68,9 +66,9 @@
             padding: 24px;
             border-radius: 4px;
             box-shadow:
-                0 0 50px rgba(0,100,55,0.35),
-                0 0 100px rgba(0,80,40,0.12),
-                inset 0 1px 0 rgba(0,123,67,0.18);
+                0 4px 20px rgba(16,40,28,0.08),
+                0 1px 4px rgba(16,40,28,0.05),
+                inset 0 1px 0 rgba(255,255,255,0.6);
             width: 95%;
             max-width: 860px;
             position: relative;
@@ -115,7 +113,6 @@
             letter-spacing: 6px;
             font-size: 1.7rem;
             color: var(--primary);
-            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5);
         }
         .subtitle {
             font-size: 0.65rem;
@@ -138,7 +135,6 @@
             font-weight: bold;
             letter-spacing: 3px;
             color: var(--primary);
-            text-shadow: 0 0 8px rgba(0,208,106,0.5);
         }
         .sos-inline-visual {
             display: inline-flex;
@@ -151,8 +147,7 @@
             gap: 4px;
         }
         .sos-inline-dot, .sos-inline-dash {
-            background: var(--code-color);
-            box-shadow: 0 0 4px rgba(238,247,242,0.5);
+            background: var(--primary);
         }
         .sos-inline-dot { width: 7px; height: 7px; border-radius: 50%; }
         .sos-inline-dash { width: 18px; height: 7px; border-radius: 3px; }
@@ -174,7 +169,7 @@
             margin-bottom: 8px;
         }
         .morse-cell {
-            background: rgba(0,0,0,0.4);
+            background: var(--scope-bg);
             border: 1px solid rgba(30,92,56,0.6);
             border-radius: 3px;
             padding: 10px 12px;
@@ -186,13 +181,13 @@
             cursor: default;
         }
         .morse-cell:hover {
-            background: rgba(0,123,67,0.12);
-            border-color: var(--primary-dim);
+            background: #132a1c;
+            border-color: var(--primary-bright);
         }
         .morse-char {
             font-size: 1.4rem;
             font-weight: bold;
-            color: var(--success);
+            color: var(--success-bright);
             text-shadow: 0 0 10px rgba(0,238,119,0.5);
             line-height: 1;
         }
@@ -221,7 +216,7 @@
         }
         .morse-sym {
             font-size: 0.65rem;
-            color: var(--primary-dim);
+            color: var(--primary-bright);
             letter-spacing: 1px;
             opacity: 0.8;
         }
@@ -279,7 +274,7 @@
         footer {
             margin-top: 44px;
             padding: 22px 0 6px;
-            border-top: 1px solid #1e5c38;
+            border-top: 1px solid #d7e9e0;
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
@@ -387,25 +382,25 @@ renderGrid('num-grid', NUMS, null);
 renderGrid('sym-grid', SYMS, SYM_NAMES);
 </script>
 <!-- ハンバーガーメニュー -->
-<button id="menu-btn" aria-label="メニューを開く" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);">☰</button>
-<a id="lang-switch-btn" href="/morse-table-en.html" onclick="setMorsedaLangPref('en')" aria-label="Switch to English" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:6px 12px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);text-decoration:none;display:inline-block;">🌐 EN</a>
+<button id="menu-btn" aria-label="メニューを開く" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(255,255,255,0.9);color:#007b43;border:1px solid #d7e9e0;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 2px 10px rgba(16,40,28,0.12);">☰</button>
+<a id="lang-switch-btn" href="/morse-table-en.html" onclick="setMorsedaLangPref('en')" aria-label="Switch to English" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(255,255,255,0.9);color:#007b43;border:1px solid #d7e9e0;border-radius:4px;padding:6px 12px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 2px 10px rgba(16,40,28,0.12);text-decoration:none;display:inline-block;">🌐 EN</a>
 <div id="menu-overlay" onclick="document.getElementById('menu-panel').classList.remove('open');this.classList.remove('open');" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:998;"></div>
-<nav id="menu-panel" aria-label="サイト内メニュー" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#0e1f16;border-right:1px solid #1e5c38;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(0,0,0,0.6);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
-    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ ゲーム</h3>
-    <a href="/" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 ホーム</a>
-    <a href="/rx.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 受信モード</a>
-    <a href="/tx.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 送信モード</a>
-    <a href="/asobi.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 お遊びモード</a>
-    <a href="/ranking.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 ランキング</a>
-    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ 学習コンテンツ</h3>
-    <a href="/how-to-use.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ 使い方</a>
-    <a href="/morse-table.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 モールス符号表</a>
-    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ その他</h3>
-    <a href="/morse-board.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎹 Morse Boardについて</a>
-    <a href="/profile.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 運営者情報</a>
-    <a href="/privacy.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 プライバシー</a>
-    <a href="/contact.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ お問い合わせ</a>
+<nav id="menu-panel" aria-label="サイト内メニュー" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#ffffff;border-right:1px solid #d7e9e0;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(16,40,28,0.15);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
+    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.85;">▸ ゲーム</h3>
+    <a href="/" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 ホーム</a>
+    <a href="/rx.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 受信モード</a>
+    <a href="/tx.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 送信モード</a>
+    <a href="/asobi.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 お遊びモード</a>
+    <a href="/ranking.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 ランキング</a>
+    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.85;">▸ 学習コンテンツ</h3>
+    <a href="/how-to-use.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ 使い方</a>
+    <a href="/morse-table.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 モールス符号表</a>
+    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.85;">▸ その他</h3>
+    <a href="/morse-board.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎹 Morse Boardについて</a>
+    <a href="/profile.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 運営者情報</a>
+    <a href="/privacy.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 プライバシー</a>
+    <a href="/contact.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ お問い合わせ</a>
 </nav>
-<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(0,100,55,0.25);}nav#menu-panel a:hover{background:rgba(0,100,55,0.15);padding-left:6px;transition:padding 0.15s;}#lang-switch-btn:hover{background:rgba(0,100,55,0.25);}</style>
+<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(10,125,68,0.08);}nav#menu-panel a:hover{background:rgba(10,125,68,0.08);padding-left:6px;transition:padding 0.15s;}#lang-switch-btn:hover{background:rgba(10,125,68,0.08);}</style>
 </body>
 </html>

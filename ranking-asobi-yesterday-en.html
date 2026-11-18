@@ -26,16 +26,16 @@
     <meta name="twitter:site" content="@JL1GIX">
     <meta name="twitter:creator" content="@JL1GIX">
     <meta name="author" content="JL1GIX">
-    <meta name="theme-color" content="#080f0b">
+    <meta name="theme-color" content="#f6faf8">
         <style>
         :root {
-            --primary: #00c060;
-            --primary-dim: #00a050;
-            --bg: #080f0b;
-            --panel: #0e1f16;
-            --border: #1e5c38;
-            --error: #e74c3c;
-            --success: #00ee77;
+            --primary: #007b43;
+            --primary-dim: #19815a;
+            --bg: #f6faf8;
+            --panel: #ffffff;
+            --border: #d7e9e0;
+            --error: #c0392b;
+            --success: #15803d;
         }
         * { box-sizing: border-box; }
         body {
@@ -49,19 +49,14 @@
             margin: 0;
             padding: 20px 10px 40px;
             background-image:
-                radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
+                radial-gradient(ellipse at 50% 0%, rgba(10,125,68,0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(10,125,68,0.04) 0%, transparent 60%);
         }
         body::after {
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: repeating-linear-gradient(
-                0deg, transparent, transparent 2px,
-                rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px
-            );
-            pointer-events: none;
-            z-index: 9999;
+            display: none;
         }
         .container {
             background: var(--panel);
@@ -70,9 +65,9 @@
             padding: 20px;
             border-radius: 4px;
             box-shadow:
-                0 0 50px rgba(0,100,55,0.35),
-                0 0 100px rgba(0,80,40,0.12),
-                inset 0 1px 0 rgba(0,123,67,0.18);
+                0 4px 20px rgba(16,40,28,0.08),
+                0 1px 4px rgba(16,40,28,0.05),
+                inset 0 1px 0 rgba(255,255,255,0.6);
             width: 95%;
             max-width: 960px;
             position: relative;
@@ -117,7 +112,6 @@
             letter-spacing: 7px;
             font-size: 1.75rem;
             color: var(--primary);
-            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5), 0 0 80px rgba(0,123,67,0.2);
         }
         .day-title {
             display: block;
@@ -130,11 +124,10 @@
             font-weight: bold;
             letter-spacing: 1px;
             color: var(--primary);
-            text-shadow: 0 0 10px rgba(0,123,67,0.5);
             text-align: center;
-            border: 1px solid rgba(0,192,96,0.4);
+            border: 1px solid rgba(10,125,68,0.3);
             border-radius: 8px;
-            background: rgba(0,192,96,0.05);
+            background: rgba(10,125,68,0.05);
         }
         .day-title .day-date {
             display: inline-block;
@@ -142,7 +135,6 @@
             font-weight: bold;
             color: var(--success);
             letter-spacing: 1px;
-            text-shadow: 0 0 8px rgba(0,238,119,0.45);
         }
         /* Mode tabs */
         .mode-tabs {
@@ -164,10 +156,9 @@
             transition: all 0.15s;
         }
         .mode-tab.active {
-            background: rgba(0,192,96,0.1);
+            background: var(--primary-soft, #e6f5ee);
             border-color: var(--primary);
             color: var(--primary);
-            text-shadow: 0 0 8px rgba(0,192,96,0.6);
         }
         .mode-tab:hover:not(.active) {
             border-color: var(--primary-dim);
@@ -180,7 +171,6 @@
             color: var(--primary);
             letter-spacing: 2px;
             margin-bottom: 14px;
-            text-shadow: 0 0 8px rgba(0,192,96,0.4);
         }
         .mode-tabs-label { font-size: 0.64rem; color: var(--primary-dim); letter-spacing: 2px; margin: 14px 0 6px; opacity: 0.85; text-align: left; }
         /* Today/Yesterday/All-time ranking nav links */
@@ -227,32 +217,32 @@
         }
         .ranking-table td {
             padding: 9px 8px;
-            border-bottom: 1px solid rgba(30,92,56,0.35);
+            border-bottom: 1px solid rgba(16,40,28,0.1);
             letter-spacing: 1px;
             vertical-align: middle;
         }
         .ranking-table tr:last-child td { border-bottom: none; }
         .ranking-table tr:hover td {
-            background: rgba(0,192,96,0.04);
+            background: rgba(10,125,68,0.04);
         }
         .rank-num {
             color: var(--primary-dim);
             font-size: 0.78rem;
             white-space: nowrap;
         }
-        .rank-1 { color: #ffd700; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
-        .rank-2 { color: #c0c0c0; text-shadow: 0 0 6px rgba(192,192,192,0.5); }
-        .rank-3 { color: #cd7f32; text-shadow: 0 0 6px rgba(205,127,50,0.5); }
+        .rank-1 { color: #8f6500; }
+        .rank-2 { color: #6b6b6b; }
+        .rank-3 { color: #8b5a2b; }
         /* Highlight the row for the score we just submitted, so it's easy to spot */
         .ranking-table tr.my-entry td {
-            background: rgba(0,220,120,0.16);
+            background: rgba(10,125,68,0.1);
             box-shadow: inset 0 2px 0 var(--primary), inset 0 -2px 0 var(--primary);
         }
-        .ranking-table tr.my-entry:hover td { background: rgba(0,220,120,0.22); }
-        .ranking-table tr.my-entry .nickname { color: var(--primary); text-shadow: 0 0 8px rgba(0,255,130,0.6); }
+        .ranking-table tr.my-entry:hover td { background: rgba(10,125,68,0.15); }
+        .ranking-table tr.my-entry .nickname { color: var(--primary); }
         @keyframes my-entry-pulse {
-            0%, 100% { background: rgba(0,220,120,0.16); }
-            50% { background: rgba(0,220,120,0.42); }
+            0%, 100% { background: rgba(10,125,68,0.1); }
+            50% { background: rgba(10,125,68,0.22); }
         }
         .ranking-table tr.my-entry td { animation: my-entry-pulse 1.1s ease-in-out 3; }
         .nickname {
@@ -264,7 +254,6 @@
         }
         .score-val {
             color: var(--success);
-            text-shadow: 0 0 8px rgba(0,238,119,0.4);
             font-size: 1rem;
             white-space: nowrap;
         }
@@ -287,8 +276,8 @@
         .beginner-badge {
             display: inline-block;
             font-size: 0.58rem;
-            background: rgba(0,192,96,0.12);
-            border: 1px solid rgba(0,192,96,0.25);
+            background: rgba(10,125,68,0.08);
+            border: 1px solid rgba(10,125,68,0.25);
             color: var(--primary-dim);
             padding: 1px 5px;
             border-radius: 2px;
@@ -355,7 +344,7 @@
         footer {
             margin-top: 44px;
             padding: 22px 0 6px;
-            border-top: 1px solid #1e5c38;
+            border-top: 1px solid #d7e9e0;
             display: flex;
             justify-content: center;
             gap: 24px;
@@ -697,25 +686,25 @@ function changePage(delta) {
 })();
 </script>
 <!-- Hamburger menu -->
-<button id="menu-btn" aria-label="Open menu" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);">☰</button>
-<a id="lang-switch-btn" href="/ranking-asobi-yesterday.html" onclick="setMorsedaLangPref('ja')" aria-label="Switch to Japanese" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:6px 12px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);text-decoration:none;display:inline-block;">🌐 JA</a>
+<button id="menu-btn" aria-label="Open menu" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(255,255,255,0.9);color:#007b43;border:1px solid #d7e9e0;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 2px 10px rgba(16,40,28,0.12);">☰</button>
+<a id="lang-switch-btn" href="/ranking-asobi-yesterday.html" onclick="setMorsedaLangPref('ja')" aria-label="Switch to Japanese" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(255,255,255,0.9);color:#007b43;border:1px solid #d7e9e0;border-radius:4px;padding:6px 12px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 2px 10px rgba(16,40,28,0.12);text-decoration:none;display:inline-block;">🌐 JA</a>
 <div id="menu-overlay" onclick="document.getElementById('menu-panel').classList.remove('open');this.classList.remove('open');" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:998;"></div>
-<nav id="menu-panel" aria-label="Site menu" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#0e1f16;border-right:1px solid #1e5c38;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(0,0,0,0.6);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
-    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Game</h3>
-    <a href="/index-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 Home</a>
-    <a href="/rx-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 Receive Mode</a>
-    <a href="/tx-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 Transmit Mode</a>
-    <a href="/asobi-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 Fun Mode</a>
-    <a href="/ranking-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 Ranking</a>
-    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Learning</h3>
-    <a href="/how-to-use-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ How to Use</a>
-    <a href="/morse-table-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 Morse Code Table</a>
-    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ Other</h3>
-    <a href="/morse-board-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎹 About Morse Board</a>
-    <a href="/profile-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 About</a>
-    <a href="/privacy-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 Privacy</a>
-    <a href="/contact-en.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ Contact</a>
+<nav id="menu-panel" aria-label="Site menu" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#ffffff;border-right:1px solid #d7e9e0;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(16,40,28,0.15);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
+    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.85;">▸ Game</h3>
+    <a href="/index-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 Home</a>
+    <a href="/rx-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 Receive Mode</a>
+    <a href="/tx-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 Transmit Mode</a>
+    <a href="/asobi-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 Fun Mode</a>
+    <a href="/ranking-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 Ranking</a>
+    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.85;">▸ Learning</h3>
+    <a href="/how-to-use-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ How to Use</a>
+    <a href="/morse-table-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 Morse Code Table</a>
+    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.85;">▸ Other</h3>
+    <a href="/morse-board-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎹 About Morse Board</a>
+    <a href="/profile-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 About</a>
+    <a href="/privacy-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 Privacy</a>
+    <a href="/contact-en.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ Contact</a>
 </nav>
-<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(0,100,55,0.25);}nav#menu-panel a:hover{background:rgba(0,100,55,0.15);padding-left:6px;transition:padding 0.15s;}#lang-switch-btn:hover{background:rgba(0,100,55,0.25);}</style>
+<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(10,125,68,0.08);}nav#menu-panel a:hover{background:rgba(10,125,68,0.08);padding-left:6px;transition:padding 0.15s;}#lang-switch-btn:hover{background:rgba(10,125,68,0.08);}</style>
 </body>
 </html>

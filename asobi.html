@@ -28,17 +28,22 @@
     <meta name="twitter:site" content="@JL1GIX">
     <meta name="twitter:creator" content="@JL1GIX">
     <meta name="author" content="JL1GIX">
-    <meta name="theme-color" content="#080f0b">
+    <meta name="theme-color" content="#f6faf8">
         <style>
         :root {
-            --primary: #00d06a;
-            --primary-dim: #00b85a;
-            --bg: #080f0b;
-            --panel: #0e1f16;
-            --border: #1e5c38;
-            --error: #e74c3c;
-            --success: #00ee77;
-            --scope-bg: #050f08;
+            --primary: #007b43;
+            --primary-dim: #19815a;
+            --primary-bright: #00d06a;
+            --primary-soft: #e6f5ee;
+            --bg: #f6faf8;
+            --panel: #ffffff;
+            --border: #d7e9e0;
+            --border-strong: #3d9c66;
+            --error: #c0392b;
+            --success: #15803d;
+            --error-bright: #e74c3c;
+            --success-bright: #00ee77;
+            --scope-bg: #0a1b12;
             --code-color: #eef7f2;
         }
         html, body { scrollbar-gutter: stable; }
@@ -73,19 +78,14 @@
             overflow-x: hidden;
             touch-action: manipulation;
             background-image:
-                radial-gradient(ellipse at 50% 0%, rgba(0,80,40,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 100%, rgba(0,40,20,0.3) 0%, transparent 60%);
+                radial-gradient(ellipse at 50% 0%, rgba(10,125,68,0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(10,125,68,0.04) 0%, transparent 60%);
         }
         body::after {
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: repeating-linear-gradient(
-                0deg, transparent, transparent 2px,
-                rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
-            );
-            pointer-events: none;
-            z-index: 9999;
+            display: none;
         }
         #game-container {
             background: var(--panel);
@@ -93,7 +93,7 @@
             border-top: 2px solid var(--primary);
             padding: 28px 20px;
             border-radius: 4px;
-            box-shadow: 0 0 50px rgba(0,100,55,0.35), 0 0 100px rgba(0,80,40,0.12), inset 0 1px 0 rgba(0,123,67,0.18);
+            box-shadow: 0 4px 20px rgba(16,40,28,0.08), 0 1px 4px rgba(16,40,28,0.05), inset 0 1px 0 rgba(255,255,255,0.6);
             width: 95%;
             max-width: 980px;
             text-align: center;
@@ -141,7 +141,7 @@
             letter-spacing: 8px;
             font-size: 2rem;
             color: var(--primary);
-            text-shadow: 0 0 15px rgba(0,123,67,1.0), 0 0 40px rgba(0,123,67,0.5), 0 0 80px rgba(0,123,67,0.2);
+            text-shadow: none;
         }
         .subtitle {
             font-size: 0.8rem;
@@ -155,13 +155,13 @@
             justify-content: space-around;
             margin-bottom: 12px;
             border: 1px solid var(--border);
-            background: rgba(0,0,0,0.5);
+            background: var(--primary-soft);
             padding: 8px 15px;
-            border-radius: 2px;
+            border-radius: 8px;
         }
         .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; flex: 1; min-width: 0; }
         .stat-label { color: var(--primary-dim); font-size: 0.68rem; letter-spacing: 2px; opacity: 1.0; }
-        .stat-value { color: var(--primary); font-size: 1.05rem; font-weight: bold; text-shadow: 0 0 10px rgba(0,123,67,0.9), 0 0 20px rgba(0,123,67,0.4); }
+        .stat-value { color: var(--primary); font-size: 1.05rem; font-weight: bold; }
         /* 単語を制限時間内に打ち切った際の「+1秒」ボーナス演出 */
         .time-bonus-pop {
             position: absolute;
@@ -201,7 +201,7 @@
             position: absolute;
             top: 5px; left: 8px;
             font-size: 0.58rem;
-            color: var(--primary-dim);
+            color: var(--primary-bright);
             opacity: 1.0;
             letter-spacing: 2px;
             z-index: 2;
@@ -211,7 +211,7 @@
             position: absolute;
             top: 5px; right: 8px;
             font-size: 0.58rem;
-            color: var(--primary-dim);
+            color: var(--primary-bright);
             opacity: 1.0;
             letter-spacing: 1px;
             z-index: 2;
@@ -282,15 +282,15 @@
         }
         .flash-error { animation: error-flash 0.4s ease-in-out; }
         @keyframes error-flash {
-            0%, 100% { border-top-color: var(--primary); border-color: var(--primary-dim); }
-            50% { border-color: var(--error); border-top-color: var(--error); box-shadow: 0 0 30px var(--error), inset 0 0 20px rgba(231,76,60,0.1); }
+            0%, 100% { border-top-color: var(--primary-bright); border-color: var(--primary-bright); }
+            50% { border-color: var(--error-bright); border-top-color: var(--error-bright); box-shadow: 0 0 30px var(--error-bright), inset 0 0 20px rgba(231,76,60,0.1); }
         }
         .flash-correct { animation: correct-flash 0.4s ease-in-out; }
         @keyframes correct-flash {
-            0%, 100% { border-top-color: var(--primary); border-color: var(--primary-dim); }
-            50% { border-color: var(--success); border-top-color: var(--success); box-shadow: 0 0 30px var(--success), inset 0 0 20px rgba(0,255,133,0.08); }
+            0%, 100% { border-top-color: var(--primary-bright); border-color: var(--primary-bright); }
+            50% { border-color: var(--success-bright); border-top-color: var(--success-bright); box-shadow: 0 0 30px var(--success-bright), inset 0 0 20px rgba(0,255,133,0.08); }
         }
-        .cursor { display: inline-block; width: 2px; height: 32px; background: var(--primary); animation: blink 1s infinite; margin-left: 5px; box-shadow: 0 0 12px var(--primary), 0 0 25px rgba(0,123,67,0.5); }
+        .cursor { display: inline-block; width: 2px; height: 32px; background: var(--primary-bright); animation: blink 1s infinite; margin-left: 5px; box-shadow: 0 0 12px var(--primary-bright), 0 0 25px rgba(0,123,67,0.5); }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         button {
             background: transparent;
@@ -308,9 +308,9 @@
             font-family: inherit;
         }
         button:hover {
-            background: rgba(0,123,67,0.2);
+            background: var(--primary);
             border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(0,123,67,0.35);
+            box-shadow: 0 2px 10px rgba(16,40,28,0.18);
             color: #fff;
         }
         .quit-btn { font-size: 0.72rem; padding: 5px 15px; margin-top: 15px; opacity: 0.85; }
@@ -324,7 +324,7 @@
             padding: 16px 38px;
             font-weight: bold;
             letter-spacing: 2px;
-            background: rgba(0,192,96,0.14);
+            background: var(--primary-soft);
             border: 2px solid var(--primary);
             animation: start-btn-glow 1.8s ease-in-out infinite;
         }
@@ -339,7 +339,7 @@
             width: 32px; height: 32px;
             border: 2px solid var(--primary);
             border-radius: 6px;
-            background: rgba(0,192,96,0.16);
+            background: var(--primary-soft);
             font-weight: bold;
             font-size: 1.1rem;
             animation: start-keycap-pulse 1.4s ease-in-out infinite;
@@ -374,9 +374,9 @@
         #game-screen.beginner-compact #word-timer-bar-wrap { height: 11px; }
         #game-screen.beginner-compact .quit-btn { margin-top: 11px; }
         select {
-            background: rgba(0,0,0,0.85);
+            background: var(--panel);
             color: var(--primary);
-            border: 1px solid var(--primary);
+            border: 1px solid var(--border-strong);
             font-size: 0.9rem;
             padding: 8px 30px 8px 10px;
             border-radius: 2px;
@@ -400,9 +400,9 @@
             font-size: 0.6rem; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px;
             border: 1px solid var(--border); white-space: nowrap;
         }
-        .wpm-band-tag.wpm-band-beginner     { color: #6fcf97; border-color: #2d7a4f; background: rgba(50,180,100,0.08); }
-        .wpm-band-tag.wpm-band-intermediate { color: #ffd166; border-color: #a6791f; background: rgba(220,170,40,0.08); }
-        .wpm-band-tag.wpm-band-advanced     { color: #ff6f6f; border-color: #a63333; background: rgba(220,60,60,0.08); }
+        .wpm-band-tag.wpm-band-beginner     { color: #1f7a4f; border-color: #a8d9bc; background: #eafbf0; }
+        .wpm-band-tag.wpm-band-intermediate { color: #7a5c00; border-color: #e3c77a; background: #fff8e0; }
+        .wpm-band-tag.wpm-band-advanced     { color: #b33a2d; border-color: #e3a79c; background: #fff0ed; }
         .wpm-range {
             -webkit-appearance: none; appearance: none; width: 100%; height: 8px;
             background: linear-gradient(to right,
@@ -413,12 +413,12 @@
         }
         .wpm-range::-webkit-slider-thumb {
             -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%;
-            background: var(--primary); border: 3px solid #04170c;
-            box-shadow: 0 0 10px rgba(0,208,106,0.8), 0 2px 4px rgba(0,0,0,0.4); cursor: pointer;
+            background: var(--primary); border: 3px solid #ffffff;
+            box-shadow: 0 0 8px rgba(0,208,106,0.6), 0 2px 4px rgba(16,40,28,0.25); cursor: pointer;
         }
         .wpm-range::-moz-range-thumb {
             width: 26px; height: 26px; border-radius: 50%; background: var(--primary);
-            border: 3px solid #04170c; box-shadow: 0 0 10px rgba(0,208,106,0.8), 0 2px 4px rgba(0,0,0,0.4); cursor: pointer;
+            border: 3px solid #ffffff; box-shadow: 0 0 8px rgba(0,208,106,0.6), 0 2px 4px rgba(16,40,28,0.25); cursor: pointer;
         }
         .wpm-range::-moz-range-track { background: transparent; }
         .wpm-band-labels {
@@ -433,11 +433,12 @@
         }
         .settings-grid.morse-board-settings #time-setting-item { grid-column: 1 / -1; }
         .setting-item {
-            background: rgba(0,0,0,0.45);
+            background: var(--panel);
             border: 1px solid var(--border);
             padding: 12px;
-            border-radius: 2px;
+            border-radius: 10px;
             text-align: left;
+            box-shadow: 0 1px 4px rgba(16,40,28,0.05);
         }
         .setting-label {
             font-size: 0.68rem;
@@ -497,8 +498,8 @@
             flex-shrink: 0;
             width: 40px; height: 22px;
             border-radius: 12px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(175,190,183,0.45);
+            background: #dde8e2;
+            border: 1px solid #b9c9c0;
             position: relative;
             transition: background 0.2s, border-color 0.2s;
         }
@@ -510,7 +511,7 @@
             font-size: 0.42rem;
             letter-spacing: 0.3px;
             font-weight: 700;
-            color: rgba(175,190,183,0.9);
+            color: #8a9890;
             line-height: 1;
             pointer-events: none;
         }
@@ -520,25 +521,25 @@
             top: 2px; left: 2px;
             width: 16px; height: 16px;
             border-radius: 50%;
-            background: #8a9d93;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(16,40,28,0.35);
             transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
         }
         .toggle-item input[type="checkbox"]:checked ~ .toggle-switch {
-            background: rgba(0,208,106,0.4);
+            background: var(--primary);
             border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(0,192,96,0.35);
+            box-shadow: 0 0 10px rgba(0,192,96,0.3);
         }
         .toggle-item input[type="checkbox"]:checked ~ .toggle-switch::before {
             content: 'ON';
             right: auto;
             left: 4px;
-            color: rgba(6,24,15,0.9);
+            color: #ffffff;
         }
         .toggle-item input[type="checkbox"]:checked ~ .toggle-switch::after {
             transform: translateX(18px);
-            background: #eafff0;
-            box-shadow: 0 0 10px rgba(0,255,140,1), 0 1px 2px rgba(0,0,0,0.4);
+            background: #ffffff;
+            box-shadow: 0 0 8px rgba(0,180,90,0.5), 0 1px 2px rgba(16,40,28,0.3);
         }
         .toggle-item:hover .toggle-switch { border-color: var(--primary); }
         .toggle-item input[type="checkbox"]:focus-visible ~ .toggle-switch {
@@ -561,7 +562,7 @@
             flex-wrap: wrap;
         }
         .sig-label { font-size: 0.58rem; color: var(--primary-dim); opacity: 1.0; letter-spacing: 1px; margin-right: 4px; }
-        .sig-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(0,70,35,0.4); border: 1px solid rgba(0,100,50,0.5); }
+        .sig-dot { width: 7px; height: 7px; border-radius: 50%; background: #e3ece7; border: 1px solid #c7d7cd; }
         .sig-dot.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 6px var(--primary); }
         .sig-dot.blink-active { animation: sig-blink 0.6s infinite alternate; }
         @keyframes sig-blink {
@@ -614,7 +615,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--bg);
+            background: var(--scope-bg);
             color: #fff;
             font-size: clamp(3.5rem, 16vw, 9rem);
             font-weight: 700;
@@ -629,10 +630,10 @@
             padding: 20px 10px;
             font-size: 1rem;
             letter-spacing: 2px;
-            border: 1px solid var(--primary);
+            border: 1px solid var(--primary-bright);
             background: rgba(0, 35, 18, 0.7);
-            color: var(--primary);
-            border-radius: 4px;
+            color: var(--primary-bright);
+            border-radius: 10px;
             cursor: pointer;
             user-select: none;
             -webkit-user-select: none;
@@ -645,7 +646,7 @@
         .tx-paddle-btn:active, .tx-paddle-btn.pressed {
             background: rgba(0, 123, 67, 0.35);
             box-shadow: 0 0 22px rgba(0, 123, 67, 0.55);
-            border-color: var(--success);
+            border-color: var(--success-bright);
         }
         .tx-paddle-sym { display: block; font-size: 1.6rem; line-height: 1; margin-bottom: 4px; text-shadow: 0 0 10px rgba(0,123,67,0.8); }
         .tx-paddle-label { display: block; font-size: 0.68rem; letter-spacing: 3px; opacity: 0.9; }
@@ -655,28 +656,28 @@
             font-weight: 700;
             letter-spacing: 6px;
             min-height: 7rem;
-            border: 1px solid var(--primary-dim);
-            border-top: 2px solid var(--primary);
+            border: 1px solid var(--primary-bright);
+            border-top: 2px solid var(--primary-bright);
             padding: 10px 2px;
             background: rgba(0, 15, 8, 0.95);
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 2px;
+            border-radius: 10px;
             position: relative;
         }
         #tx-target-text { display: inline-block; white-space: nowrap; }
         #tx-target-text .tx-char-done {
-            color: var(--success);
+            color: var(--success-bright);
             opacity: 0.78;
         }
         #tx-target-text .tx-char-current {
             color: #fff;
             opacity: 1;
-            text-shadow: 0 0 6px var(--primary), 0 0 18px var(--primary);
+            text-shadow: 0 0 6px var(--primary-bright), 0 0 18px var(--primary-bright);
         }
         #tx-target-text .tx-char-next {
-            color: var(--primary);
+            color: var(--primary-bright);
             opacity: 0.82;
             text-shadow: 0 0 8px rgba(0, 208, 106, 0.35);
         }
@@ -685,16 +686,16 @@
             position: absolute;
             top: -1px; left: -1px;
             width: 10px; height: 10px;
-            border-top: 2px solid var(--success);
-            border-left: 2px solid var(--success);
+            border-top: 2px solid var(--success-bright);
+            border-left: 2px solid var(--success-bright);
         }
         #tx-word-display::after {
             content: '';
             position: absolute;
             bottom: -1px; right: -1px;
             width: 10px; height: 10px;
-            border-bottom: 2px solid var(--success);
-            border-right: 2px solid var(--success);
+            border-bottom: 2px solid var(--success-bright);
+            border-right: 2px solid var(--success-bright);
         }
         #tx-morse-input {
             min-height: 3.5rem;
@@ -706,18 +707,18 @@
             padding: 8px 12px;
             background: rgba(0, 0, 0, 0.45);
             border: 1px solid rgba(0, 192, 96, 0.25);
-            border-radius: 2px;
-            color: var(--primary);
+            border-radius: 10px;
+            color: var(--primary-bright);
             letter-spacing: 2px;
         }
         /* Result screen */
-        #result-screen h2 { letter-spacing: 6px; font-size: 1.4rem; text-shadow: 0 0 20px rgba(0,123,67,1.0), 0 0 50px rgba(0,123,67,0.4); }
+        #result-screen h2 { letter-spacing: 6px; font-size: 1.4rem; text-shadow: none; }
         #final-result-text {
             font-size: clamp(1.1rem, 5.5vw, 2rem); color: var(--success);
-            text-shadow: 0 0 20px rgba(0,180,90,0.9), 0 0 50px rgba(0,180,90,0.4); white-space: nowrap;
+            text-shadow: none; white-space: nowrap;
             display: inline-block; padding: 14px 28px; border: 2px solid var(--success);
-            border-radius: 10px; background: rgba(0,180,90,0.08);
-            box-shadow: 0 0 20px rgba(0,180,90,0.35), inset 0 0 20px rgba(0,180,90,0.08);
+            border-radius: 10px; background: var(--primary-soft);
+            box-shadow: 0 2px 10px rgba(16,40,28,0.08);
         }
         .share-area { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
         .share-label { font-size: 0.65rem; letter-spacing: 3px; color: var(--primary-dim); opacity: 1.0; margin-bottom: 12px; }
@@ -742,24 +743,24 @@
             color: var(--primary-dim); padding-bottom: 8px; border-bottom: 1px solid var(--border);
         }
         #free-header span { color: var(--primary); font-size: 1.0rem; letter-spacing: 8px; }
-        #free-input-block { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 2px; padding: 10px 16px 12px; }
+        #free-input-block { background: rgba(0,0,0,0.4); border: 1px solid rgba(0,123,67,0.3); border-radius: 10px; padding: 10px 16px 12px; }
         #free-input-block .free-section-label {
-            font-size: 0.58rem; color: var(--primary-dim); letter-spacing: 3px;
+            font-size: 0.58rem; color: var(--primary-bright); letter-spacing: 3px;
             margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
         }
         #free-input-block .free-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
         #free-morse-render { min-height: 2.2rem; display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: wrap; }
-        #free-output-block { background: rgba(0,0,0,0.55); border: 1px solid var(--primary); border-radius: 2px; padding: 0; overflow: hidden; }
+        #free-output-block { background: rgba(0,15,8,0.95); border: 1px solid var(--primary-bright); border-radius: 10px; padding: 0; overflow: hidden; }
         #free-output-block .free-section-label {
-            font-size: 0.58rem; color: var(--primary-dim); letter-spacing: 3px;
-            padding: 6px 14px 5px; border-bottom: 1px solid var(--border);
+            font-size: 0.58rem; color: var(--primary-bright); letter-spacing: 3px;
+            padding: 6px 14px 5px; border-bottom: 1px solid rgba(0,208,106,0.25);
             background: rgba(0,50,20,0.3); display: flex; align-items: center; gap: 6px;
         }
         #free-output-block .free-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
         #free-text-display {
             min-height: 100px; max-height: 200px; overflow-y: auto;
             padding: 12px 16px 10px; font-size: 1.4rem; letter-spacing: 5px;
-            color: var(--primary); word-break: break-all; text-align: left;
+            color: var(--primary-bright); word-break: break-all; text-align: left;
             line-height: 1.9; font-family: 'Courier New', monospace;
         }
         #free-controls { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
@@ -781,8 +782,8 @@
         #free-mode-link button:hover { opacity: 1; border-color: var(--primary); color: var(--primary); box-shadow: none; }
         /* キー設定 */
         #key-customize-btn {
-            background: transparent; border: 1px solid rgba(30,92,56,0.6);
-            color: rgba(0,192,96,0.75); font-size: 0.78rem;
+            background: transparent; border: 1px solid var(--border);
+            color: var(--primary); font-size: 0.78rem;
             padding: 5px 14px; letter-spacing: 1px; opacity: 1; margin-top: 0;
             transition: border-color 0.2s, color 0.2s;
         }
@@ -790,7 +791,7 @@
         /* Key Customize Modal */
         #key-customize-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999; align-items: center; justify-content: center; }
         #key-customize-modal.open { display: flex; }
-        .kc-box { background: #000f08; border: 1px solid var(--primary-dim); border-top: 2px solid var(--primary); padding: 26px 28px; width: min(340px, 88vw); }
+        .kc-box { background: var(--panel); border: 1px solid var(--border); border-top: 2px solid var(--primary); padding: 26px 28px; width: min(340px, 88vw); border-radius: 10px; box-shadow: 0 10px 40px rgba(16,40,28,0.3); }
         .kc-title { font-size: 0.7rem; letter-spacing: 3px; color: var(--primary-dim); margin-bottom: 18px; text-align: center; }
         .kc-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 0; }
         .kc-label { font-size: 0.78rem; letter-spacing: 2px; color: var(--primary-dim); flex-shrink: 0; }
@@ -838,9 +839,9 @@
         /* プレイ中のモード別ステータス表示（正確重視: やり直し回数） */
         #variant-status {
             font-size: 0.68rem; letter-spacing: 1px; color: var(--error); text-align: center;
-            margin-bottom: 8px; text-shadow: 0 0 8px rgba(231,76,60,0.6); animation: blink 0.7s infinite;
+            margin-bottom: 8px; text-shadow: none; animation: blink 0.7s infinite;
         }
-        #game-container.oneshot-active { border-color: #5c1e1e; border-top-color: var(--error); box-shadow: 0 0 50px rgba(231,76,60,0.25), 0 0 100px rgba(100,20,20,0.15), inset 0 1px 0 rgba(231,76,60,0.18); }
+        #game-container.oneshot-active { border-color: var(--error); border-top-color: var(--error); box-shadow: 0 0 40px rgba(231,76,60,0.18), 0 2px 10px rgba(100,20,20,0.1), inset 0 1px 0 rgba(231,76,60,0.1); }
         #game-container.oneshot-active #scope-container { border-color: #6a2a2a; }
 
         @media (max-width: 700px) {
@@ -978,7 +979,7 @@
                 <p id="mode-description" style="color:var(--primary);font-size:0.82rem;line-height:1.9;letter-spacing:1px;border-left:2px solid var(--primary);padding-left:12px;text-align:left;margin:0;flex:1;"></p>
                 <div id="key-customize-wrap" style="flex-shrink:0;padding-top:3px; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
                     <button id="key-customize-btn" onclick="openKeyCustomize()">⌨ キー設定</button>
-                    <div id="key-assign-display" style="font-size:0.6rem; line-height:1.4; color:var(--primary-dim); text-align:right; letter-spacing:1px; white-space:nowrap; border:1px solid var(--border); border-radius:4px; padding:6px 9px; background:rgba(0,0,0,0.3);"></div>
+                    <div id="key-assign-display" style="font-size:0.6rem; line-height:1.4; color:var(--primary-dim); text-align:right; letter-spacing:1px; white-space:nowrap; border:1px solid var(--border); border-radius:4px; padding:6px 9px; background:var(--primary-soft);"></div>
                 </div>
             </div>
             <div class="settings-grid">
@@ -1131,7 +1132,7 @@
         <h2 id="result-headline">MISSION END</h2>
         <div id="score-result-block">
             <p id="final-result-text" style="margin: 20px 0;"></p>
-            <div id="asobi-mistake-area" class="hidden" style="margin:0 auto 20px; padding:12px 14px; border:1px solid var(--border); border-radius:6px; background:rgba(0,0,0,0.25); max-width:380px;">
+            <div id="asobi-mistake-area" class="hidden" style="margin:0 auto 20px; padding:12px 14px; border:1px solid var(--border); border-radius:10px; background:var(--primary-soft); max-width:380px;">
                 <div style="font-size:0.65rem; letter-spacing:2px; color:var(--primary-dim); margin-bottom:8px;">▸ ミスが多かった文字 ◂</div>
                 <div id="asobi-mistake-list" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
             </div>
@@ -1151,7 +1152,7 @@
                         autocomplete="off" autocapitalize="characters" spellcheck="false"
                         oninput="if(!event.isComposing){this.value = toHankakuUpperNick(this.value);}"
                         onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();setNickname();}"
-                        style="background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:2px;
+                        style="background:#ffffff; border:1px solid var(--border-strong); border-radius:6px;
                                color:var(--primary); font-family:inherit; font-size:0.82rem;
                                padding:8px 12px; width:230px; letter-spacing:1px; outline:none;">
                     <button onclick="setNickname()" id="submit-score-btn" style="font-size:0.82rem; padding:8px 18px;">✏️ 名前を設定</button>
@@ -1165,7 +1166,7 @@
     </div>
 </div>
 
-<footer style="margin-top:20px;padding:12px 0 28px;border-top:1px solid #1e5c38;font-size:0.65rem;letter-spacing:1px;opacity:0.55;text-align:center;">
+<footer style="margin-top:20px;padding:12px 0 28px;border-top:1px solid #d7e9e0;font-size:0.65rem;letter-spacing:1px;opacity:0.55;text-align:center;">
     <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px 20px;">
         <a href="https://jl1gix.com" style="color:#007b43; text-decoration:none;">トップ</a>
         <a href="ranking.html" style="color:#007b43; text-decoration:none;">ランキング</a>
@@ -1199,25 +1200,25 @@
     </div>
 </div>
 <!-- ハンバーガーメニュー -->
-<button id="menu-btn" aria-label="メニューを開く" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);">☰</button>
-<a id="lang-switch-btn" href="/asobi-en.html" onclick="setMorsedaLangPref('en')" aria-label="Switch to English" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(8,15,11,0.85);color:#00c060;border:1px solid #1e5c38;border-radius:4px;padding:6px 12px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 0 10px rgba(0,100,55,0.3);text-decoration:none;display:inline-block;">🌐 EN</a>
+<button id="menu-btn" aria-label="メニューを開く" onclick="document.getElementById('menu-panel').classList.toggle('open');document.getElementById('menu-overlay').classList.toggle('open');" style="position:fixed;top:12px;left:12px;z-index:1000;background:rgba(255,255,255,0.9);color:#007b43;border:1px solid #d7e9e0;border-radius:4px;padding:5px 10px;font-size:1.2rem;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 2px 10px rgba(16,40,28,0.12);">☰</button>
+<a id="lang-switch-btn" href="/asobi-en.html" onclick="setMorsedaLangPref('en')" aria-label="Switch to English" style="position:fixed;top:12px;right:12px;z-index:1000;background:rgba(255,255,255,0.9);color:#007b43;border:1px solid #d7e9e0;border-radius:4px;padding:6px 12px;font-size:0.8rem;letter-spacing:1px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 2px 10px rgba(16,40,28,0.12);text-decoration:none;display:inline-block;">🌐 EN</a>
 <div id="menu-overlay" onclick="document.getElementById('menu-panel').classList.remove('open');this.classList.remove('open');" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:998;"></div>
-<nav id="menu-panel" aria-label="サイト内メニュー" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#0e1f16;border-right:1px solid #1e5c38;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(0,0,0,0.6);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
-    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ ゲーム</h3>
-    <a href="/" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 ホーム</a>
-    <a href="/rx.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 受信モード</a>
-    <a href="/tx.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 送信モード</a>
-    <a href="/asobi.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 お遊びモード</a>
-    <a href="/ranking.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 ランキング</a>
-    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ 学習コンテンツ</h3>
-    <a href="/how-to-use.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ 使い方</a>
-    <a href="/morse-table.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 モールス符号表</a>
-    <h3 style="color:#00c060;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ その他</h3>
-    <a href="/morse-board.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎹 Morse Boardについて</a>
-    <a href="/profile.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 運営者情報</a>
-    <a href="/privacy.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 プライバシー</a>
-    <a href="/contact.html" style="display:block;color:#00c060;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ お問い合わせ</a>
+<nav id="menu-panel" aria-label="サイト内メニュー" style="position:fixed;top:0;left:0;height:100vh;width:270px;background:#ffffff;border-right:1px solid #d7e9e0;transform:translateX(-100%);transition:transform 0.25s ease;z-index:999;padding:55px 22px 30px;box-shadow:5px 0 25px rgba(16,40,28,0.15);overflow-y:auto;font-family:'Consolas','Monaco','Courier New',monospace;">
+    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:0 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.9;">▸ ゲーム</h3>
+    <a href="/" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏠 ホーム</a>
+    <a href="/rx.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">📻 受信モード</a>
+    <a href="/tx.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">📡 送信モード</a>
+    <a href="/asobi.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎮 お遊びモード</a>
+    <a href="/ranking.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🏆 ランキング</a>
+    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.9;">▸ 学習コンテンツ</h3>
+    <a href="/how-to-use.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ 使い方</a>
+    <a href="/morse-table.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 モールス符号表</a>
+    <h3 style="color:#007b43;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #d7e9e0;padding-bottom:6px;opacity:0.9;">▸ その他</h3>
+    <a href="/morse-board.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎹 Morse Boardについて</a>
+    <a href="/profile.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 運営者情報</a>
+    <a href="/privacy.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 プライバシー</a>
+    <a href="/contact.html" style="display:block;color:#007b43;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ お問い合わせ</a>
 </nav>
-<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(0,100,55,0.25);}nav#menu-panel a:hover{background:rgba(0,100,55,0.15);padding-left:6px;transition:padding 0.15s;}#lang-switch-btn:hover{background:rgba(0,100,55,0.25);}</style>
+<style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(10,125,68,0.08);}nav#menu-panel a:hover{background:rgba(10,125,68,0.08);padding-left:6px;transition:padding 0.15s;}#lang-switch-btn:hover{background:rgba(10,125,68,0.08);}</style>
 </body>
 </html>
