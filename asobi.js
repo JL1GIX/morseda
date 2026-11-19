@@ -616,6 +616,7 @@ function pickCurrentWord() {
 let wordCategory = 'GENERAL';
 let gameVariant = 'NORMAL';
 let accuracyResetCount = 0; // 正確重視モードでの「やり直し」回数
+let wordStartScore = 0; // 普通/正確重視モード: 現在の単語に入った時点のscore（タイムアウト判定・正確重視のリセットで使用）
 let oneShotEliminated = false; // 一発勝負モードで脱落したか
 
 // ── 単語ごとの制限時間（Sメーター風シグナルバーが尽きるとアウト） ──────────────────────
@@ -676,12 +677,13 @@ function handleWordTimeout() {
         setTimeout(() => txArea.classList.remove('flash-error'), 400);
     }
     document.getElementById('status-msg').innerText = t('qsbLost', txWord.join(''));
+    // 非初心者モードでは、普通/正確重視/一発勝負のいずれも、単語の制限時間切れ(QSB)で即ゲーム終了する
+    // （以前はONESHOTのみ即終了し、普通/正確重視は次の単語に進んでいたが、1単語の制限時間内に
+    //   打ち終えられなかった時点でその場で終了する仕様に変更）
     if (gameVariant === 'ONESHOT') {
         oneShotEliminated = true;
-        setTimeout(() => endGame(), 350);
-        return;
     }
-    nextTxWord();
+    setTimeout(() => endGame(), 350);
 }
 
 // ── Audio unlock + prepare ─────────────────────────────────────────────────────
@@ -800,6 +802,9 @@ function startTxGame() {
 }
 
 function nextTxWord() {
+    // 次の単語に入る時点のscoreを記録しておく（正確重視でのミス・リセット時に、この単語で
+    // 稼いだ分だけを巻き戻すために使う）
+    wordStartScore = score;
     // 次の単語に進む際、前の単語で表示されていた「正確重視」のミス表示（赤点滅）を消す。
     // ※やり直し回数(accuracyResetCount)自体はリセットしない。表示だけ毎単語クリアし、
     //   その単語でまたミスした場合に再度表示される。
@@ -1106,8 +1111,15 @@ function evaluateTxChar(decoded) {
             return;
         }
         if (gameVariant === 'ACCURACY') {
-            // 正確重視: ミスしたらその単語の最初からやり直し
+            // 正確重視: ミスしたらその単語の最初からやり直し。
+            // 非初心者モードに限り、この単語内で既に稼いでいた得点も単語に入った時点のscoreまで
+            // 巻き戻す（例: 70点の状態で「BLOOM」のBLOOまで打ててもMでミスしたら、74点ではなく
+            // 70点からやり直し）。初心者モードの挙動はこれまで通り変更しない。
             accuracyResetCount++;
+            if (!beginnerMode) {
+                score = wordStartScore;
+                document.getElementById('score').innerText = score;
+            }
             updateVariantStatusUI();
             txCharIndex = 0;
             updateTxDisplay();

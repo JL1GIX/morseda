@@ -136,7 +136,7 @@
             font-size: 1rem;
             cursor: pointer;
             border-radius: 2px;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            transition: border-color 0.15s ease;
             margin-top: 10px;
             outline: none;
             -webkit-tap-highlight-color: transparent;
@@ -144,12 +144,7 @@
             font-family: inherit;
         }
         button:hover {
-            transform: translate(-3px, -3px);
-            box-shadow: 3px 3px 0 var(--primary);
-        }
-        button:active {
-            transform: translate(0, 0);
-            box-shadow: none;
+            border-color: #005c32;
         }
         .home-link-btn {
             display: inline-block;
@@ -162,9 +157,7 @@
             transition: all 0.2s;
         }
         .home-link-btn:hover {
-            border-color: var(--primary);
-            background: rgba(0,123,67,0.18);
-            box-shadow: 0 2px 10px rgba(16,40,28,0.18);
+            border-color: #005c32;
         }
         @media (max-width: 700px) {
             body { justify-content: flex-start; padding: 8px 0; }
