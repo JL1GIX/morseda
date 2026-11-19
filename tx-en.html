@@ -603,7 +603,11 @@
         #tx-target-text .tx-char-current {
             color: var(--primary);
             opacity: 1;
-            text-shadow: none;
+            animation: tx-char-glow 1.8s ease-in-out infinite;
+        }
+        @keyframes tx-char-glow {
+            0%, 100% { text-shadow: 0 0 4px rgba(0,208,106,0.35); }
+            50% { text-shadow: 0 0 11px rgba(0,208,106,0.85); }
         }
         #tx-target-text .tx-char-next {
             color: var(--text-secondary);
