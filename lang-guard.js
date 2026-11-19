@@ -55,3 +55,22 @@ document.addEventListener('keydown', function (e) {
     const htmlLang = (document.documentElement.lang === 'en') ? 'en' : 'ja';
     location.href = (htmlLang === 'en') ? '/index-en.html' : 'https://jl1gix.com';
 });
+
+// ── グローバルショートカット: 「M」キー（Morse Boardで「M」＝「－－」を打鍵した場合も同じキー入力として届く）で
+// ハンバーガーメニューの開閉をトグルする。ゲームプレイ中（isPlayingがtrueのページ）だけは誤操作防止のため
+// 無効にする。状態の保存は行わない（ページ遷移・再読込で毎回閉じた状態に戻る）。
+document.addEventListener('keydown', function (e) {
+    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key.toUpperCase() !== 'M') return;
+    if (typeof isPlaying !== 'undefined' && isPlaying) return;
+    if (typeof _capturingFor !== 'undefined' && _capturingFor) return;
+    const target = e.target;
+    const isTyping = target instanceof Element && (target.matches('input, select, textarea') || target.isContentEditable);
+    if (isTyping) return;
+    const panel = document.getElementById('menu-panel');
+    const overlay = document.getElementById('menu-overlay');
+    if (!panel || !overlay) return;
+    e.preventDefault();
+    panel.classList.toggle('open');
+    overlay.classList.toggle('open');
+});
