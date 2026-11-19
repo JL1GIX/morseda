@@ -217,6 +217,14 @@ document.addEventListener('keydown', (e) => {
             unlockAndPrepare();
             return;
         }
+        // ロビー画面: Fキー（Morse BoardでFを打鍵した場合も同じキー入力として届く）でフリー入力モードへ
+        // ※free.html（フリー入力モード単体ページ）では元々ロビー画面を経由しないため対象外
+        if (!typing && !_capturingFor && e.key.toUpperCase() === 'F' &&
+            !(typeof FREE_STANDALONE !== 'undefined' && FREE_STANDALONE)) {
+            e.preventDefault();
+            startFreeMode();
+            return;
+        }
         // シークレットショートカット: Sキー（Morse Boardでsを打鍵した場合も同じキー入力として届く）
         // でランキング(送信&受信)画面へ。使い方ページのショートカット一覧にのみ記載し、UI上には明示しない。
         if (!typing && !_capturingFor && e.key.toUpperCase() === 'S') {
@@ -270,10 +278,13 @@ document.addEventListener('keydown', (e) => {
 
     // プレイ中: Escキーで強制的にロビーへ戻る（送信モード・フリー入力モード共通）
     // ※Escは制御キーなので、入力欄にフォーカスがあっても常に有効にする
-    if (e.code === 'Escape' && isPlaying) {
+    // ※free.html（フリー入力モード単体ページ）のみ、？打鍵（Morse Board）でも同様に扱う
+    //   （quitFreeMode()側でFREE_STANDALONE時はトップ画面へ遷移するよう分岐済み）
+    const freeStandalonePage = typeof FREE_STANDALONE !== 'undefined' && FREE_STANDALONE;
+    if ((e.code === 'Escape' || (freeStandalonePage && e.key === '?')) && isPlaying) {
         const gameScreen = document.getElementById('game-screen');
         const freeScreen = document.getElementById('free-screen');
-        if (gameScreen && !gameScreen.classList.contains('hidden')) {
+        if (e.code === 'Escape' && gameScreen && !gameScreen.classList.contains('hidden')) {
             e.preventDefault();
             quitGame();
             return;
@@ -979,6 +990,12 @@ function resetFreeMode() {
 }
 
 function quitFreeMode() {
+    // free.html（フリー入力モード単体ページ）には戻る先のロビー画面が無いため、
+    // モールス打のトップ画面へ遷移する（QUITボタン・Esc・？打鍵のいずれも本関数経由）
+    if (typeof FREE_STANDALONE !== 'undefined' && FREE_STANDALONE) {
+        location.href = (LANG === 'en') ? '/index-en.html' : 'https://jl1gix.com';
+        return;
+    }
     isPlaying = false;
     setGameplayViewportLock(false);
     gameMode = 'TX';

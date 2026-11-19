@@ -225,6 +225,12 @@ document.addEventListener('keydown', (e) => {
             unlockAndPrepare();
             return;
         }
+        // ロビー画面: Fキー（Morse BoardでFを打鍵した場合も同じキー入力として届く）でフリー入力モードへ
+        if (!typing && !_capturingFor && e.key.toUpperCase() === 'F') {
+            e.preventDefault();
+            startFreeMode();
+            return;
+        }
         // シークレットショートカット: Sキー（Morse Boardでsを打鍵した場合も同じキー入力として届く）
         // でランキング(送信&受信)画面へ。使い方ページのショートカット一覧にのみ記載し、UI上には明示しない。
         if (!typing && !_capturingFor && e.key.toUpperCase() === 'S') {
