@@ -28,17 +28,24 @@ const I18N = {
         ja: `コールサインとコンテストナンバーが交互に表示される。`,
         en: `A callsign and contest number are shown in turn. `
     },
+    // 単語ごとの制限時間切れ(QSB)の警告文。普通/正確重視/一発勝負のいずれも、QSBで
+    // その場でゲーム全体が終了する（初心者モードのみ、この制限時間の仕組み自体が無い）ため、
+    // 初心者モードがONの間はこの文を表示しない（updateTxModeDesc()側で分岐）。
+    modeDescQsbWarning: {
+        ja: `制限時間内にキーイングしないとシグナルが途切れ(QSB)、その場でゲーム終了！`,
+        en: `Key it before the signal fades (QSB), or the game ends right there!`
+    },
     modeDescMorseBoardRest: {
-        ja: `制限時間内にキーイングしないとシグナルが途切れ(QSB)その単語はアウト！<br>Morse BoardをPCに接続し、表示された文字をパドルで入力。<br>キーボードとして入力された英数字を、そのまま解答として判定します。`,
-        en: `Key it before the signal fades (QSB) or the word is lost!<br>Connect a Morse Board to your PC and key the displayed characters on the paddle.<br>Alphanumeric characters received as keyboard input are judged directly as your answer.`
+        ja: `Morse BoardをPCに接続し、表示された文字をパドルで入力。<br>キーボードとして入力された英数字を、そのまま解答として判定します。`,
+        en: `Connect a Morse Board to your PC and key the displayed characters on the paddle.<br>Alphanumeric characters received as keyboard input are judged directly as your answer.`
     },
     modeDescTouchRest: {
-        ja: `制限時間内にキーイングしないとシグナルが途切れ(QSB)その単語はアウト！<br>スマホ・タブレットは画面の「トン/ツー」をタップして送信。<br>キーボードでも操作可（右記参照）。<br>長押しで連続、両方同時押しで交互（アイアンビック）。離すと自動判定。`,
-        en: `Key it before the signal fades (QSB) or the word is lost!<br>On phone/tablet, tap the on-screen "DIT/DAH" buttons to send.<br>Keyboard input also works (see right).<br>Hold for repeats, hold both together to alternate (Iambic). Release to auto-judge.`
+        ja: `スマホ・タブレットは画面の「トン/ツー」をタップして送信。<br>キーボードでも操作可（右記参照）。<br>長押しで連続、両方同時押しで交互（アイアンビック）。離すと自動判定。`,
+        en: `On phone/tablet, tap the on-screen "DIT/DAH" buttons to send.<br>Keyboard input also works (see right).<br>Hold for repeats, hold both together to alternate (Iambic). Release to auto-judge.`
     },
     modeDescDesktopRest: (dotLabel, dashLabel) => ({
-        ja: `制限時間内にキーイングしないとシグナルが途切れ(QSB)その単語はアウト！<br>${dotLabel}キー長押し＝連続短点（・・・）、${dashLabel}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`,
-        en: `Key it before the signal fades (QSB) or the word is lost!<br>Hold ${dotLabel} = repeated dits (・・・), hold ${dashLabel} = repeated dahs (－－－)<br>Hold both together to alternate (Iambic). Release to auto-judge.`
+        ja: `${dotLabel}キー長押し＝連続短点（・・・）、${dashLabel}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`,
+        en: `Hold ${dotLabel} = repeated dits (・・・), hold ${dashLabel} = repeated dahs (－－－)<br>Hold both together to alternate (Iambic). Release to auto-judge.`
     }),
     dotLabel:  { ja: '・ 短点', en: '・ Dot' },
     dashLabel: { ja: '－ 長点', en: '－ Dash' },
@@ -78,7 +85,7 @@ const I18N = {
         en: '⚠ One Shot: A single mistake ends the game immediately. No mercy.<br>'
     },
     accuracyResetLabel: (n) => ({ ja: `↺ やり直し ${n}回`, en: `↺ Restarted ${n} time${n === 1 ? '' : 's'}` }),
-    oneShotEliminatedHeadline: { ja: '🔥 ELIMINATED（ミスで即終了）', en: '🔥 ELIMINATED (one mistake)' },
+    oneShotEliminatedHeadline: { ja: '🔥 ELIMINATED（ミス/QSBで即終了）', en: '🔥 ELIMINATED (mistake or QSB)' },
     accuracyRate: (pct, correct, total) => ({
         ja: `正確率: ${pct}% (${correct}/${total}打鍵)`,
         en: `Accuracy: ${pct}% (${correct}/${total} keys)`
@@ -400,12 +407,16 @@ function updateTxModeDesc() {
 
     let desc;
     const wordPart = (wordCategory === 'CALLSIGN') ? t('modeDescWordPart_CALLSIGN') : t('modeDescWordPart_GENERAL');
+    const beginnerModeOn = Boolean(document.getElementById('beginner-mode-check')?.checked);
+    const qsbPart = beginnerModeOn ? '' : (t('modeDescQsbWarning') + '<br>');
+    let deviceRest;
     if (isMorseBoard) {
-        desc = wordPart + t('modeDescMorseBoardRest');
+        deviceRest = t('modeDescMorseBoardRest');
     } else {
         const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-        desc = wordPart + (isTouchDevice ? t('modeDescTouchRest') : t('modeDescDesktopRest', getKeyLabel(dotKey), getKeyLabel(dashKey)));
+        deviceRest = isTouchDevice ? t('modeDescTouchRest') : t('modeDescDesktopRest', getKeyLabel(dotKey), getKeyLabel(dashKey));
     }
+    desc = wordPart + qsbPart + deviceRest;
     if (gameVariant === 'ACCURACY') desc = t('variantPrefix_ACCURACY') + desc;
     else if (gameVariant === 'ONESHOT') desc = t('variantPrefix_ONESHOT') + desc;
     document.getElementById('mode-description').innerHTML = desc;
