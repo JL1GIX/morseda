@@ -668,7 +668,11 @@ document.addEventListener('keydown', (e) => {
     } else if (k === 'G') {
         e.preventDefault();
         const link = document.getElementById('nav-asobi-link');
-        if (link) location.href = link.href;
+        if (link) location.href = link.getAttribute('href') + '?wordcat=GENERAL';
+    } else if (k === 'C') {
+        e.preventDefault();
+        const link = document.getElementById('nav-asobi-link');
+        if (link) location.href = link.getAttribute('href') + '?wordcat=CALLSIGN';
     }
 });
 </script>
