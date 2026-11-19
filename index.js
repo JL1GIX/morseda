@@ -240,5 +240,9 @@ document.addEventListener('keydown', (e) => {
         // 使い方ページのショートカット一覧にのみ記載し、UI上には明示しない。
         e.preventDefault();
         location.href = (lang === 'en') ? 'ranking-en.html' : 'ranking.html';
+    } else if (key === 'U') {
+        // トップ画面のみのショートカット: 使い方ページへ。
+        e.preventDefault();
+        location.href = (lang === 'en') ? 'how-to-use-en.html' : 'how-to-use.html';
     }
 });
