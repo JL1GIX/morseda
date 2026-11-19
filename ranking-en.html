@@ -363,7 +363,7 @@
     <div class="ranking-nav-links">
         <a id="nav-today-link" href="ranking-today-en.html">📅 Today's Ranking</a>
         <a id="nav-yesterday-link" href="ranking-yesterday-en.html">📅 Yesterday's Ranking</a>
-        <a href="/ranking-asobi-en.html">🎮 Fun Mode Ranking</a>
+        <a id="nav-asobi-link" href="/ranking-asobi-en.html">🎮 Fun Mode Ranking</a>
     </div>
 
     <div id="hl-search-status" class="status-msg" style="display:none; font-size:0.72rem; opacity:0.8; padding:4px 0 0;">🔍 Looking for your score…</div>
@@ -643,12 +643,33 @@ function changePage(delta) {
     });
 })();
 
-// ── キーボードショートカット: Escキー（Morse Boardの場合はクエスチョン・・－－・・打鍵でも同じ）でモールス打のトップ画面へ戻る ──
+// ── キーボードショートカット ──────────────────────────────────────────────
+// Escキー（Morse Boardの場合はクエスチョン・・－－・・打鍵でも同じ）でモールス打のトップ画面へ戻る。
+// 1/3/5キーで制限時間タブ、R/Tキーで受信/送信モードタブを切り替え（Morse Boardで対応する符号を
+// 打鍵した場合も同じキー入力として届くため、そのまま同じ条件で反応する）。Gキーでお遊びモードの
+// ランキングページへ移動する。タブ切り替えは既存のswitchMode()/switchMinutes()をそのまま呼び出すため、
+// クリック操作と全く同じ保存処理（URL・localStorageへのタブ状態保存）が行われる。
 document.addEventListener('keydown', (e) => {
-    if (e.repeat) return;
+    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.code === 'Escape' || e.key === '?') {
         e.preventDefault();
         location.href = (document.documentElement.lang === 'en') ? '/index-en.html' : 'https://jl1gix.com';
+        return;
+    }
+    const k = e.key.toUpperCase();
+    if (k === '1' || k === '3' || k === '5') {
+        e.preventDefault();
+        switchMinutes(Number(k));
+    } else if (k === 'R') {
+        e.preventDefault();
+        switchMode('RX');
+    } else if (k === 'T') {
+        e.preventDefault();
+        switchMode('TX');
+    } else if (k === 'G') {
+        e.preventDefault();
+        const link = document.getElementById('nav-asobi-link');
+        if (link) location.href = link.href;
     }
 });
 </script>
