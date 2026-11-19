@@ -719,7 +719,10 @@ document.addEventListener('keydown', (e) => {
     } else if (k === 'R' || k === 'T') {
         e.preventDefault();
         const link = document.getElementById('nav-rxtx-link');
-        if (link) location.href = link.href;
+        if (link) {
+            const mode = (k === 'R') ? 'RX' : 'TX';
+            location.href = link.getAttribute('href') + `?mode=${mode}&time=${currentMinutes}`;
+        }
     }
 });
 </script>
