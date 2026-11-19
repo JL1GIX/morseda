@@ -1358,6 +1358,8 @@ async function setNickname() {
     const timeParam = params.get('time');
     if (timeSelect && ['60', '180', '300'].includes(timeParam)) timeSelect.value = timeParam;
     syncTimeTabs();
+    // ナビゲーションの「フリー入力モード」リンク（tx.html?free=1）から直接入れるようにする
+    if (params.get('free') === '1') startFreeMode();
 })();
 
 // ── Initialize mode description on page load ───────────────────────────────────
