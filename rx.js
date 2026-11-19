@@ -662,11 +662,13 @@ document.addEventListener('keydown', (e) => {
             unlockAndPrepare();
             return;
         }
-        // シークレットショートカット: Sキーでランキング(送信&受信)画面へ。
-        // 使い方ページのショートカット一覧にのみ記載し、UI上には明示しない。
+        // シークレットショートカット: Sキーで、現在選択中の制限時間タブの状態を保ったまま
+        // 受信モードのランキング画面へ。使い方ページのショートカット一覧にのみ記載し、UI上には明示しない。
         if (!typing && e.key.toUpperCase() === 'S') {
             e.preventDefault();
-            location.href = (LANG === 'en') ? '/ranking-en.html' : '/ranking.html';
+            const minutes = Math.round(parseInt(document.getElementById('time-select').value) / 60);
+            const base = (LANG === 'en') ? '/ranking-en.html' : '/ranking.html';
+            location.href = `${base}?mode=RX&time=${minutes}`;
             return;
         }
         // ロビー画面: Escキーでモールス打のトップ画面へ（制御キーなので入力中でも有効）

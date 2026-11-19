@@ -232,10 +232,12 @@ document.addEventListener('keydown', (e) => {
             return;
         }
         // シークレットショートカット: Sキー（Morse Boardでsを打鍵した場合も同じキー入力として届く）
-        // でランキング(送信&受信)画面へ。使い方ページのショートカット一覧にのみ記載し、UI上には明示しない。
+        // で、現在選択中の単語種別・プレイスタイル・制限時間タブの状態を保ったまま
+        // お遊びモードのランキング画面へ。使い方ページのショートカット一覧にのみ記載し、UI上には明示しない。
         if (!typing && !_capturingFor && e.key.toUpperCase() === 'S') {
             e.preventDefault();
-            location.href = (LANG === 'en') ? '/ranking-en.html' : '/ranking.html';
+            const minutes = Math.round(parseInt(document.getElementById('time-select').value) / 60);
+            location.href = `${asobiRankingBase()}&time=${minutes}`;
             return;
         }
         // ロビー画面（Morse Board）: ？打鍵（・・－－・・）でモールス打のトップ画面へ戻る

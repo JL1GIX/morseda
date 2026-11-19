@@ -226,10 +226,13 @@ document.addEventListener('keydown', (e) => {
             return;
         }
         // シークレットショートカット: Sキー（Morse Boardでsを打鍵した場合も同じキー入力として届く）
-        // でランキング(送信&受信)画面へ。使い方ページのショートカット一覧にのみ記載し、UI上には明示しない。
+        // で、現在選択中の制限時間タブの状態を保ったまま送信モードのランキング画面へ。
+        // 使い方ページのショートカット一覧にのみ記載し、UI上には明示しない。
         if (!typing && !_capturingFor && e.key.toUpperCase() === 'S') {
             e.preventDefault();
-            location.href = (LANG === 'en') ? '/ranking-en.html' : '/ranking.html';
+            const minutes = Math.round(parseInt(document.getElementById('time-select').value) / 60);
+            const base = (LANG === 'en') ? '/ranking-en.html' : '/ranking.html';
+            location.href = `${base}?mode=TX&time=${minutes}`;
             return;
         }
         // ロビー画面（Morse Board）: ？打鍵（・・－－・・）でモールス打のトップ画面へ戻る
