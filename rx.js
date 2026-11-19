@@ -696,6 +696,16 @@ document.addEventListener('keydown', (e) => {
                 return;
             }
         }
+        // リザルト画面: Sキーで、今プレイした制限時間（スコア登録済みならhlパラメータも含めて）の
+        // 受信モードランキング画面へ（受信モードはMorse Board非対応のため通常のキー入力のみ）。
+        if (!typing && e.key.toUpperCase() === 'S') {
+            e.preventDefault();
+            const minutes = Math.round(initialSeconds / 60);
+            const hl = _registeredId ? `&hl=${encodeURIComponent(_registeredId)}` : '';
+            const base = (LANG === 'en') ? '/ranking-en.html' : '/ranking.html';
+            location.href = `${base}?mode=${gameMode}&time=${minutes}${hl}`;
+            return;
+        }
         if (e.code === 'Escape') {
             e.preventDefault();
             retryGame();

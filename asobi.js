@@ -277,6 +277,16 @@ document.addEventListener('keydown', (e) => {
                 return;
             }
         }
+        // リザルト画面: Sキー（Morse BoardでSを打鍵した場合も同じキー入力として届く）で
+        // 今プレイした単語種別・プレイスタイル・制限時間（スコア登録済みならhlパラメータも含めて）
+        // のお遊びモードランキング画面へ。
+        if (!typing && e.key.toUpperCase() === 'S') {
+            e.preventDefault();
+            const minutes = Math.round(initialSeconds / 60);
+            const hl = _registeredId ? `&hl=${encodeURIComponent(_registeredId)}` : '';
+            location.href = `${asobiRankingBase()}&time=${minutes}${hl}`;
+            return;
+        }
         if (e.code === 'Escape' || (!typing && morseBoardMode && e.key.toUpperCase() === 'R')) {
             e.preventDefault();
             retryGame();

@@ -272,6 +272,16 @@ document.addEventListener('keydown', (e) => {
                 return;
             }
         }
+        // リザルト画面: Sキー（Morse BoardでSを打鍵した場合も同じキー入力として届く）で
+        // 今プレイしたモード・制限時間（スコア登録済みならhlパラメータも含めて）のランキング画面へ。
+        if (!typing && e.key.toUpperCase() === 'S') {
+            e.preventDefault();
+            const minutes = Math.round(initialSeconds / 60);
+            const hl = _registeredId ? `&hl=${encodeURIComponent(_registeredId)}` : '';
+            const base = (LANG === 'en') ? '/ranking-en.html' : '/ranking.html';
+            location.href = `${base}?mode=TX&time=${minutes}${hl}`;
+            return;
+        }
         if (e.code === 'Escape' || (!typing && morseBoardMode && e.key.toUpperCase() === 'R')) {
             e.preventDefault();
             retryGame();
