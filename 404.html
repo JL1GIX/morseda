@@ -103,5 +103,17 @@
     <a href="/contact.html" style="display:block;color:#262626;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ お問い合わせ</a>
 </nav>
 <style>#menu-panel.open{transform:translateX(0)!important;}#menu-overlay.open{opacity:1!important;pointer-events:auto!important;}#menu-btn:hover{background:rgba(10,125,68,0.08);}nav#menu-panel a:hover{background:rgba(10,125,68,0.08);padding-left:6px;transition:padding 0.15s;}</style>
+<script>
+// グローバルショートカット: 「:」キー（Morse Boardで「:」を打鍵した場合も同じキー入力として届く）でトップ画面へ戻る
+document.addEventListener('keydown', function (e) {
+    if (e.repeat) return;
+    if (e.key !== ':') return;
+    const target = e.target;
+    const isTyping = target instanceof Element && (target.matches('input, select, textarea') || target.isContentEditable);
+    if (isTyping) return;
+    e.preventDefault();
+    location.href = 'https://jl1gix.com';
+});
+</script>
 </body>
 </html>

@@ -38,3 +38,20 @@
 function setMorsedaLangPref(lang) {
     try { localStorage.setItem('morseda_lang', lang); } catch (e) {}
 }
+
+// ── グローバルショートカット: 「:」キー（Morse Boardで「:」を打鍵した場合も同じキー入力として届く）で
+// どのページからでもモールス打のトップ画面へ戻る。ゲームプレイ中（isPlayingがtrueのページ）だけは
+// 誤操作防止のため無効にする。lang-guard.jsは個別のゲーム画面を含むほぼ全ページで読み込まれるため、
+// ここに実装することでページごとの重複実装を避けている。
+document.addEventListener('keydown', function (e) {
+    if (e.repeat) return;
+    if (e.key !== ':') return;
+    if (typeof isPlaying !== 'undefined' && isPlaying) return;
+    if (typeof _capturingFor !== 'undefined' && _capturingFor) return;
+    const target = e.target;
+    const isTyping = target instanceof Element && (target.matches('input, select, textarea') || target.isContentEditable);
+    if (isTyping) return;
+    e.preventDefault();
+    const htmlLang = (document.documentElement.lang === 'en') ? 'en' : 'ja';
+    location.href = (htmlLang === 'en') ? '/index-en.html' : 'https://jl1gix.com';
+});
