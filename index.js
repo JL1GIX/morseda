@@ -96,12 +96,12 @@
         return s;
     }
     function wfCol(v) {
-        // 白背景の水色スペクトラムに合わせたウォーターフォール配色（白→薄水色→スカイブルー→紺）
-        if (v < 0.10) { const t = v/0.10; return [~~(255-t*25), ~~(255-t*13), ~~(255-t*3)]; }
-        if (v < 0.30) { const t = (v-0.10)/0.20; return [~~(230-t*60), ~~(242-t*32), ~~(252-t*12)]; }
-        if (v < 0.58) { const t = (v-0.30)/0.28; return [~~(170-t*100), ~~(210-t*60), ~~(240-t*25)]; }
-        if (v < 0.82) { const t = (v-0.58)/0.24; return [~~(70-t*50), ~~(150-t*60), ~~(215-t*45)]; }
-        const t = Math.min(1,(v-0.82)/0.18); return [~~(20-t*15), ~~(90-t*50), ~~(170-t*60)];
+        // 黒背景の水色スペクトラムに合わせたウォーターフォール配色（黒→紺→スカイブルー→明るい水色、水色の色相自体は維持）
+        if (v < 0.10) { const t = v/0.10; return [~~(8+t*2), ~~(14+t*21), ~~(11+t*39)]; }
+        if (v < 0.30) { const t = (v-0.10)/0.20; return [~~(10+t*10), ~~(35+t*35), ~~(50+t*60)]; }
+        if (v < 0.58) { const t = (v-0.30)/0.28; return [~~(20+t*20), ~~(70+t*50), ~~(110+t*70)]; }
+        if (v < 0.82) { const t = (v-0.58)/0.24; return [~~(40+t*30), ~~(120+t*50), ~~(180+t*50)]; }
+        const t = Math.min(1,(v-0.82)/0.18); return [~~(70+t*70), ~~(170+t*50), ~~(230+t*25)];
     }
     function drawFrame() {
         if (!hActive) return;
@@ -117,7 +117,7 @@
             wfRows.unshift(smoothSpec.slice());
             if (wfRows.length > FALL_H) wfRows.pop();
         }
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#0a1b12';
         ctx.fillRect(0, 0, SW, SPEC_H);
         ctx.lineWidth = 0.5;
         for (let i = 1; i <= 4; i++) {
