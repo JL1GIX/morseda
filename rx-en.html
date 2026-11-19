@@ -562,19 +562,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(120deg, var(--primary-dim), var(--primary) 50%, var(--primary-bright));
-            background-size: 220% 220%;
-            animation: start-gradient-shift 1.6s ease-in-out infinite;
-            color: #fff;
+            background: var(--panel);
+            color: var(--primary);
             font-size: clamp(3.5rem, 16vw, 9rem);
             font-weight: 700;
             letter-spacing: clamp(6px, 2vw, 20px);
             text-align: center;
-            text-shadow: 0 3px 14px rgba(0,30,15,0.35);
-        }
-        @keyframes start-gradient-shift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+            text-shadow: none;
         }
         #result-screen h2 { letter-spacing: 6px; font-size: 1.4rem; text-shadow: none; }
         #final-result-text {
