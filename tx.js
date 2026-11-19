@@ -59,6 +59,10 @@ const I18N = {
     wpmBand_beginner:     { ja: '初心者向け', en: 'Beginner' },
     wpmBand_intermediate: { ja: '中級者向け', en: 'Intermediate' },
     wpmBand_advanced:     { ja: '上級者向け', en: 'Advanced' },
+    accuracyRate: (pct, correct, total) => ({
+        ja: `正確率: ${pct}% (${correct}/${total}打鍵)`,
+        en: `Accuracy: ${pct}% (${correct}/${total} keys)`
+    }),
 };
 function t(key, ...args) {
     const entry = I18N[key];
@@ -1197,8 +1201,8 @@ function renderMistakeBreakdown() {
     }
     const top = entries.slice(0, 8); // 表示件数は上位8件まで
     list.innerHTML = top.map(([ch, count]) =>
-        `<span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border:1px solid var(--border); border-radius:3px; background:rgba(0,0,0,0.35); font-size:0.85rem;">` +
-        `<b style="color:var(--error);">${ch}</b><span style="color:var(--primary-dim); font-size:0.7rem;">×${count}</span></span>`
+        `<span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border:1px solid var(--border); border-radius:3px; background:rgba(192,57,43,0.12); font-size:0.85rem;">` +
+        `<b style="color:var(--error);">${ch}</b><span style="color:var(--text-secondary); font-size:0.7rem;">×${count}</span></span>`
     ).join('');
     area.classList.remove('hidden');
 }
@@ -1211,6 +1215,18 @@ function endGame() {
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
         `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min`;
+    const accuracyEl = document.getElementById('accuracy-result-text');
+    if (accuracyEl) {
+        const totalMistakes = Object.values(txMistakeCounts).reduce((a, b) => a + b, 0);
+        const totalAttempts = score + totalMistakes;
+        if (totalAttempts > 0) {
+            const pct = Math.round((score / totalAttempts) * 1000) / 10;
+            accuracyEl.textContent = t('accuracyRate', pct, score, totalAttempts);
+            accuracyEl.style.display = '';
+        } else {
+            accuracyEl.style.display = 'none';
+        }
+    }
     renderMistakeBreakdown();
     const resultKeyHint = document.getElementById('result-key-hint');
     if (resultKeyHint) resultKeyHint.textContent = morseBoardMode ? t('resultHintMorseBoard') : t('resultHintEsc');

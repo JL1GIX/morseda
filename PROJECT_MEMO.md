@@ -193,6 +193,13 @@
 1. **「今打つべき文字」をもっとわかりやすく**: §4.5で`.tx-char-current`を単色の濃い緑(`var(--primary)`、opacity 1)にしたが、「色を濃くするだけでなく、文字の枠が若干光るような、ゆっくり明暗する点滅アニメーションが欲しい（きらきらしすぎなくていい）」との要望を受け、`tx.html`/`tx-en.html`/`asobi.html`/`asobi-en.html`の`#tx-target-text .tx-char-current`に`text-shadow`を使った**1.8秒周期でゆっくり明滅するグローアニメーション**(`@keyframes tx-char-glow`)を追加した。文字色自体は引き続き`var(--primary)`のまま変更せず、影の強さだけが`rgba(0,208,106,0.35)`〜`rgba(0,208,106,0.85)`の間を往復する、派手すぎない呼吸するような光り方にした。
 2. **お遊びモードの単語ごと制限時間バー「SIGNAL」が暗すぎる**: 原因は`#word-timer-bar-wrap`自体ではなく、それを包む外枠`#word-timer-track`の背景が`rgba(0,20,10,0.5)`という黒に近い半透明のままだったこと（§4.4のダークゾーン一掃の際に見落としていた）。`asobi.html`/`asobi-en.html`の`#word-timer-track`背景を`var(--bg)`（グレー地）に変更し、`#word-timer-label`（📡 SIGNALの文字）も`var(--primary-dim)`・opacity 0.9から`var(--primary)`・opacity 1に変更して視認性を上げた。あわせて`#word-timer-bar-wrap`自体の地色も`#ededed`→`#f2f2f2`、目盛りの不透明度も0.18→0.22に微調整し、全体的に明るくクリアな見た目にした。
 
+### 4.9 リザルト画面への「正確率」表示 + ミス文字チップの明度改善 (2026-11 第7弾)
+
+熊谷さんより2点の追加要望があった。
+
+1. **送信モード・お遊びモードの全モードでリザルト画面に正確率を表示**: 「(打ち終わった文字数/ノーミスで打てた文字数)を計算して正確率を出してほしい」との要望。文字どおりの比だと1以上になり得て「率」として読めないため、一般的な正解率の定義（ノーミス入力数 ÷ 総打鍵数 × 100）で実装した。`tx.js`はゲームバリアント機構を持たず`score`が常に加算オンリー（巻き戻りなし）なので、そのまま`score`を正解数として使用。一方`asobi.js`は§4.7で正確重視モードの得点巻き戻し(`score = wordStartScore`)を実装済みのため、`score`は正解率の分子としては使えない。そこで巻き戻りの影響を受けない新しいカウンタ`totalCorrectKeys`を追加し、`evaluateTxChar()`の正解分岐で`score++`と並べて`totalCorrectKeys++`し、ゲーム開始時(`startGame()`)にのみ0へリセットする設計にした。分母は`totalCorrectKeys + (txMistakeCounts / asobiMistakeCountsの合計値)`。`tx.html`/`asobi.html`の`#final-result-text`直下に`<p id="accuracy-result-text">`を新設し、`endGame()`内で「正確率: 94.9% (93/98打鍵)」のような文言を算出・表示する（`I18N.accuracyRate`としてja/en両対応、小数点1桁）。1打も打っていない場合（総打鍵数0）は非表示にして0除算の見栄えを回避。
+2. **「ミスが多かった文字」チップの背景が暗すぎる**: `renderMistakeBreakdown()`内のインラインスタイルが`background:rgba(0,0,0,0.35)`という黒系のままだったことが原因（§4.4のダークゾーン一掃で見落としていたJS側の暗い背景の一つ）。`tx.js`/`asobi.js`双方で`rgba(192,57,43,0.12)`という`var(--error)`系の薄い赤系タイントに変更し、件数テキストの色も`var(--primary-dim)`から`var(--text-secondary)`に変更して全体の明るさ・視認性を改善した。
+
 ## 5. ゲーム仕様の要点
 
 - **モード**: 受信 (rx) / 送信 (tx)

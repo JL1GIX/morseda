@@ -653,6 +653,10 @@
             border-radius: 10px; background: var(--primary-soft);
             box-shadow: 0 2px 10px rgba(16,40,28,0.08);
         }
+        #accuracy-result-text {
+            display: block; margin: -8px 0 20px; font-size: 0.9rem;
+            color: var(--text-secondary); letter-spacing: 1px;
+        }
         .share-area { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
         .share-label { font-size: 0.65rem; letter-spacing: 3px; color: var(--text-secondary); opacity: 1.0; margin-bottom: 12px; }
         .share-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
@@ -991,6 +995,7 @@
     <div id="result-screen" class="hidden">
         <h2>MISSION END</h2>
         <p id="final-result-text" style="margin: 20px 0;"></p>
+        <p id="accuracy-result-text"></p>
         <div id="tx-mistake-area" class="hidden" style="margin:0 auto 20px; padding:12px 14px; border:1px solid var(--border); border-radius:10px; background:var(--primary-soft); max-width:380px;">
             <div style="font-size:0.65rem; letter-spacing:2px; color:var(--text-secondary); margin-bottom:8px;">▸ ミスが多かった文字 ◂</div>
             <div id="tx-mistake-list" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>

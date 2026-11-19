@@ -70,6 +70,10 @@ const I18N = {
     },
     accuracyResetLabel: (n) => ({ ja: `↺ やり直し ${n}回`, en: `↺ Restarted ${n} time${n === 1 ? '' : 's'}` }),
     oneShotEliminatedHeadline: { ja: '🔥 ELIMINATED（ミスで即終了）', en: '🔥 ELIMINATED (one mistake)' },
+    accuracyRate: (pct, correct, total) => ({
+        ja: `正確率: ${pct}% (${correct}/${total}打鍵)`,
+        en: `Accuracy: ${pct}% (${correct}/${total} keys)`
+    }),
 };
 function t(key, ...args) {
     const entry = I18N[key];
@@ -616,6 +620,7 @@ function pickCurrentWord() {
 let wordCategory = 'GENERAL';
 let gameVariant = 'NORMAL';
 let accuracyResetCount = 0; // 正確重視モードでの「やり直し」回数
+let totalCorrectKeys = 0; // 正確率計算用：ACCURACYモードのスコア巻き戻しの影響を受けない、ノーミス入力の総数
 let wordStartScore = 0; // 普通/正確重視モード: 現在の単語に入った時点のscore（タイムアウト判定・正確重視のリセットで使用）
 let oneShotEliminated = false; // 一発勝負モードで脱落したか
 
@@ -752,6 +757,7 @@ function startGame() {
     initialSeconds = parseInt(document.getElementById('time-select').value);
     timeLeft = initialSeconds;
     score = 0; isPlaying = true;
+    totalCorrectKeys = 0;
     wordsCompleted = 0; wordsMissed = 0;
     document.getElementById('score').innerText = 0;
     masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
@@ -1079,6 +1085,7 @@ function evaluateTxChar(decoded) {
     if (isCorrect) {
         txCharIndex++;
         score++;
+        totalCorrectKeys++;
         document.getElementById('score').innerText = score;
         txArea.classList.remove('flash-error');
         txArea.classList.add('flash-correct');
@@ -1457,8 +1464,8 @@ function renderMistakeBreakdown() {
     }
     const top = entries.slice(0, 8); // 表示件数は上位8件まで
     list.innerHTML = top.map(([ch, count]) =>
-        `<span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border:1px solid var(--border); border-radius:3px; background:rgba(0,0,0,0.35); font-size:0.85rem;">` +
-        `<b style="color:var(--error);">${ch}</b><span style="color:var(--primary-dim); font-size:0.7rem;">×${count}</span></span>`
+        `<span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border:1px solid var(--border); border-radius:3px; background:rgba(192,57,43,0.12); font-size:0.85rem;">` +
+        `<b style="color:var(--error);">${ch}</b><span style="color:var(--text-secondary); font-size:0.7rem;">×${count}</span></span>`
     ).join('');
     area.classList.remove('hidden');
 }
@@ -1500,6 +1507,18 @@ function endGame() {
     const minutes = Math.round(initialSeconds / 60);
     document.getElementById('final-result-text').innerText =
         `${score} ${score === 1 ? 'character' : 'characters'} / ${minutes} min` + t('resultSuffix', wordsCompleted);
+    const accuracyEl = document.getElementById('accuracy-result-text');
+    if (accuracyEl) {
+        const totalMistakes = Object.values(asobiMistakeCounts).reduce((a, b) => a + b, 0);
+        const totalAttempts = totalCorrectKeys + totalMistakes;
+        if (totalAttempts > 0) {
+            const pct = Math.round((totalCorrectKeys / totalAttempts) * 1000) / 10;
+            accuracyEl.textContent = t('accuracyRate', pct, totalCorrectKeys, totalAttempts);
+            accuracyEl.style.display = '';
+        } else {
+            accuracyEl.style.display = 'none';
+        }
+    }
     renderMistakeBreakdown();
     const resultKeyHint = document.getElementById('result-key-hint');
     if (resultKeyHint) resultKeyHint.textContent = morseBoardMode ? t('resultHintMorseBoard') : t('resultHintEsc');
