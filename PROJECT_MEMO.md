@@ -521,6 +521,14 @@ git log --oneline -3
 - **検証時に見つかった既存の軽微な挙動**（今回は対象外・修正せず）: `ranking-asobi.html`の`updateNavLinks()`は、`window.location.search`を元にクエリ文字列を再構築する`ranking.html`の`updateUrlState()`と異なり、`?wordcat=&variant=&time=`のみでURLを組み直すため、`&hl=`パラメータは初期読み込み時の強調表示（`highlightId`）には正しく使われるものの、その後のURL（アドレスバー表示）からは消える。既存の「ランキングを見る」リンクも同じ挙動であり、今回追加したSキーショートカットも同様。強調表示自体は正しく機能するため、実害は無いと判断し対応は見送った。
 - `how-to-use.html`/`how-to-use-en.html`のショートカット表に「リザルト画面 S（Morse Boardの場合は・・・打鍵。送信・お遊びモードのリザルトのみ対応）」の行を追加（受信モードはMorse Board非対応のため、物理キーのみ）。
 
+### 13.8 お遊びモードのロビー説明文が単語種別(wordCategory)を反映していなかった不具合を修正
+
+熊谷さんより「コールサイン+コンテストナンバーを選んでいる時、ロビーの説明文が身近な単語のままになっている」との報告。
+
+- **原因**: `asobi.js`の`updateTxModeDesc()`が生成するロビーの説明文（`modeDescMorseBoard`/`modeDescTouch`/`modeDescDesktop`）は、いずれも先頭に「身近な英単語が表示される。」という文言が**単語種別(`wordCategory`)を一切見ずに**ハードコードされていた。単語種別タブ切替時に呼ばれる`selectWordCategory()`は`updateTxModeDesc()`を呼んでいるものの、関数側が`wordCategory`を参照していなかったため、コールサイン+コンテストナンバーを選んでも表示だけが「身近な単語」のまま変わらなかった。
+- **修正**: 説明文の冒頭部分を`modeDescWordPart_GENERAL`（「身近な英単語が表示される。」）/`modeDescWordPart_CALLSIGN`（「コールサインとコンテストナンバーが交互に表示される。」）の2種類に分離し、残りの共通部分（QSB・操作方法の説明）は`modeDescMorseBoardRest`/`modeDescTouchRest`/`modeDescDesktopRest`にリネーム。`updateTxModeDesc()`側で`wordCategory`の値に応じて冒頭部分を選び、共通部分と連結して表示するように変更した。
+- Morse Boardモード・タッチデバイス・デスクトップの3パターン、および正確重視/一発勝負のプレフィックスとの組み合わせ全てで、単語種別ごとに正しい説明文に切り替わることをPlaywrightで確認済み（ja/en両方）。
+
 ---
 
-_最終更新: 2026-11-19（リザルト画面にもSキー（Morse Board：・・・打鍵、送信・お遊びモードのみ）ショートカットを追加し、既存の「ランキングを見る」リンクと同じ遷移先（スコア登録済みならhlパラメータで自分の記録を光らせる）へ移動できるようにした。詳細は13章）_
+_最終更新: 2026-11-19（お遊びモードのロビー説明文が単語種別(身近な単語/コールサイン+コンテストナンバー)を反映せず常に「身近な単語」用の文言になっていた不具合を修正。詳細は13章）_

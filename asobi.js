@@ -19,17 +19,26 @@ const I18N = {
     errDotConflict:      { ja: '短点と同じキーは設定できません', en: 'Cannot use the same key as Dot' },
     startHintMorseBoard: { ja: '（・　ー）打鍵でスタート', en: 'Key (・ ー) to start' },
     startHintKey:        { ja: 'キーでスタート', en: 'Press a key to start' },
-    modeDescMorseBoard: {
-        ja: `身近な英単語が表示される。制限時間内にキーイングしないとシグナルが途切れ(QSB)その単語はアウト！<br>Morse BoardをPCに接続し、表示された文字をパドルで入力。<br>キーボードとして入力された英数字を、そのまま解答として判定します。`,
-        en: `A familiar English word is shown. Key it before the signal fades (QSB) or the word is lost!<br>Connect a Morse Board to your PC and key the displayed characters on the paddle.<br>Alphanumeric characters received as keyboard input are judged directly as your answer.`
+    // 単語種別(wordCategory)に応じて切り替わる、ロビーの説明文の冒頭部分
+    modeDescWordPart_GENERAL: {
+        ja: `身近な英単語が表示される。`,
+        en: `A familiar English word is shown. `
     },
-    modeDescTouch: {
-        ja: `身近な英単語が表示される。制限時間内にキーイングしないとシグナルが途切れ(QSB)その単語はアウト！<br>スマホ・タブレットは画面の「トン/ツー」をタップして送信。<br>キーボードでも操作可（右記参照）。<br>長押しで連続、両方同時押しで交互（アイアンビック）。離すと自動判定。`,
-        en: `A familiar English word is shown. Key it before the signal fades (QSB) or the word is lost!<br>On phone/tablet, tap the on-screen "DIT/DAH" buttons to send.<br>Keyboard input also works (see right).<br>Hold for repeats, hold both together to alternate (Iambic). Release to auto-judge.`
+    modeDescWordPart_CALLSIGN: {
+        ja: `コールサインとコンテストナンバーが交互に表示される。`,
+        en: `A callsign and contest number are shown in turn. `
     },
-    modeDescDesktop: (dotLabel, dashLabel) => ({
-        ja: `身近な英単語が表示される。制限時間内にキーイングしないとシグナルが途切れ(QSB)その単語はアウト！<br>${dotLabel}キー長押し＝連続短点（・・・）、${dashLabel}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`,
-        en: `A familiar English word is shown. Key it before the signal fades (QSB) or the word is lost!<br>Hold ${dotLabel} = repeated dits (・・・), hold ${dashLabel} = repeated dahs (－－－)<br>Hold both together to alternate (Iambic). Release to auto-judge.`
+    modeDescMorseBoardRest: {
+        ja: `制限時間内にキーイングしないとシグナルが途切れ(QSB)その単語はアウト！<br>Morse BoardをPCに接続し、表示された文字をパドルで入力。<br>キーボードとして入力された英数字を、そのまま解答として判定します。`,
+        en: `Key it before the signal fades (QSB) or the word is lost!<br>Connect a Morse Board to your PC and key the displayed characters on the paddle.<br>Alphanumeric characters received as keyboard input are judged directly as your answer.`
+    },
+    modeDescTouchRest: {
+        ja: `制限時間内にキーイングしないとシグナルが途切れ(QSB)その単語はアウト！<br>スマホ・タブレットは画面の「トン/ツー」をタップして送信。<br>キーボードでも操作可（右記参照）。<br>長押しで連続、両方同時押しで交互（アイアンビック）。離すと自動判定。`,
+        en: `Key it before the signal fades (QSB) or the word is lost!<br>On phone/tablet, tap the on-screen "DIT/DAH" buttons to send.<br>Keyboard input also works (see right).<br>Hold for repeats, hold both together to alternate (Iambic). Release to auto-judge.`
+    },
+    modeDescDesktopRest: (dotLabel, dashLabel) => ({
+        ja: `制限時間内にキーイングしないとシグナルが途切れ(QSB)その単語はアウト！<br>${dotLabel}キー長押し＝連続短点（・・・）、${dashLabel}キー長押し＝連続長点（－－－）<br>両方同時押しで交互（アイアンビック）。離すと自動判定。`,
+        en: `Key it before the signal fades (QSB) or the word is lost!<br>Hold ${dotLabel} = repeated dits (・・・), hold ${dashLabel} = repeated dahs (－－－)<br>Hold both together to alternate (Iambic). Release to auto-judge.`
     }),
     dotLabel:  { ja: '・ 短点', en: '・ Dot' },
     dashLabel: { ja: '－ 長点', en: '－ Dash' },
@@ -390,11 +399,12 @@ function updateTxModeDesc() {
     if (startHintLabel) startHintLabel.textContent = isMorseBoard ? t('startHintMorseBoard') : t('startHintKey');
 
     let desc;
+    const wordPart = (wordCategory === 'CALLSIGN') ? t('modeDescWordPart_CALLSIGN') : t('modeDescWordPart_GENERAL');
     if (isMorseBoard) {
-        desc = t('modeDescMorseBoard');
+        desc = wordPart + t('modeDescMorseBoardRest');
     } else {
         const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-        desc = isTouchDevice ? t('modeDescTouch') : t('modeDescDesktop', getKeyLabel(dotKey), getKeyLabel(dashKey));
+        desc = wordPart + (isTouchDevice ? t('modeDescTouchRest') : t('modeDescDesktopRest', getKeyLabel(dotKey), getKeyLabel(dashKey)));
     }
     if (gameVariant === 'ACCURACY') desc = t('variantPrefix_ACCURACY') + desc;
     else if (gameVariant === 'ONESHOT') desc = t('variantPrefix_ONESHOT') + desc;
