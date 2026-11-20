@@ -854,7 +854,10 @@ function decodeTxChar() {
 
 function evaluateTxChar(decoded) {
     const expected = txWord[txCharIndex];
-    const txArea   = document.getElementById('tx-area');
+    // 枠の点滅(.flash-error/.flash-correct)は、実際に境界線が見える#tx-word-display
+    // (お題表示の枠)に対して行う。#tx-areaは枠を持たないラッパーdivのため、
+    // 従来はここに点滅クラスを付けても見た目上何も起きていなかった。
+    const txArea   = document.getElementById('tx-word-display');
     // コールサインの1・0は本来の符号のみ正解（カットナンバー不可）。
     // コンテストナンバーの1・0は本来の符号に加え、カットナンバー（1→A、0→O/T）も正解とする。
     const cutAlts = (!txWordIsCallsign && CUT_NUMBER_ACCEPT[expected]) || [];

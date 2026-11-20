@@ -836,11 +836,16 @@
         .mode-tabs-label { font-size: 0.64rem; color: var(--text-secondary); letter-spacing: 2px; margin: 10px 0 6px; opacity: 0.85; text-align: left; }
         .settings-grid.no-time #wpm-setting-item { grid-column: 1 / -1; }
 
-        /* In-game status for the current variant (Accuracy Focus: restart count) */
+        /* In-game status for the current variant (Accuracy Focus: restart count).
+           During Accuracy Focus mode, reserve the same height whether or not text is
+           shown (min-height) and toggle only visibility (not display), so showing/hiding
+           this line never shifts the rest of the screen layout. */
         #variant-status {
             font-size: 0.68rem; letter-spacing: 1px; color: var(--error); text-align: center;
-            margin-bottom: 8px; text-shadow: none; animation: blink 0.7s infinite;
+            margin-bottom: 8px; text-shadow: none;
+            min-height: 1.3em; visibility: hidden;
         }
+        #variant-status.active { visibility: visible; animation: blink 0.7s infinite; }
         #game-container.oneshot-active { border-color: var(--error); border-top-color: var(--error); box-shadow: 0 0 40px rgba(231,76,60,0.18), 0 2px 10px rgba(100,20,20,0.1), inset 0 1px 0 rgba(231,76,60,0.1); }
         #game-container.oneshot-active #scope-container { border-color: #7a3a2e; }
 

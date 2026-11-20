@@ -490,16 +490,27 @@ function selectGameVariant(variant) {
 }
 
 // ── プレイ中のモード別ステータス表示（正確重視: やり直し回数） ───────────────────────
+// 正確重視モード以外では行自体を完全に非表示にしスペースも取らない(display:none)。
+// 正確重視モードでは、ミスでテキストが出たり消えたりしても画面全体のレイアウトが
+// 動かないよう、常に同じ高さのスペースを確保したまま visibility のみを切り替える
+// (displayは切り替えない。高さはCSS側の#variant-statusのmin-heightで確保)。
 function updateVariantStatusUI() {
     const el = document.getElementById('variant-status');
     if (!el) return;
-    if (gameVariant !== 'ACCURACY' || accuracyResetCount <= 0) {
+    if (gameVariant !== 'ACCURACY') {
         el.classList.add('hidden');
+        el.classList.remove('active');
         el.textContent = '';
         return;
     }
     el.classList.remove('hidden');
-    el.textContent = t('accuracyResetLabel', accuracyResetCount);
+    if (accuracyResetCount <= 0) {
+        el.classList.remove('active');
+        el.textContent = '';
+    } else {
+        el.classList.add('active');
+        el.textContent = t('accuracyResetLabel', accuracyResetCount);
+    }
 }
 
 // キーラベルを、実物のキー形状に近いアイコンで描画する（Space＝横長の長方形、それ以外＝正方形）
@@ -714,7 +725,9 @@ function startWordTimer(word) {
 function handleWordTimeout() {
     wordTimeoutTimer = null;
     wordsMissed++;
-    const txArea = document.getElementById('tx-area');
+    // 枠の点滅(.flash-error)は、実際に境界線が見える#tx-word-display(お題表示の枠)に対して行う。
+    // #tx-areaは枠を持たないラッパーdivのため、従来はここに点滅クラスを付けても見た目上何も起きていなかった。
+    const txArea = document.getElementById('tx-word-display');
     if (txArea) {
         txArea.classList.remove('flash-correct');
         txArea.classList.add('flash-error');
@@ -853,9 +866,11 @@ function nextTxWord() {
     // 次の単語に進む際、前の単語で表示されていた「正確重視」のミス表示（赤点滅）を消す。
     // ※やり直し回数(accuracyResetCount)自体はリセットしない。表示だけ毎単語クリアし、
     //   その単語でまたミスした場合に再度表示される。
+    // (displayではなくvisibilityのみ切り替え、画面全体のレイアウトが動かないようにする。
+    //  NORMAL/ONESHOTモードでは元々display:noneのままなのでここでは何も変わらない。)
     const variantStatusEl = document.getElementById('variant-status');
     if (variantStatusEl) {
-        variantStatusEl.classList.add('hidden');
+        variantStatusEl.classList.remove('active');
         variantStatusEl.textContent = '';
     }
     const raw = pickCurrentWord();
@@ -1116,7 +1131,10 @@ function decodeTxChar() {
 
 function evaluateTxChar(decoded) {
     const expected = txWord[txCharIndex];
-    const txArea   = document.getElementById('tx-area');
+    // 枠の点滅(.flash-error/.flash-correct)は、実際に境界線が見える#tx-word-display
+    // (お題表示の枠)に対して行う。#tx-areaは枠を持たないラッパーdivのため、
+    // 従来はここに点滅クラスを付けても見た目上何も起きていなかった。
+    const txArea   = document.getElementById('tx-word-display');
     // コールサイン+ナンバーのコンテストナンバー部分のみ、カットナンバーも正解として許容する
     // (送信モードと同じ挙動。コールサイン部分や「身近な単語」カテゴリでは対象外)
     const cutAlts = (wordCategory === 'CALLSIGN' && !asobiCurrentIsCallsign && CUT_NUMBER_ACCEPT[expected]) || [];
