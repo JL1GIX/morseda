@@ -453,6 +453,11 @@ let highlightSearchToken = 0;
 
 function updateNavLinks() {
     const qs = `?wordcat=${currentWordCat}&variant=${currentVariant}&time=${currentMinutes}`;
+    // 送信・受信モードのランキングへ移動する際も、今選んでいる制限時間(currentMinutes)を
+    // 引き継ぐ。送受信側はモード(RX/TX)以外の状態をこちらから受け取る仕組みが無いため、
+    // timeだけをクエリに付与する(モードはR/Tショートカット操作時のみ明示的に指定される)。
+    const rxtxLink = document.getElementById('nav-rxtx-link');
+    if (rxtxLink) rxtxLink.href = rxtxLink.getAttribute('href').split('?')[0] + `?time=${currentMinutes}`;
     const todayLink = document.getElementById('nav-today-link');
     if (todayLink) todayLink.href = '/ranking-asobi-today-en.html' + qs;
     const yesterdayLink = document.getElementById('nav-yesterday-link');
@@ -722,7 +727,9 @@ document.addEventListener('keydown', (e) => {
         const link = document.getElementById('nav-rxtx-link');
         if (link) {
             const mode = (k === 'R') ? 'RX' : 'TX';
-            location.href = link.getAttribute('href') + `?mode=${mode}&time=${currentMinutes}`;
+            // href は updateNavLinks() 側で既に ?time=... 付きに更新されている場合があるため、
+            // クエリ部分を一旦取り除いてから組み立て直す(?が二重になるのを防ぐ)。
+            location.href = link.getAttribute('href').split('?')[0] + `?mode=${mode}&time=${currentMinutes}`;
         }
     }
 });

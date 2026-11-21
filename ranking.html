@@ -558,6 +558,11 @@ function saveRankingTabState() {
 // リロード時にinitの初期化処理がこのURLを読み直すため、選択中のタブを保ったままリロードできる。
 function updateNavLinkHrefs() {
     const qs = `?mode=${currentMode}&time=${currentMinutes}`;
+    // お遊びモードのランキングへ移動する際も、今選んでいる制限時間(currentMinutes)を
+    // 引き継ぐ。お遊びランキング側は時間以外(単語種別・プレイスタイル)の状態をこちらから
+    // 受け取る仕組みが無いため、timeだけをクエリに付与する。
+    const asobiLink = document.getElementById('nav-asobi-link');
+    if (asobiLink) asobiLink.href = asobiLink.getAttribute('href').split('?')[0] + `?time=${currentMinutes}`;
     const todayLink = document.getElementById('nav-today-link');
     if (todayLink) todayLink.href = 'ranking-today.html' + qs;
     const yesterdayLink = document.getElementById('nav-yesterday-link');
@@ -669,11 +674,11 @@ document.addEventListener('keydown', (e) => {
     } else if (k === 'G') {
         e.preventDefault();
         const link = document.getElementById('nav-asobi-link');
-        if (link) location.href = link.getAttribute('href') + '?wordcat=GENERAL';
+        if (link) location.href = link.getAttribute('href').split('?')[0] + `?wordcat=GENERAL&time=${currentMinutes}`;
     } else if (k === 'C') {
         e.preventDefault();
         const link = document.getElementById('nav-asobi-link');
-        if (link) location.href = link.getAttribute('href') + '?wordcat=CALLSIGN';
+        if (link) location.href = link.getAttribute('href').split('?')[0] + `?wordcat=CALLSIGN&time=${currentMinutes}`;
     }
 });
 </script>
