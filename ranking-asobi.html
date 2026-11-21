@@ -382,7 +382,6 @@
 
     <div class="ranking-nav-links">
         <a id="nav-today-link" href="ranking-asobi-today.html">📅 今日のランキング</a>
-        <a id="nav-yesterday-link" href="ranking-asobi-yesterday.html">📅 昨日のランキング</a>
         <a id="nav-rxtx-link" href="ranking.html">📡 送信・受信モードのランキング</a>
     </div>
 
@@ -462,8 +461,6 @@ function updateNavLinks() {
     if (rxtxLink) rxtxLink.href = rxtxLink.getAttribute('href').split('?')[0] + `?time=${currentMinutes}`;
     const todayLink = document.getElementById('nav-today-link');
     if (todayLink) todayLink.href = 'ranking-asobi-today.html' + qs;
-    const yesterdayLink = document.getElementById('nav-yesterday-link');
-    if (yesterdayLink) yesterdayLink.href = 'ranking-asobi-yesterday.html' + qs;
     // 現在選択中のタブをURLのクエリ文字列にも反映する。リロード時に下の初期化処理が
     // このURLを読み直すため、選択中のタブを保ったままリロードできる。
     history.replaceState(null, '', window.location.pathname + qs);

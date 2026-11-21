@@ -671,7 +671,6 @@ let wordCategory = 'GENERAL';
 let gameVariant = 'NORMAL';
 let accuracyResetCount = 0; // 正確重視モードでの「やり直し」回数
 let totalCorrectKeys = 0; // 正確率計算用：ACCURACYモードのスコア巻き戻しの影響を受けない、ノーミス入力の総数
-let wordStartScore = 0; // 普通/正確重視モード: 現在の単語に入った時点のscore（タイムアウト判定・正確重視のリセットで使用）
 let oneShotEliminated = false; // 一発勝負モードで脱落したか
 
 // ── 単語ごとの制限時間（Sメーター風シグナルバーが尽きるとアウト） ──────────────────────
@@ -860,9 +859,6 @@ function startTxGame() {
 }
 
 function nextTxWord() {
-    // 次の単語に入る時点のscoreを記録しておく（正確重視でのミス・リセット時に、この単語で
-    // 稼いだ分だけを巻き戻すために使う）
-    wordStartScore = score;
     // 次の単語に進む際、前の単語で表示されていた「正確重視」のミス表示（赤点滅）を消す。
     // ※やり直し回数(accuracyResetCount)自体はリセットしない。表示だけ毎単語クリアし、
     //   その単語でまたミスした場合に再度表示される。
@@ -1175,15 +1171,9 @@ function evaluateTxChar(decoded) {
             return;
         }
         if (gameVariant === 'ACCURACY') {
-            // 正確重視: ミスしたらその単語の最初からやり直し。
-            // 非初心者モードに限り、この単語内で既に稼いでいた得点も単語に入った時点のscoreまで
-            // 巻き戻す（例: 70点の状態で「BLOOM」のBLOOまで打ててもMでミスしたら、74点ではなく
-            // 70点からやり直し）。初心者モードの挙動はこれまで通り変更しない。
+            // 正確重視: ミスしたらその単語の最初からやり直し。得点は巻き戻さない
+            // (ミスまでに稼いだ分もそのまま保持する)。
             accuracyResetCount++;
-            if (!beginnerMode) {
-                score = wordStartScore;
-                document.getElementById('score').innerText = score;
-            }
             updateVariantStatusUI();
             txCharIndex = 0;
             updateTxDisplay();

@@ -379,7 +379,6 @@
 
     <div class="ranking-nav-links">
         <a id="nav-alltime-link" href="ranking.html">🏆 全期間ランキング</a>
-        <a id="nav-yesterday-link" href="ranking-yesterday.html">📅 昨日のランキング</a>
         <a id="nav-asobi-link" href="ranking-asobi-today.html">🎮 お遊びモードのランキング</a>
     </div>
 
@@ -596,8 +595,6 @@ function updateNavLinkHrefs() {
     if (asobiLink) asobiLink.href = asobiLink.getAttribute('href').split('?')[0] + `?time=${currentMinutes}`;
     const alltimeLink = document.getElementById('nav-alltime-link');
     if (alltimeLink) alltimeLink.href = 'ranking.html' + qs;
-    const yesterdayLink = document.getElementById('nav-yesterday-link');
-    if (yesterdayLink) yesterdayLink.href = 'ranking-yesterday.html' + qs;
 }
 
 function updateUrlState() {

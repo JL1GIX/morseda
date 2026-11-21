@@ -362,7 +362,6 @@
 
     <div class="ranking-nav-links">
         <a id="nav-today-link" href="ranking-today-en.html">📅 Today's Ranking</a>
-        <a id="nav-yesterday-link" href="ranking-yesterday-en.html">📅 Yesterday's Ranking</a>
         <a id="nav-asobi-link" href="/ranking-asobi-en.html">🎮 Fun Mode Ranking</a>
     </div>
 
@@ -566,8 +565,6 @@ function updateNavLinkHrefs() {
     if (asobiLink) asobiLink.href = asobiLink.getAttribute('href').split('?')[0] + `?time=${currentMinutes}`;
     const todayLink = document.getElementById('nav-today-link');
     if (todayLink) todayLink.href = 'ranking-today-en.html' + qs;
-    const yesterdayLink = document.getElementById('nav-yesterday-link');
-    if (yesterdayLink) yesterdayLink.href = 'ranking-yesterday-en.html' + qs;
 }
 
 function updateUrlState() {
