@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>お遊びモード ランキング - モールス打</title>
-    <meta name="description" content="モールス打お遊びモードのスコアランキング。単語種別（身近な単語・コールサイン+コンテストナンバー）×プレイスタイル（普通・正確重視・一発勝負）×制限時間（1分・3分・5分）で順位を確認できます。">
+    <meta name="description" content="モールス打お遊びモードのスコアランキング。単語種別（身近な単語・コールサイン+コンテストナンバー）×プレイスタイル（普通・一発勝負）×制限時間（1分・3分・5分）で順位を確認できます。">
     <meta property="og:title" content="お遊びモード ランキング - モールス打">
     <meta property="og:description" content="モールス打お遊びモードのスコアランキング。単語種別×プレイスタイル×制限時間で順位を確認できます。">
     <meta property="og:url" content="https://jl1gix.com/ranking-asobi.html">
@@ -369,7 +369,6 @@
     <div class="mode-tabs-label">▸ プレイスタイル</div>
     <div class="mode-tabs" id="variant-tabs">
         <button class="mode-tab active" id="tab-var-normal" onclick="switchVariant('NORMAL')">普通</button>
-        <button class="mode-tab" id="tab-var-accuracy" onclick="switchVariant('ACCURACY')">正確重視</button>
         <button class="mode-tab" id="tab-var-oneshot" onclick="switchVariant('ONESHOT')">一発勝負</button>
     </div>
 
@@ -428,14 +427,14 @@ function parseServerTime(s) {
     if (/[Zz]|[+-]\d{2}:?\d{2}$/.test(t)) return new Date(t);
     return new Date(t.replace(' ', 'T') + 'Z');
 }
-// 単語種別(wordCategory) × プレイスタイル(gameVariant) の組み合わせ(計6通り)ごとの、
+// 単語種別(wordCategory) × プレイスタイル(gameVariant) の組み合わせ(計4通り)ごとの、
 // 得点登録用バックエンドmode値。asobi.js の ASOBI_MODE_TABLE と対応させること。
+// (正確重視モードは撤廃済み。ASOBI_GEN_ACC/ASOBI_CALL_ACCは過去の記録を
+//  引き続き閲覧できるよう、バックエンド上の値としてのみ残っている)
 const ASOBI_MODE_TABLE = {
     'GENERAL_NORMAL':   'ASOBI',
-    'GENERAL_ACCURACY': 'ASOBI_GEN_ACC',
     'GENERAL_ONESHOT':  'ASOBI_GEN_ONE',
     'CALLSIGN_NORMAL':  'ASOBI_CALL_NORM',
-    'CALLSIGN_ACCURACY':'ASOBI_CALL_ACC',
     'CALLSIGN_ONESHOT': 'ASOBI_CALL_ONE',
 };
 function computeMode(wc, variant) {
@@ -617,7 +616,6 @@ function switchWordCat(wc) {
 function switchVariant(variant) {
     currentVariant = variant;
     document.getElementById('tab-var-normal').classList.toggle('active', variant === 'NORMAL');
-    document.getElementById('tab-var-accuracy').classList.toggle('active', variant === 'ACCURACY');
     document.getElementById('tab-var-oneshot').classList.toggle('active', variant === 'ONESHOT');
     currentPage = 1;
     highlightSearchToken++; // 手動でタブを切り替えたら裏の自動探索は打ち切る
@@ -667,15 +665,14 @@ function changePage(delta) {
     const isReturning = isReturningVisit();
     if (wc === 'GENERAL' || wc === 'CALLSIGN') currentWordCat = wc;
     else if (isReturning && (savedWc === 'GENERAL' || savedWc === 'CALLSIGN')) currentWordCat = savedWc;
-    if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(variant)) currentVariant = variant;
-    else if (isReturning && ['NORMAL', 'ACCURACY', 'ONESHOT'].includes(savedVariant)) currentVariant = savedVariant;
+    if (['NORMAL', 'ONESHOT'].includes(variant)) currentVariant = variant;
+    else if (isReturning && ['NORMAL', 'ONESHOT'].includes(savedVariant)) currentVariant = savedVariant;
     if ([1, 3, 5].includes(timeParam)) currentMinutes = timeParam;
     else if (isReturning && [1, 3, 5].includes(savedTime)) currentMinutes = savedTime;
 
     document.getElementById('tab-wc-general').classList.toggle('active', currentWordCat === 'GENERAL');
     document.getElementById('tab-wc-callsign').classList.toggle('active', currentWordCat === 'CALLSIGN');
     document.getElementById('tab-var-normal').classList.toggle('active', currentVariant === 'NORMAL');
-    document.getElementById('tab-var-accuracy').classList.toggle('active', currentVariant === 'ACCURACY');
     document.getElementById('tab-var-oneshot').classList.toggle('active', currentVariant === 'ONESHOT');
     [1, 3, 5].forEach(m => {
         document.getElementById(`tab-${m}`).classList.toggle('active', m === currentMinutes);
@@ -689,7 +686,7 @@ function changePage(delta) {
 
 // ── キーボードショートカット ──────────────────────────────────────────────
 // Escキー（Morse Boardの場合はクエスチョン・・－－・・打鍵でも同じ）でモールス打のトップ画面へ戻る。
-// 1/3/5キーで制限時間タブ、N/A/Oキーでプレイスタイルタブ（普通/正確重視/一発勝負）、
+// 1/3/5キーで制限時間タブ、N/Oキーでプレイスタイルタブ（普通/一発勝負）、
 // G/Cキーで単語種別タブ（身近な単語/コールサイン+コンテストナンバー）を切り替え、R・Tキーは
 // どちらを押しても送信・受信モードのランキングページへ移動する（Morse Boardで対応する符号を
 // 打鍵した場合も同じキー入力として届くため、そのまま同じ条件で反応する）。タブ切り替えは既存の
@@ -709,9 +706,6 @@ document.addEventListener('keydown', (e) => {
     } else if (k === 'N') {
         e.preventDefault();
         switchVariant('NORMAL');
-    } else if (k === 'A') {
-        e.preventDefault();
-        switchVariant('ACCURACY');
     } else if (k === 'O') {
         e.preventDefault();
         switchVariant('ONESHOT');
@@ -749,7 +743,7 @@ document.addEventListener('keydown', (e) => {
     <a href="/morse-table.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 モールス符号表</a>
     <a href="/free.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">📝 フリー入力モード</a>
     <h3 style="color:#eef7f2;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ その他</h3>
-    <a href="/morse-board.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎹 Morse Boardについて</a>
+    <a href="/morse-board.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">🕹️ Morse Boardについて</a>
     <a href="/profile.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 運営者情報</a>
     <a href="/privacy.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 プライバシー</a>
     <a href="/contact.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ お問い合わせ</a>

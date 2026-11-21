@@ -836,16 +836,6 @@
         .mode-tabs-label { font-size: 0.64rem; color: var(--text-secondary); letter-spacing: 2px; margin: 10px 0 6px; opacity: 0.85; text-align: left; }
         .settings-grid.no-time #wpm-setting-item { grid-column: 1 / -1; }
 
-        /* In-game status for the current variant (Accuracy Focus: restart count).
-           During Accuracy Focus mode, reserve the same height whether or not text is
-           shown (min-height) and toggle only visibility (not display), so showing/hiding
-           this line never shifts the rest of the screen layout. */
-        #variant-status {
-            font-size: 0.68rem; letter-spacing: 1px; color: var(--error); text-align: center;
-            margin-bottom: 8px; text-shadow: none;
-            min-height: 1.3em; visibility: hidden;
-        }
-        #variant-status.active { visibility: visible; animation: blink 0.7s infinite; }
         #game-container.oneshot-active { border-color: var(--error); border-top-color: var(--error); box-shadow: 0 0 40px rgba(231,76,60,0.18), 0 2px 10px rgba(100,20,20,0.1), inset 0 1px 0 rgba(231,76,60,0.1); }
         #game-container.oneshot-active #scope-container { border-color: #7a3a2e; }
 
@@ -920,7 +910,6 @@
             #game-container { padding: 10px 20px 12px; margin: 4px 0 10px; }
             .signal-indicators { margin-bottom: 6px; }
             #game-key-assign-row { margin-bottom: 6px; }
-            #variant-status { margin-bottom: 6px; }
             .stats { margin-bottom: 6px; padding: 6px 15px; }
             #scope-container { margin-bottom: 6px; }
             #scope-canvas { height: 95px; }
@@ -978,7 +967,6 @@
             <div class="mode-tabs-label">▸ Play Style</div>
             <div class="mode-tabs" id="variant-tabs">
                 <button class="mode-tab active" id="var-normal" onclick="selectGameVariant('NORMAL')">Normal</button>
-                <button class="mode-tab" id="var-accuracy" onclick="selectGameVariant('ACCURACY')">Accuracy Focus</button>
                 <button class="mode-tab" id="var-oneshot" onclick="selectGameVariant('ONESHOT')">One Shot</button>
             </div>
             <!-- モード説明 + キー設定ボタン -->
@@ -1046,7 +1034,6 @@
             <div class="sig-dot active blink-active" id="sig4"></div>
         </div>
         <div id="game-key-assign-row"></div>
-        <div id="variant-status" class="hidden"></div>
         <div class="stats">
             <div class="stat-item">
                 <span class="stat-label">▸ TIME</span>
@@ -1223,7 +1210,7 @@
     <a href="/morse-table-en.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 Morse Code Table</a>
     <a href="/free-en.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">📝 Free Input Mode</a>
     <h3 style="color:#eef7f2;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.9;">▸ Other</h3>
-    <a href="/morse-board-en.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">🎹 About Morse Board</a>
+    <a href="/morse-board-en.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">🕹️ About Morse Board</a>
     <a href="/profile-en.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 About</a>
     <a href="/privacy-en.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔒 Privacy</a>
     <a href="/contact-en.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">✉ Contact</a>

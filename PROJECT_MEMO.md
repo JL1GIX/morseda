@@ -723,4 +723,50 @@ Playwrightで、正確重視モード・非初心者モードを想定した状�
 
 ---
 
-_最終更新: 2026-11-21（お問い合わせフォームを、収集用メールアドレスを変更した新しいGoogleフォームへ差し替え。詳細は18章）_
+
+## 19. Morse Board絵文字の変更（🎹→🕹️）、お遊びモード「正確重視」プレイスタイルの完全撤廃 (2026-11)
+
+熊谷さんより以下2点の依頼があった。
+
+> Morse Boardの絵文字はこれで→🕹️
+>
+> あと、正確重視モード削除で、htmlファイルも完全に削除しちゃっていいし、ランキングも全部データ削除しちゃっていい。また正確重視に関するショートカットも含めて全部削除しちゃってok
+
+### 19.1 Morse Board絵文字を🎹→🕹️に変更
+
+ハンバーガーメニュー内の「🎹 Morse Boardについて」/「🎹 About Morse Board」リンクで使われていた🎹（ピアノ）の絵文字を、指定された🕹️（ジョイスティック）に差し替えた。対象は全31ファイル（各ファイルにつき1箇所のみ使用されていたことを確認済み）：404.html、asobi.html/-en、contact.html/-en、free.html/-en、how-to-use.html/-en、index.html/-en、morse-board.html/-en、morse-table.html/-en、privacy.html/-en、profile.html/-en、ranking-asobi.html/-en/-today/-today-en、ranking.html/-en/-today/-today-en、rx.html/-en、tx.html/-en。
+
+### 19.2 お遊びモード「正確重視」プレイスタイルの完全撤廃
+
+事前にAskUserQuestionで意図を確認し、「正確重視」をプレイスタイルの選択肢自体から完全に削除してお遊びモードのプレイスタイルを「普通」「一発勝負」の2通り（従来の3通りから変更）にすること、またバックエンド(api.jl1gix.com)に蓄積された正確重視モードのランキングデータ（mode値 ASOBI_GEN_ACC / ASOBI_CALL_ACC）についても、熊谷さんご自身がバックエンドへのアクセス手段をお持ちであることを確認した。
+
+#### フロントエンド側の対応内容
+
+- `asobi.js`:
+  - プレイスタイル選択UI（`selectGameVariant()`）から`var-accuracy`タブのトグル処理を削除。
+  - `updateVariantStatusUI()`関数（「↺ やり直し ◯回」表示を切り替えていた専用関数）、および呼び出し元（`nextTxWord()`内の`#variant-status`クリア処理、`quitGame()`内のリセット処理）を削除。
+  - ミス処理(`evaluateTxChar()`)のACCURACY分岐（単語の最初からやり直しにする処理）を削除。
+  - 得点登録用`ASOBI_MODE_TABLE`から`GENERAL_ACCURACY`/`CALLSIGN_ACCURACY`の2エントリを削除（6通り→4通り）。過去の記録と対応する値`ASOBI_GEN_ACC`/`ASOBI_CALL_ACC`自体は、バックエンド側の履歴に紐づく値のため、コメントでその旨を明記した上でテーブルからは除外した。
+  - URLパラメータ/localStorageからのプレイスタイル復元処理、`gameVariant`の型コメント、`accuracyResetCount`変数なども併せて除去。
+  - i18n文字列(`variantPrefix_ACCURACY`、`accuracyResetLabel`)を削除。
+  - 他モードと共通の挙動を説明していたコメント（「普通/正確重視/一発勝負のいずれも...」）も、該当箇所（QSB警告文、QSBタイムアウト時の即終了処理）で「普通/一発勝負」に修正。
+- `asobi.html`/`asobi-en.html`: プレイスタイルタブから「正確重視」ボタンを削除し、「↺ やり直し」表示用の`#variant-status`のCSS・HTML要素を削除。
+- `ranking-asobi.html`/`-en`/`-today`/`-today-en`（計4ファイル）: タブボタン`tab-var-accuracy`、`switchVariant()`・初期化処理内のトグル行、キーボードショートカット（Aキー）の分岐、ページ内に重複して持っていた`ASOBI_MODE_TABLE`のACCURACY2エントリを削除。`ranking-asobi.html`/`-en`のmeta descriptionからも「正確重視」/「Accuracy Focus」の記述を削除。
+- `how-to-use.html`/`how-to-use-en.html`: プレイスタイル説明の「正確重視」項目、キーボードショートカット表の「Aキー→正確重視タブ」行を削除。
+
+#### 確認
+
+全編集後、`node --check`でJS構文エラーがないことを確認。さらにクラウド側サンドボックスにPlaywrightを用いて以下を確認した。
+
+- `asobi.html`/`-en`：`#var-accuracy`タブ・`#variant-status`要素が存在しないこと、`#var-normal`/`#var-oneshot`タブは健在で`selectGameVariant()`が正しくクラス切り替えすること。
+- `ranking-asobi*.html`（4ファイル）：`#tab-var-accuracy`が存在しないこと、残り4通りの組み合わせで`computeMode()`が正しいmode値（ASOBI / ASOBI_GEN_ONE / ASOBI_CALL_NORM / ASOBI_CALL_ONE）を返すこと、`switchVariant()`が普通/一発勝負で正しく動作すること、Aキーを押しても新たなJSエラーが発生しないこと（各ページで検出された1件のネットワークエラーは`api.jl1gix.com`への接続がこのサンドボックスから到達できないことによるもので、今回の修正とは無関係の既知の制約）。
+- `how-to-use.html`/`-en`：「正確重視」「Accuracy Focus」の文字列がページ内に一切残っていないこと。
+- 全31ファイルで絵文字が🕹️に統一され、🎹が一切残っていないこと。
+
+#### 未対応・保留事項
+
+バックエンド(api.jl1gix.com)に残る正確重視モードの過去スコアデータ（ASOBI_GEN_ACC / ASOBI_CALL_ACC）の削除は、このリポジトリの範囲外（別システム）のため、今回の対応には含まれていない。熊谷さんがお持ちのバックエンドアクセス手段で別途対応いただくか、具体的な手順について追って相談する想定。
+
+---
+
+_最終更新: 2026-11-21（Morse Board絵文字を🕹️に変更。お遊びモードの「正確重視」プレイスタイルを完全撤廃（UIは普通/一発勝負の2通りに）。詳細は19章）_
