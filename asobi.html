@@ -840,16 +840,6 @@
         .mode-tabs-label { font-size: 0.64rem; color: var(--text-secondary); letter-spacing: 2px; margin: 10px 0 6px; opacity: 0.85; text-align: left; }
         .settings-grid.no-time #wpm-setting-item { grid-column: 1 / -1; }
 
-        /* プレイ中のモード別ステータス表示（正確重視: やり直し回数）。
-           正確重視モード中は、表示/非表示の切り替えで画面全体のレイアウトが動かないよう、
-           テキストの有無に関わらず常に同じ高さのスペースを確保し(min-height)、
-           visibilityのみを切り替える(displayは切り替えない)。 */
-        #variant-status {
-            font-size: 0.68rem; letter-spacing: 1px; color: var(--error); text-align: center;
-            margin-bottom: 8px; text-shadow: none;
-            min-height: 1.3em; visibility: hidden;
-        }
-        #variant-status.active { visibility: visible; animation: blink 0.7s infinite; }
         #game-container.oneshot-active { border-color: var(--error); border-top-color: var(--error); box-shadow: 0 0 40px rgba(231,76,60,0.18), 0 2px 10px rgba(100,20,20,0.1), inset 0 1px 0 rgba(231,76,60,0.1); }
         #game-container.oneshot-active #scope-container { border-color: #7a3a2e; }
 
@@ -923,7 +913,6 @@
             #game-container { padding: 10px 20px 12px; margin: 4px 0 10px; }
             .signal-indicators { margin-bottom: 6px; }
             #game-key-assign-row { margin-bottom: 6px; }
-            #variant-status { margin-bottom: 6px; }
             .stats { margin-bottom: 6px; padding: 6px 15px; }
             #scope-container { margin-bottom: 6px; }
             #scope-canvas { height: 95px; }
@@ -980,7 +969,6 @@
             <div class="mode-tabs-label">▸ プレイスタイル</div>
             <div class="mode-tabs" id="variant-tabs">
                 <button class="mode-tab active" id="var-normal" onclick="selectGameVariant('NORMAL')">普通</button>
-                <button class="mode-tab" id="var-accuracy" onclick="selectGameVariant('ACCURACY')">正確重視</button>
                 <button class="mode-tab" id="var-oneshot" onclick="selectGameVariant('ONESHOT')">一発勝負</button>
             </div>
             <!-- モード説明 + キー設定ボタン -->
@@ -1048,7 +1036,6 @@
             <div class="sig-dot active blink-active" id="sig4"></div>
         </div>
         <div id="game-key-assign-row"></div>
-        <div id="variant-status" class="hidden"></div>
         <div class="stats">
             <div class="stat-item">
                 <span class="stat-label">▸ TIME</span>
