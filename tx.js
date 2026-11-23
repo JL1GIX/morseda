@@ -291,13 +291,12 @@ document.addEventListener('keydown', (e) => {
 
     // プレイ中: Escキーで強制的にロビーへ戻る（送信モード・フリー入力モード共通）
     // ※Escは制御キーなので、入力欄にフォーカスがあっても常に有効にする
-    // ※free.html（フリー入力モード単体ページ）のみ、？打鍵（Morse Board）でも同様に扱う
+    // ※Morse Boardモードでプレイ中は、？打鍵（・・－－・・）でも同様に扱う
     //   （quitFreeMode()側でFREE_STANDALONE時はトップ画面へ遷移するよう分岐済み）
-    const freeStandalonePage = typeof FREE_STANDALONE !== 'undefined' && FREE_STANDALONE;
-    if ((e.code === 'Escape' || (freeStandalonePage && e.key === '?')) && isPlaying) {
+    if ((e.code === 'Escape' || (!typing && morseBoardMode && e.key === '?')) && isPlaying) {
         const gameScreen = document.getElementById('game-screen');
         const freeScreen = document.getElementById('free-screen');
-        if (e.code === 'Escape' && gameScreen && !gameScreen.classList.contains('hidden')) {
+        if (gameScreen && !gameScreen.classList.contains('hidden')) {
             e.preventDefault();
             quitGame();
             return;

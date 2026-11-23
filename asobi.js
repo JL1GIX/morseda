@@ -307,7 +307,8 @@ document.addEventListener('keydown', (e) => {
 
     // プレイ中: Escキーで強制的にロビーへ戻る（送信モード・フリー入力モード共通）
     // ※Escは制御キーなので、入力欄にフォーカスがあっても常に有効にする
-    if (e.code === 'Escape' && isPlaying) {
+    // ※Morse Boardモードでプレイ中は、？打鍵（・・－－・・）でも同様に扱う
+    if ((e.code === 'Escape' || (!typing && morseBoardMode && e.key === '?')) && isPlaying) {
         const gameScreen = document.getElementById('game-screen');
         const freeScreen = document.getElementById('free-screen');
         if (gameScreen && !gameScreen.classList.contains('hidden')) {
