@@ -1176,16 +1176,14 @@ function evaluateTxChar(decoded) {
         }
         if (gameVariant === 'ACCURACY') {
             // 正確重視: ミスしたらその単語の最初からやり直し。得点は巻き戻さない
-            // (ミスまでに稼いだ分もそのまま保持する)。
-            // 単語ごとの制限時間(QSB)はミス前から継続しているとすぐ尽きてしまい、
-            // 「ミスしても単語をやり直せる」はずのモードが実質的に機能しなくなるため、
-            // やり直しの度にその単語の制限時間を満タンに戻す(ミス回数に関わらず、
-            // 1回1回のやり直しに単語本来の持ち時間をフルに与える)。
+            // (ミスまでに稼いだ分もそのまま保持する)。単語ごとの制限時間(QSB)は
+            // やり直しても延長・リセットしない(熊谷さんの指示により、24章での
+            // リセット処理は撤回。やり直しは自由にできるが、その単語全体に
+            // 与えられた持ち時間自体は最初の表示時点から変わらず進み続ける)。
             accuracyResetCount++;
             updateVariantStatusUI();
             txCharIndex = 0;
             updateTxDisplay();
-            startWordTimer(txWord.join(''));
             if (beginnerMode) updateTxBeginnerDisplay();
             document.getElementById('status-msg').innerText = `✗ RESTART: ${txWord.join('')}`;
             return;
