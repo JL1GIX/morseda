@@ -426,11 +426,14 @@ function updateTxModeDesc() {
 
 // ── 単語種別・プレイスタイル選択（ロビー画面） ───────────────────────────────────
 function applySelectorVisibility() {
-    const isOneShot = (gameVariant === 'ONESHOT');
+    // 正確重視・一発勝負は、いずれも非初心者モード専用（初心者モードと併用不可）。
+    // このいずれかが選ばれている間は初心者モードのチェックボックス自体を隠し、
+    // チェックが入っていれば強制的に外す。
+    const isAdvancedVariant = (gameVariant === 'ONESHOT' || gameVariant === 'ACCURACY');
     const beginnerCheck = document.getElementById('beginner-mode-check');
     const beginnerItem = beginnerCheck ? beginnerCheck.closest('.setting-item') : null;
-    if (beginnerItem) beginnerItem.classList.toggle('hidden', isOneShot);
-    if (isOneShot && beginnerCheck) beginnerCheck.checked = false;
+    if (beginnerItem) beginnerItem.classList.toggle('hidden', isAdvancedVariant);
+    if (isAdvancedVariant && beginnerCheck) beginnerCheck.checked = false;
 }
 // 新規訪問(リンクを踏んだ/URLを直接入力した)か、再訪問(リロード/戻る・進むボタン)かを判定する。
 // タブ保存されたローカル設定は再訪問時のみ復元し、新規訪問時は常にデフォルト設定から始める。
