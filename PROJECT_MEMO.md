@@ -790,6 +790,30 @@ Playwrightで、正確重視モード・非初心者モードを想定した状�
 - `free.html`：Morse BoardモードON時は？打鍵で終了（トップ画面へ遷移）、OFF時は？打鍵しても継続。
 
 
+## 22. 「正確重視」プレイスタイルの復活 (2026-11)
+
+20章で熊谷さんの明確な依頼により完全削除した「正確重視」プレイスタイルだが、改めて復活の依頼があった。
+
+> ごめん何度も申し訳ないんだけど、やっぱり正確重視モード復活させてほしい。
+> それに伴ったショートカット（ショートカット表の修正も含む）の復活も全部お願いします
+
+対応方針として、記憶やゼロからの再実装ではなく、20章で「正確重視」を最終削除したコミット`c707709`自体を`git revert`し、その直前の状態（19章で一度完全復元し、動作検証済みだった`38cee49`の状態）へ機械的に戻す方法を取った。これにより再実装時の実装揺れや考慮漏れを避けた。
+
+`git revert --no-commit c707709`を実行したところ、コード・HTML側の9ファイル（`asobi.js`・`asobi.html`・`asobi-en.html`・`ranking-asobi.html`・`ranking-asobi-en.html`・`ranking-asobi-today.html`・`ranking-asobi-today-en.html`・`how-to-use.html`・`how-to-use-en.html`）はすべて無衝突で自動マージされた。`PROJECT_MEMO.md`のみ、21章の追記など`c707709`以降の変更と競合したため、コンフリクトマーカーを手動で解消し、18〜21章の記録を含むHEAD側の内容を維持した上で本章を追記する形にした。
+
+復元された主な内容：
+
+- `asobi.js`：`gameVariant`に`'ACCURACY'`を復活（`NORMAL`/`ACCURACY`/`ONESHOT`の3択に）。ミス時に単語の先頭から打ち直しにする分岐、やり直し回数`accuracyResetCount`のカウントと「↺ やり直し ◯回」表示用の`updateVariantStatusUI()`、`ASOBI_MODE_TABLE`への`GENERAL_ACCURACY`(`ASOBI_GEN_ACC`)・`CALLSIGN_ACCURACY`(`ASOBI_CALL_ACC`)の復活。なお17章で削除したスコア巻き戻し（ミス時に得点を0に戻す仕様）は復活させておらず、19章時点と同じく「やり直し表示のみ・得点は巻き戻さない」仕様のまま。
+- `asobi.html`/`asobi-en.html`：プレイスタイルタブに「正確重視」/「Accuracy Focus」ボタン、やり直し回数表示用の`#variant-status`要素とレイアウトシフト防止CSS（15章の対応内容）を復活。
+- `ranking-asobi.html`/`-en`/`-today`/`-today-en`（計4ファイル）：プレイスタイルタブ・`ASOBI_MODE_TABLE`・URLパラメータ復元・`A`キー（Morse Board：・－打鍵）によるタブ切り替えショートカットを復活。
+- `how-to-use.html`/`-en.html`：「プレイスタイル」説明に「正確重視」/「Accuracy Focus」の項目を復活、ショートカット表に「A（Morse Board：・－打鍵）→正確重視タブへ切り替え」の行を復活。
+
+なお`ranking-asobi-yesterday.html`系のファイルはリポジトリ内に存在しないため、`c707709`の変更対象にも含まれておらず、今回の復元対象からも除外（確認済み・問題なし）。
+
+### 確認
+
+`node --check asobi.js`で構文エラーがないことを確認。`grep`で`updateVariantStatusUI`が1箇所で定義され3箇所から一貫して呼ばれていること（18章で発生した「関数削除後も呼び出しが残ってReferenceErrorになる」不具合と同種の問題が再発していないこと）を確認。9ファイルすべての差分を目視で確認し、`c707709`の削除内容を過不足なく正確に打ち消す内容になっていることを確認した。
+
 ---
 
-_最終更新: 2026-11-23（ショートカットキー表の見直し・修正。詳細は21章）_
+_最終更新: 2026-11-25（「正確重視」プレイスタイルの復活。詳細は22章）_
