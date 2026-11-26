@@ -62,8 +62,8 @@ const I18N = {
     setDoneBtn:    { ja: '✓ 設定済み', en: '✓ Done' },
     setFailAlert:  { ja: '設定に失敗しました。もう一度お試しください。', en: 'Failed to set name. Please try again.' },
     shareText: (minutes, score, words) => ({
-        ja: `【モールス打】お遊びモード\n${minutes}分間で${score}文字\n#モールス打 #アマチュア無線 #CW #モールス信号\nhttps://jl1gix.com`,
-        en: `[Morseda] Fun Mode\n${score} characters in ${minutes} min\n#Morseda #AmateurRadio #CW #MorseCode\nhttps://jl1gix.com/en/`
+        ja: `【モールス打】\nお遊びモード\n${minutes}分間で${score}文字\n#モールス打 #アマチュア無線 #CW #モールス信号\nhttps://jl1gix.com`,
+        en: `[Morseda]\nFun Mode\n${score} characters in ${minutes} min\n#Morseda #AmateurRadio #CW #MorseCode\nhttps://jl1gix.com/en/`
     }),
     registering:       { ja: '登録中...', en: 'Registering...' },
     registeringRetry:  (n) => ({ ja: `登録中... (再試行 ${n}/2)`, en: `Registering... (retry ${n}/2)` }),
