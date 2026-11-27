@@ -1058,4 +1058,60 @@ WPM初期値については`tx.html`/`asobi.html`/`free.html`/`rx.html`（ja/en�
 
 ---
 
-_最終更新: 2026-11-27（free.htmlリロード後に打鍵が完全無反応になる根本原因(AudioContext初期化の例外で以降の処理全体が止まる構造)を修正。詳細は34章）_
+## 35. free.html(標準単体のフリー入力モード画面)を全面削除し、Rキーでのリセットショートカットを追加 (2026-11)
+
+熊谷さんより依頼。
+
+> やっぱ全体的に以下のように修正お願いします
+>
+> free.html自体削除する。
+> ハンバーガーメニューやフッター、ホーム画面からも完全に削除し、htmlファイルも削除。ローカルもgithubもすべて。
+>
+> そして、送信モードロビーフリー入力モード及びお遊びモードロビーフリー入力モードに新ショートカットキーとして「R」で今まで売っていた文字のリセットをお願いします。
+> ほかのescでロビーに戻るとかは変えなくていいので。
+> そこのショートカットキーだけ追加して、ショートカット表の修正、またhow-to.htmlにも何か修正要素がある場合はそちらの方もよろしくお願いします。
+>
+> ちょっと作業量多いですがよろしくお願いします
+
+32〜34章で繰り返し修正してきた「free.html単体ページ」を、今回は丸ごと廃止する方針に切り替えた。送信モード・お遊びモードのロビー画面内にはFキー（またはボタン）から入れる「フリー入力モード」が元々それぞれ別に存在しており、単体の`free.html`はこの機能とほぼ重複する入口だったため、サイト構成をシンプルにする目的で削除した。
+
+### 削除内容
+
+- `free.html`・`free-en.html`本体を`git rm`で完全に削除（ローカル・リモート双方から）。
+- 全ページ共通のハンバーガーメニュー・フッターにあった「📝 フリー入力モード」／「Free Input Mode」リンクを、サイト内の対象ファイルすべて（404.html、index.html/-en.html、asobi.html/-en.html、contact.html/-en.html、morse-board.html/-en.html、morse-table.html/-en.html、privacy.html/-en.html、profile.html/-en.html、ranking.html/-en.html、ranking-today.html/-en.html、ranking-asobi.html/-en.html、ranking-asobi-today.html/-en.html、rx.html/-en.html、tx.html/-en.html、how-to-use.html/-en.html の計29ファイル）から機械的に除去した。既知の8パターン（ja/en×フッターリンク・メニューリンク・ホーム画面専用ボタン）に厳密一致する行だけを取り除くスクリプトを書いて適用し、各ファイルの除去件数（404.html=1、index系=3、その他26ファイル=各2）を想定通りであることを確認した。
+- ホーム画面（index.html/index-en.html）の「📝 フリー入力モード」特設ボタンも同様に削除。`index.js`のトップ画面キーボードショートカット（Fキーで`free.html`へ遷移する処理）も不要になったため削除した。
+- `tx.js`/`asobi.js`では、`free.html`だけが設定していた`FREE_STANDALONE`フラグを参照する分岐（ロビー画面Fキーショートカットのガード、および`quitFreeMode()`内の「トップ画面へ遷移」分岐）が、free.html削除後は二度と真にならない死んだコードになるため、あわせて削除・簡略化した（`tx.js`のみ該当。`asobi.js`には元々`FREE_STANDALONE`参照は無かった）。
+- 送信モード・お遊びモードのロビー画面内に残る「フリー入力モード」（`#free-screen`、`startFreeMode()`で入る機能自体）、および32〜34章で修正したリロード耐性・キー設定ボタンなどは、これらとは別物であり一切削除していない。
+
+### 追加内容: Rキーによるリセットショートカット
+
+送信モードロビー・お遊びモードロビーそれぞれのフリー入力モード画面（`#free-screen`）にて、プレイ中に「R」キーを押すと、画面上の「↺ RESET」ボタンと同じ処理（それまで打った文字のリセット）が実行されるショートカットを`tx.js`・`asobi.js`それぞれに追加した。
+
+```js
+// フリー入力画面(送信モード・お遊びモード共通)でプレイ中: Rキーでそれまで打った文字をリセットする
+// （RESETボタンと同じ処理。ロビーへ戻るEsc等、他のショートカットは変更しない）
+if (!typing && !_capturingFor && !kcModalOpen && e.key.toUpperCase() === 'R' && isPlaying) {
+    const freeScreenForReset = document.getElementById('free-screen');
+    if (freeScreenForReset && !freeScreenForReset.classList.contains('hidden')) {
+        e.preventDefault();
+        resetFreeMode();
+        return;
+    }
+}
+```
+
+依頼にあった通り、既存のEsc（ロビーへ戻る）やMorse Boardのクエスチョン打鍵など、他のショートカットには一切手を加えておらず、上記のRキー判定を独立した新しい`if`ブロックとして既存のEscブロックの直前に追加しただけに留めている。
+
+### how-to-use.html / how-to-use-en.html の修正
+
+- 「6. フリー入力モード」の説明文を、単体ページ・ホーム画面・メニュー・フッターへの言及を削除したうえで、送信モード・お遊びモードの設定画面から入る機能として書き直し。あわせて「⌨ キー設定」ボタン（画面内で短点・長点のキー割り当てを変更できる）と、新設の「↺ RESET」ボタン／Rキーについての説明を箇条書きに追加した。
+- ショートカット表から、削除済みの「トップ画面: F → free.htmlへ」の行を削除。
+- 「フリー入力モード画面」に関する行を、単体free.html向け（「トップ画面へ」）とロビー内フリー入力向け（「ロビー画面へ戻る」）に分かれていた計4行から、free.html相当がなくなったことで3行に整理（Esc／Morse Boardクエスチョン打鍵／新設のR行）。英語版(`how-to-use-en.html`)にも同内容を反映した。
+
+### 確認
+
+`node --check`で`tx.js`・`asobi.js`・`index.js`いずれも構文エラーがないことを確認。リポジトリ全体を`grep -rln "free\.html\|free-en\.html\|FREE_STANDALONE"`で検索し、ヒットが一件も無いことを確認した（`how-to-use.html`等に残る「フリー入力モード」という日本語テキスト自体は、現存するロビー内フリー入力機能を指す正しい記述であり問題なし）。
+
+---
+
+_最終更新: 2026-11-27（free.html(標準単体のフリー入力モード画面)を全面削除し、送信・お遊びモードロビー内のフリー入力モードにRキーでのリセットショートカットを追加。how-to-use.html/-en.htmlも更新。詳細は35章）_

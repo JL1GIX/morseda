@@ -219,9 +219,7 @@ document.addEventListener('keydown', (e) => {
             return;
         }
         // ロビー画面: Fキー（Morse BoardでFを打鍵した場合も同じキー入力として届く）でフリー入力モードへ
-        // ※free.html（フリー入力モード単体ページ）では元々ロビー画面を経由しないため対象外
-        if (!typing && !_capturingFor && e.key.toUpperCase() === 'F' &&
-            !(typeof FREE_STANDALONE !== 'undefined' && FREE_STANDALONE)) {
+        if (!typing && !_capturingFor && e.key.toUpperCase() === 'F') {
             e.preventDefault();
             startFreeMode();
             return;
@@ -290,10 +288,20 @@ document.addEventListener('keydown', (e) => {
         }
     }
 
+    // フリー入力画面(送信モード・お遊びモード共通)でプレイ中: Rキーでそれまで打った文字をリセットする
+    // （RESETボタンと同じ処理。ロビーへ戻るEsc等、他のショートカットは変更しない）
+    if (!typing && !_capturingFor && !kcModalOpen && e.key.toUpperCase() === 'R' && isPlaying) {
+        const freeScreenForReset = document.getElementById('free-screen');
+        if (freeScreenForReset && !freeScreenForReset.classList.contains('hidden')) {
+            e.preventDefault();
+            resetFreeMode();
+            return;
+        }
+    }
+
     // プレイ中: Escキーで強制的にロビーへ戻る（送信モード・フリー入力モード共通）
     // ※Escは制御キーなので、入力欄にフォーカスがあっても常に有効にする
     // ※Morse Boardモードでプレイ中は、？打鍵（・・－－・・）でも同様に扱う
-    //   （quitFreeMode()側でFREE_STANDALONE時はトップ画面へ遷移するよう分岐済み）
     if ((e.code === 'Escape' || (!typing && morseBoardMode && e.key === '?')) && isPlaying) {
         const gameScreen = document.getElementById('game-screen');
         const freeScreen = document.getElementById('free-screen');
@@ -777,11 +785,9 @@ function onTxKeyDown(e) {
     // キー設定モーダル表示中は、キャプチャ用のリスナー(onKeyCapture)に処理を一任する
     if (document.getElementById('key-customize-modal').classList.contains('open')) return;
     if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
-    // free.html(フリー入力モード単体ページ)はページ読み込み時に自動でフリー入力を開始するため、
-    // リロード時など「このページ内でのクリック等の操作」を経由していない場合、ブラウザの自動
-    // 再生ポリシーによりAudioContextのresume()が失敗し、無音のまま打鍵だけ反応してしまうことが
-    // ある。ここ(実際のキー入力＝本物のユーザー操作)で再度resume()を試みて、次の打鍵から音が
-    // 出るように回復させる。
+    // ブラウザの自動再生ポリシーによりAudioContextのresume()が失敗し、無音のまま打鍵だけ
+    // 反応してしまうことがある。ここ(実際のキー入力＝本物のユーザー操作)で再度resume()を
+    // 試みて、次の打鍵から音が出るように回復させる。
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     if (gameMode === 'TX' && morseBoardMode) {
         handleMorseBoardKey(e);
@@ -923,8 +929,6 @@ function cleanupTx() {
 function startFreeMode() {
     // 音声初期化(AudioContext関連)のどこかで例外が起きても、打鍵・デコード自体は
     // 必ず使えるようにする(音が出ないことはあっても、入力が完全に無反応にはならないようにする)。
-    // free.htmlはページ読み込み時にユーザー操作を介さず自動でここに入るため、ブラウザや
-    // 環境によっては自動再生ポリシー関連の処理が想定外の挙動になる可能性がある。
     let doResume = Promise.resolve();
     try {
         const AC = window.AudioContext || window.webkitAudioContext;
@@ -1042,12 +1046,6 @@ function resetFreeMode() {
 }
 
 function quitFreeMode() {
-    // free.html（フリー入力モード単体ページ）には戻る先のロビー画面が無いため、
-    // モールス打のトップ画面へ遷移する（QUITボタン・Esc・？打鍵のいずれも本関数経由）
-    if (typeof FREE_STANDALONE !== 'undefined' && FREE_STANDALONE) {
-        location.href = (LANG === 'en') ? '/index-en.html' : 'https://jl1gix.com';
-        return;
-    }
     isPlaying = false;
     setGameplayViewportLock(false);
     gameMode = 'TX';

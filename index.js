@@ -232,9 +232,6 @@ document.addEventListener('keydown', (e) => {
     } else if (key === 'G') {
         e.preventDefault();
         location.href = (lang === 'en') ? 'asobi-en.html' : 'asobi.html';
-    } else if (key === 'F') {
-        e.preventDefault();
-        location.href = (lang === 'en') ? 'free-en.html' : 'free.html';
     } else if (key === 'S') {
         // シークレットショートカット: ランキング(送信&受信)画面へ。
         // 使い方ページのショートカット一覧にのみ記載し、UI上には明示しない。

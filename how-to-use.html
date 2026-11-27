@@ -197,11 +197,13 @@
     </ul>
 
     <h2>6. フリー入力モード</h2>
-    <p>送信モード・お遊びモードの設定画面にある「📝 フリー入力モード」ボタン（またはFキー/Morse Board：・・－・打鍵）を使うと、そのモードの画面のまま自由に文字を打って音を確認できるモードに入れます。ホーム画面・ハンバーガーメニュー・フッターの「📝 フリー入力モード」リンクからは、専用ページ（free.html）として単体でも利用できます。</p>
+    <p>送信モード・お遊びモードの設定画面にある「📝 フリー入力モード」ボタン（またはFキー/Morse Board：・・－・打鍵）を使うと、そのモードの画面のまま自由に文字を打って音を確認できるモードに入れます。</p>
     <ul>
         <li>お題は表示されず、自分の打ちたい文字を自由に打鍵</li>
         <li>デコードされた文字がリアルタイムで画面に表示される</li>
         <li>打った符号(・−)も表示されるので、自分の打鍵が正しいか確認できる</li>
+        <li>画面上の「⌨ キー設定」ボタンから、フリー入力画面に入ったままでも短点・長点のキー割り当てを変更できる</li>
+        <li>「↺ RESET」ボタン（またはRキー）で、それまで打った文字をいつでもリセットできる</li>
     </ul>
     <p>実機の代わりに、打鍵の練習・トーンの確認・新しい文字の暗記に便利です。</p>
 
@@ -235,17 +237,15 @@
     <tr><td>トップ画面</td><td>R（Morse Board：・－・打鍵）</td><td>受信モードのロビー画面へ</td></tr>
     <tr><td>トップ画面</td><td>G（Morse Board：－－・打鍵）</td><td>お遊びモードのロビー画面へ</td></tr>
     <tr><td>トップ画面</td><td>S（Morse Board：・・・打鍵）</td><td>ランキング（送信&受信）画面へ</td></tr>
-    <tr><td>トップ画面</td><td>F（Morse Board：・・－・打鍵）</td><td>フリー入力モード（free.html）へ</td></tr>
     <tr><td>トップ画面</td><td>U（Morse Board：・・－打鍵）</td><td>使い方ページへ</td></tr>
     <tr><td>ロビー画面</td><td>A（Morse Board：・－打鍵）</td><td>ゲーム開始</td></tr>
     <tr><td>ロビー画面</td><td>Esc</td><td>モールス打のトップ画面へ</td></tr>
     <tr><td>ロビー画面（Morse Board）</td><td>クエスチョン打鍵（・・－－・・）</td><td>モールス打のトップ画面へ</td></tr>
     <tr><td>ロビー画面</td><td>S（Morse Boardの場合は・・・打鍵。送信・受信・お遊びモードのロビーで対応）</td><td>現在選択中のタブ状態（モード・制限時間。お遊びモードはさらに単語種別・プレイスタイルも）を保ったまま、そのモードのランキング画面へ</td></tr>
     <tr><td>ロビー画面（送信・お遊び）</td><td>F（Morse Board：・・－・打鍵）</td><td>フリー入力モードへ切り替え（ページ内）</td></tr>
-    <tr><td>フリー入力モード画面（free.html単体）</td><td>Esc</td><td>モールス打のトップ画面へ</td></tr>
-    <tr><td>フリー入力モード画面（free.html単体・Morse Board）</td><td>クエスチョン打鍵（・・－－・・）</td><td>モールス打のトップ画面へ</td></tr>
-    <tr><td>フリー入力モード画面（送信・お遊び内）</td><td>Esc</td><td>そのモードのロビー画面へ戻る</td></tr>
-    <tr><td>フリー入力モード画面（送信・お遊び内・Morse Board）</td><td>クエスチョン打鍵（・・－－・・）</td><td>そのモードのロビー画面へ戻る</td></tr>
+    <tr><td>フリー入力モード画面</td><td>Esc</td><td>そのモードのロビー画面へ戻る</td></tr>
+    <tr><td>フリー入力モード画面（Morse Board）</td><td>クエスチョン打鍵（・・－－・・）</td><td>そのモードのロビー画面へ戻る</td></tr>
+    <tr><td>フリー入力モード画面</td><td>R</td><td>それまで打った文字をリセット（「↺ RESET」ボタンと同じ）</td></tr>
     <tr><td>リザルト画面</td><td>Esc</td><td>ロビー画面に戻る</td></tr>
     <tr><td>リザルト画面（Morse Board）</td><td>R打鍵（・－・）</td><td>ロビー画面に戻る</td></tr>
     <tr><td>リザルト画面</td><td>/（Morse Board：－・・－・打鍵）</td><td>ニックネーム入力欄にフォーカス（Morse Boardはフォーカス済みの状態でもう一度打鍵すると確定）</td></tr>
@@ -278,7 +278,6 @@
         <a href="https://jl1gix.com" style="color:#b8c7bf; text-decoration:none;">トップ</a>
 <a href="how-to-use.html" style="color:#b8c7bf; text-decoration:none;">使い方</a>
 <a href="morse-table.html" style="color:#b8c7bf; text-decoration:none;">モールス符号表</a>
-<a href="free.html" style="color:#b8c7bf; text-decoration:none;">フリー入力モード</a>
         <a href="ranking.html" style="color:#b8c7bf; text-decoration:none;">ランキング</a>
         <a href="profile.html" style="color:#b8c7bf; text-decoration:none;">運営者情報</a>
         <a href="privacy.html" style="color:#b8c7bf; text-decoration:none;">プライバシー</a>
@@ -299,7 +298,6 @@
     <h3 style="color:#eef7f2;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ 学習コンテンツ</h3>
     <a href="/how-to-use.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">❓ 使い方</a>
     <a href="/morse-table.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">🔤 モールス符号表</a>
-    <a href="/free.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">📝 フリー入力モード</a>
     <h3 style="color:#eef7f2;font-size:0.75rem;letter-spacing:3px;margin:22px 0 12px;border-bottom:1px solid #1e5c38;padding-bottom:6px;opacity:0.85;">▸ その他</h3>
     <a href="/morse-board.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">🕹️ Morse Boardについて</a>
     <a href="/profile.html" style="display:block;color:#eef7f2;text-decoration:none;padding:7px 0;font-size:0.82rem;">👤 運営者情報</a>
