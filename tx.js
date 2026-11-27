@@ -35,6 +35,7 @@ const I18N = {
     }),
     dotLabel:  { ja: '・ 短点', en: '・ Dot' },
     dashLabel: { ja: '－ 長点', en: '－ Dash' },
+    freeKeyCustomizeBtn: { ja: '⌨ キー設定', en: '⌨ Key Settings' },
     paddleSideDot:  { ja: '左', en: 'LEFT' },
     paddleSideDash: { ja: '右', en: 'RIGHT' },
     gameplayHintMorseBoard: { ja: 'クエスチョン（・・－－・・）', en: 'Question mark key (・・－－・・)' },
@@ -326,6 +327,9 @@ function openKeyCustomize() {
     _capturingFor   = null;
     document.getElementById('kc-error').textContent = '';
     updateKcBtns();
+    // プレイ中(特にフリー入力画面)に開かれた場合に備え、押しっぱなし状態をリセットして
+    // キーヤーループが鳴り続けたままにならないようにする
+    dotHeld = false; dashHeld = false; dotLatched = false; dashLatched = false;
     document.getElementById('key-customize-modal').classList.add('open');
     document.addEventListener('keydown', onKeyCapture);
 }
@@ -429,9 +433,14 @@ function updateKeyAssignRow(elementId) {
         return;
     }
     el.style.display = 'flex';
+    // フリー入力画面の常時表示行にだけ、その場でキー設定を変更できる小さなボタンを添える
+    const customizeBtn = (elementId === 'free-key-assign-row')
+        ? `<button onclick="openKeyCustomize()" style="margin:0 0 0 10px; padding:4px 12px; font-size:0.7rem; letter-spacing:1px;">${t('freeKeyCustomizeBtn')}</button>`
+        : '';
     el.innerHTML =
         `<span style="color:var(--primary);font-weight:bold;font-size:0.78rem;">${t('dotLabel')}</span> ${renderKeyCap(getKeyLabel(dotKey))}` +
-        `<span style="color:var(--primary);font-weight:bold;font-size:0.78rem;margin-left:6px;">${t('dashLabel')}</span> ${renderKeyCap(getKeyLabel(dashKey))}`;
+        `<span style="color:var(--primary);font-weight:bold;font-size:0.78rem;margin-left:6px;">${t('dashLabel')}</span> ${renderKeyCap(getKeyLabel(dashKey))}` +
+        customizeBtn;
 }
 
 // ロビー画面のキー設定欄用の小さめキーキャップ表示
@@ -763,6 +772,8 @@ function paddleUp(isDash) {
 }
 
 function onTxKeyDown(e) {
+    // キー設定モーダル表示中は、キャプチャ用のリスナー(onKeyCapture)に処理を一任する
+    if (document.getElementById('key-customize-modal').classList.contains('open')) return;
     if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
     if (gameMode === 'TX' && morseBoardMode) {
         handleMorseBoardKey(e);
@@ -794,6 +805,7 @@ function handleMorseBoardKey(e) {
 }
 
 function onTxKeyUp(e) {
+    if (document.getElementById('key-customize-modal').classList.contains('open')) return;
     if (e.code === dotKey) {
         e.preventDefault();
         dotHeld = false;
