@@ -760,6 +760,8 @@ function tapSymbol(isDash) {
 // タッチパドル(長押し対応): touchstart で押下→キーヤーループ開始、touchend/cancel で解放
 function paddleDown(isDash) {
     if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
+    // タッチパドルでも同様に、リロード直後などで音が止まったままになっている場合に回復させる
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     if (isDash) {
         if (!dashHeld) { dashHeld = true; dashLatched = true; startKeyerLoop(); }
     } else {
@@ -775,6 +777,12 @@ function onTxKeyDown(e) {
     // キー設定モーダル表示中は、キャプチャ用のリスナー(onKeyCapture)に処理を一任する
     if (document.getElementById('key-customize-modal').classList.contains('open')) return;
     if (!isPlaying || (gameMode !== 'TX' && gameMode !== 'FREE')) return;
+    // free.html(フリー入力モード単体ページ)はページ読み込み時に自動でフリー入力を開始するため、
+    // リロード時など「このページ内でのクリック等の操作」を経由していない場合、ブラウザの自動
+    // 再生ポリシーによりAudioContextのresume()が失敗し、無音のまま打鍵だけ反応してしまうことが
+    // ある。ここ(実際のキー入力＝本物のユーザー操作)で再度resume()を試みて、次の打鍵から音が
+    // 出るように回復させる。
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     if (gameMode === 'TX' && morseBoardMode) {
         handleMorseBoardKey(e);
         return;
