@@ -28,7 +28,7 @@ const I18N = {
         ja: `コールサインとコンテストナンバーが交互に表示される。`,
         en: `A callsign and contest number are shown in turn. `
     },
-    // 単語ごとの制限時間切れ(QSB)の警告文。普通/正確重視/一発勝負のいずれも、QSBで
+    // 単語ごとの制限時間切れ(QSB)の警告文。普通/一発勝負のいずれも、QSBで
     // その場でゲーム全体が終了する（初心者モードのみ、この制限時間の仕組み自体が無い）ため、
     // 初心者モードがONの間はこの文を表示しない（updateTxModeDesc()側で分岐）。
     modeDescQsbWarning: {
@@ -76,15 +76,10 @@ const I18N = {
     wpmBand_intermediate: { ja: '中級者向け', en: 'Intermediate' },
     wpmBand_advanced:     { ja: '上級者向け', en: 'Advanced' },
     // ── 単語種別・プレイスタイル選択 (2026-10 第2弾) ──────────────────────────────
-    variantPrefix_ACCURACY: {
-        ja: '⚠ 正確重視: 打ち間違えると、その単語を最初から打ち直しになります。<br>',
-        en: '⚠ Accuracy Focus: A mistake sends you back to the start of the word.<br>'
-    },
     variantPrefix_ONESHOT: {
         ja: '⚠ 一発勝負: 一度でもミスした時点でゲーム終了。手加減なし。<br>',
         en: '⚠ One Shot: A single mistake ends the game immediately. No mercy.<br>'
     },
-    accuracyResetLabel: (n) => ({ ja: `↺ やり直し ${n}回`, en: `↺ Restarted ${n} time${n === 1 ? '' : 's'}` }),
     oneShotEliminatedHeadline: { ja: '🔥 ELIMINATED（ミス/QSBで即終了）', en: '🔥 ELIMINATED (mistake or QSB)' },
     accuracyRate: (pct, correct, total) => ({
         ja: `正確率: ${pct}% (${correct}/${total}打鍵)`,
@@ -418,22 +413,18 @@ function updateTxModeDesc() {
         deviceRest = isTouchDevice ? t('modeDescTouchRest') : t('modeDescDesktopRest', getKeyLabel(dotKey), getKeyLabel(dashKey));
     }
     desc = wordPart + qsbPart + deviceRest;
-    if (gameVariant === 'ACCURACY') desc = t('variantPrefix_ACCURACY') + desc;
-    else if (gameVariant === 'ONESHOT') desc = t('variantPrefix_ONESHOT') + desc;
+    if (gameVariant === 'ONESHOT') desc = t('variantPrefix_ONESHOT') + desc;
     document.getElementById('mode-description').innerHTML = desc;
     updateKeyAssignDisplay();
 }
 
 // ── 単語種別・プレイスタイル選択（ロビー画面） ───────────────────────────────────
 function applySelectorVisibility() {
-    // 正確重視・一発勝負は、いずれも非初心者モード専用（初心者モードと併用不可）。
-    // このいずれかが選ばれている間は初心者モードのチェックボックス自体を隠し、
-    // チェックが入っていれば強制的に外す。
-    const isAdvancedVariant = (gameVariant === 'ONESHOT' || gameVariant === 'ACCURACY');
+    const isOneShot = (gameVariant === 'ONESHOT');
     const beginnerCheck = document.getElementById('beginner-mode-check');
     const beginnerItem = beginnerCheck ? beginnerCheck.closest('.setting-item') : null;
-    if (beginnerItem) beginnerItem.classList.toggle('hidden', isAdvancedVariant);
-    if (isAdvancedVariant && beginnerCheck) beginnerCheck.checked = false;
+    if (beginnerItem) beginnerItem.classList.toggle('hidden', isOneShot);
+    if (isOneShot && beginnerCheck) beginnerCheck.checked = false;
 }
 // 新規訪問(リンクを踏んだ/URLを直接入力した)か、再訪問(リロード/戻る・進むボタン)かを判定する。
 // タブ保存されたローカル設定は再訪問時のみ復元し、新規訪問時は常にデフォルト設定から始める。
@@ -486,35 +477,10 @@ function selectWordCategory(cat) {
 function selectGameVariant(variant) {
     gameVariant = variant;
     document.getElementById('var-normal').classList.toggle('active', variant === 'NORMAL');
-    document.getElementById('var-accuracy').classList.toggle('active', variant === 'ACCURACY');
     document.getElementById('var-oneshot').classList.toggle('active', variant === 'ONESHOT');
     applySelectorVisibility();
     updateTxModeDesc();
     updateAsobiUrlState();
-}
-
-// ── プレイ中のモード別ステータス表示（正確重視: やり直し回数） ───────────────────────
-// 正確重視モード以外では行自体を完全に非表示にしスペースも取らない(display:none)。
-// 正確重視モードでは、ミスでテキストが出たり消えたりしても画面全体のレイアウトが
-// 動かないよう、常に同じ高さのスペースを確保したまま visibility のみを切り替える
-// (displayは切り替えない。高さはCSS側の#variant-statusのmin-heightで確保)。
-function updateVariantStatusUI() {
-    const el = document.getElementById('variant-status');
-    if (!el) return;
-    if (gameVariant !== 'ACCURACY') {
-        el.classList.add('hidden');
-        el.classList.remove('active');
-        el.textContent = '';
-        return;
-    }
-    el.classList.remove('hidden');
-    if (accuracyResetCount <= 0) {
-        el.classList.remove('active');
-        el.textContent = '';
-    } else {
-        el.classList.add('active');
-        el.textContent = t('accuracyResetLabel', accuracyResetCount);
-    }
 }
 
 // キーラベルを、実物のキー形状に近いアイコンで描画する（Space＝横長の長方形、それ以外＝正方形）
@@ -670,11 +636,10 @@ function pickCurrentWord() {
 
 // ── お遊びモード: 単語種別 × プレイスタイル (2026-10 第2弾) ─────────────────────
 // wordCategory: 'GENERAL'(身近な単語) | 'CALLSIGN'(コールサイン+コンテストナンバー)
-// gameVariant : 'NORMAL'(普通) | 'ACCURACY'(正確重視・ミスで単語の最初からやり直し) | 'ONESHOT'(一発勝負・ミスで即終了)
+// gameVariant : 'NORMAL'(普通) | 'ONESHOT'(一発勝負・ミスで即終了)
 let wordCategory = 'GENERAL';
 let gameVariant = 'NORMAL';
-let accuracyResetCount = 0; // 正確重視モードでの「やり直し」回数
-let totalCorrectKeys = 0; // 正確率計算用：ACCURACYモードのスコア巻き戻しの影響を受けない、ノーミス入力の総数
+let totalCorrectKeys = 0; // 正確率計算用：ノーミス入力の総数
 let oneShotEliminated = false; // 一発勝負モードで脱落したか
 
 // ── 単語ごとの制限時間（Sメーター風シグナルバーが尽きるとアウト） ──────────────────────
@@ -737,8 +702,8 @@ function handleWordTimeout() {
         setTimeout(() => txArea.classList.remove('flash-error'), 400);
     }
     document.getElementById('status-msg').innerText = t('qsbLost', txWord.join(''));
-    // 非初心者モードでは、普通/正確重視/一発勝負のいずれも、単語の制限時間切れ(QSB)で即ゲーム終了する
-    // （以前はONESHOTのみ即終了し、普通/正確重視は次の単語に進んでいたが、1単語の制限時間内に
+    // 非初心者モードでは、普通/一発勝負のいずれも、単語の制限時間切れ(QSB)で即ゲーム終了する
+    // （以前はONESHOTのみ即終了し、普通は次の単語に進んでいたが、1単語の制限時間内に
     //   打ち終えられなかった時点でその場で終了する仕様に変更）
     if (gameVariant === 'ONESHOT') {
         oneShotEliminated = true;
@@ -840,10 +805,9 @@ function startTxGame() {
     txCharIndex = 0; txMorseInput = ''; txCharTimer = null;
     dotHeld = false; dashHeld = false; dotLatched = false; dashLatched = false; lastSentSym = null; keyerPending = false;
     asobiMistakeCounts = {};
-    accuracyResetCount = 0; oneShotEliminated = false;
+    oneShotEliminated = false;
     nextAsobiCallType = 'CALLSIGN';
     resetAsobiWordBag();
-    updateVariantStatusUI();
     // 前回プレイの短点・長点表示をクリア
     const _txMorseBox = document.getElementById('tx-morse-input');
     const _txMorseRender = document.getElementById('tx-input-render');
@@ -863,16 +827,6 @@ function startTxGame() {
 }
 
 function nextTxWord() {
-    // 次の単語に進む際、前の単語で表示されていた「正確重視」のミス表示（赤点滅）を消す。
-    // ※やり直し回数(accuracyResetCount)自体はリセットしない。表示だけ毎単語クリアし、
-    //   その単語でまたミスした場合に再度表示される。
-    // (displayではなくvisibilityのみ切り替え、画面全体のレイアウトが動かないようにする。
-    //  NORMAL/ONESHOTモードでは元々display:noneのままなのでここでは何も変わらない。)
-    const variantStatusEl = document.getElementById('variant-status');
-    if (variantStatusEl) {
-        variantStatusEl.classList.remove('active');
-        variantStatusEl.textContent = '';
-    }
     const raw = pickCurrentWord();
     txWord = raw.split('');
     txCharIndex = 0; txMorseInput = '';
@@ -1172,20 +1126,6 @@ function evaluateTxChar(decoded) {
             document.getElementById('status-msg').innerText = `✗ MISS: ${expected}`;
             oneShotEliminated = true;
             setTimeout(() => endGame(), 350);
-            return;
-        }
-        if (gameVariant === 'ACCURACY') {
-            // 正確重視: ミスしたらその単語の最初からやり直し。得点は巻き戻さない
-            // (ミスまでに稼いだ分もそのまま保持する)。単語ごとの制限時間(QSB)は
-            // やり直しても延長・リセットしない(熊谷さんの指示により、24章での
-            // リセット処理は撤回。やり直しは自由にできるが、その単語全体に
-            // 与えられた持ち時間自体は最初の表示時点から変わらず進み続ける)。
-            accuracyResetCount++;
-            updateVariantStatusUI();
-            txCharIndex = 0;
-            updateTxDisplay();
-            if (beginnerMode) updateTxBeginnerDisplay();
-            document.getElementById('status-msg').innerText = `✗ RESTART: ${txWord.join('')}`;
             return;
         }
         document.getElementById('status-msg').innerText = `✗ RETRY: ${expected}`;
@@ -1534,8 +1474,6 @@ function quitGame() {
     cleanupTx();
     score = 0;
     gameMode = 'TX';
-    accuracyResetCount = 0;
-    updateVariantStatusUI();
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('start-screen').classList.remove('hidden');
     updateTxModeDesc();
@@ -1603,15 +1541,15 @@ function shareX() {
 }
 
 // ── Score registration ─────────────────────────────────────────────────────────
-// 単語種別(wordCategory) × プレイスタイル(gameVariant) の組み合わせ(計6通り)ごとに、
+// 単語種別(wordCategory) × プレイスタイル(gameVariant) の組み合わせ(計4通り)ごとに、
 // 得点を登録するバックエンドの mode 値を切り替える。身近な単語+普通モードは従来からの
-// 'ASOBI' をそのまま使い(過去スコアとの継続性を維持)、他の5通りは新設の mode 値を使う。
+// 'ASOBI' をそのまま使い(過去スコアとの継続性を維持)、他の3通りは新設の mode 値を使う。
+// (正確重視モードは撤廃済み。ASOBI_GEN_ACC/ASOBI_CALL_ACCは過去の記録用の値として
+//  バックエンド側にのみ残っており、新規登録では使用しない)
 const ASOBI_MODE_TABLE = {
     'GENERAL_NORMAL':   'ASOBI',
-    'GENERAL_ACCURACY': 'ASOBI_GEN_ACC',
     'GENERAL_ONESHOT':  'ASOBI_GEN_ONE',
     'CALLSIGN_NORMAL':  'ASOBI_CALL_NORM',
-    'CALLSIGN_ACCURACY':'ASOBI_CALL_ACC',
     'CALLSIGN_ONESHOT': 'ASOBI_CALL_ONE',
 };
 function asobiBackendMode() {
@@ -1720,13 +1658,12 @@ async function setNickname() {
     }
     document.getElementById('wc-general').classList.toggle('active', wordCategory === 'GENERAL');
     document.getElementById('wc-callsign').classList.toggle('active', wordCategory === 'CALLSIGN');
-    if (['NORMAL', 'ACCURACY', 'ONESHOT'].includes(variantParam)) {
+    if (['NORMAL', 'ONESHOT'].includes(variantParam)) {
         gameVariant = variantParam;
-    } else if (isReturning && ['NORMAL', 'ACCURACY', 'ONESHOT'].includes(savedVariant)) {
+    } else if (isReturning && ['NORMAL', 'ONESHOT'].includes(savedVariant)) {
         gameVariant = savedVariant;
     }
     document.getElementById('var-normal').classList.toggle('active', gameVariant === 'NORMAL');
-    document.getElementById('var-accuracy').classList.toggle('active', gameVariant === 'ACCURACY');
     document.getElementById('var-oneshot').classList.toggle('active', gameVariant === 'ONESHOT');
     const beginnerCheck = document.getElementById('beginner-mode-check');
     if (beginnerCheck && params.get('beginner') === '1') beginnerCheck.checked = true;
