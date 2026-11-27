@@ -1086,12 +1086,17 @@ function scheduleCwTone(ctx, dest, startTime, dur, peak, stopMargin) {
 }
 
 function playSidetone(isDash) {
-    if (!audioCtx) return;
-    const dur = isDash ? TX_DOT_TIME * 3 : TX_DOT_TIME;
-    const t   = audioCtx.currentTime;
-    const ms  = Date.now();
-    scheduleCwTone(audioCtx, masterGain, t, dur, 0.4, 0.01);
-    toneSchedule.push({ onTime: ms, offTime: ms + dur * 1000 });
+    if (!audioCtx || !masterGain) return;
+    // 音声再生(Web Audio API呼び出し)が何らかの理由で失敗しても、打鍵のデコード自体は
+    // 必ず続行できるよう、ここで例外を握りつぶす(呼び出し元でtxMorseInputへの追記が
+    // 行われる前に例外で処理が止まり、無音どころか入力自体が反応しなくなるのを防ぐ)。
+    try {
+        const dur = isDash ? TX_DOT_TIME * 3 : TX_DOT_TIME;
+        const t   = audioCtx.currentTime;
+        const ms  = Date.now();
+        scheduleCwTone(audioCtx, masterGain, t, dur, 0.4, 0.01);
+        toneSchedule.push({ onTime: ms, offTime: ms + dur * 1000 });
+    } catch (err) {}
 }
 
 function decodeTxChar() {
@@ -1187,20 +1192,29 @@ function cleanupTx() {
 
 // ── Free Input Mode ────────────────────────────────────────────────────────────
 function startFreeMode() {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!audioCtx) {
-        audioCtx = new AC();
-        masterGain = audioCtx.createGain();
-        masterGain.gain.setValueAtTime(1, 0);
-        masterGain.connect(audioCtx.destination);
+    // 音声初期化(AudioContext関連)のどこかで例外が起きても、打鍵・デコード自体は
+    // 必ず使えるようにする(音が出ないことはあっても、入力が完全に無反応にはならないようにする)。
+    // free.htmlはページ読み込み時にユーザー操作を介さず自動でここに入るため、ブラウザや
+    // 環境によっては自動再生ポリシー関連の処理が想定外の挙動になる可能性がある。
+    let doResume = Promise.resolve();
+    try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!audioCtx) {
+            audioCtx = new AC();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(1, 0);
+            masterGain.connect(audioCtx.destination);
+        }
+        doResume = (audioCtx.state === 'suspended') ? audioCtx.resume() : Promise.resolve();
+        const unlockBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+        const unlockSrc = audioCtx.createBufferSource();
+        unlockSrc.buffer = unlockBuf;
+        unlockSrc.connect(masterGain);
+        unlockSrc.start(0);
+        audioCtx.onstatechange = () => { if (audioCtx.state === 'suspended') audioCtx.resume(); };
+    } catch (err) {
+        doResume = Promise.resolve();
     }
-    const doResume = (audioCtx.state === 'suspended') ? audioCtx.resume() : Promise.resolve();
-    const unlockBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
-    const unlockSrc = audioCtx.createBufferSource();
-    unlockSrc.buffer = unlockBuf;
-    unlockSrc.connect(masterGain);
-    unlockSrc.start(0);
-    audioCtx.onstatechange = () => { if (audioCtx.state === 'suspended') audioCtx.resume(); };
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('free-screen').classList.remove('hidden');
     updateKeyAssignRow('free-key-assign-row');
@@ -1212,7 +1226,10 @@ function startFreeMode() {
 }
 
 function launchFreeMode() {
-    masterGain.gain.setValueAtTime(1, audioCtx.currentTime);
+    // masterGainが無い(音声初期化に失敗した)場合でも、以降の処理(打鍵の有効化)は必ず行う
+    if (masterGain && audioCtx) {
+        try { masterGain.gain.setValueAtTime(1, audioCtx.currentTime); } catch (err) {}
+    }
     gameMode = 'FREE';
     // 開始画面の速度設定を引き継ぎ、フリー入力画面側のセレクタにも反映
     document.getElementById('free-wpm-select').value = document.getElementById('wpm-select').value;
