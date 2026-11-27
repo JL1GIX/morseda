@@ -932,4 +932,25 @@ _最終更新: 2026-11-26（お遊びモードのXシェア文言から「〇単
 
 ---
 
-_最終更新: 2026-11-27（フリー入力画面内からキー設定を変更できるよう対応。詳細は28章）_
+## 29. free.htmlの見出し重複を解消 (2026-11)
+
+熊谷さんより依頼。
+
+> free.htmlで
+> 
+> ▸FREE INPUT MODE ◂
+> ▸ FREE INPUT
+> 
+> 両方あるのキモイから一つに統一しておいて
+
+`free.html`/`free-en.html`は、ページ共通ヘッダー直下に常設の`<div class="subtitle">▸ FREE INPUT MODE ◂</div>`があり、さらにフリー入力画面(`#free-screen`)側にも`<div id="free-header">▸ FREE INPUT ◂</div>`があった。`tx.html`/`asobi.html`ではページ共通の副題がそれぞれ「AMATEUR RADIO CONTEST TRAINER」「FUN WORD KEYING GAME」のため重複しないが、`free.html`は単体ページとしてロビー画面を経由せず最初からフリー入力画面を表示する作りのため、常にこの2つが縦に並んで表示されてしまっていた。
+
+`#free-header`側は送信モード・お遊びモードのフリー入力サブ画面とも共通のコードのため残し、`free.html`/`free-en.html`固有のページ上部`subtitle`の行のみ削除して重複を解消した。
+
+### 確認
+
+`free.html`/`free-en.html`それぞれに「FREE INPUT MODE」の文言が1回も残っていないこと、`#free-header`側の「FREE INPUT」表示は変更していないことを`grep`で確認。
+
+---
+
+_最終更新: 2026-11-27（free.htmlの見出し重複を解消。詳細は29章）_
