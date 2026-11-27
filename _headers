@@ -1,0 +1,6 @@
+# JSファイルはCloudflare Pagesのデフォルトだと4時間キャッシュされ、更新をpushしても
+# ブラウザが古いファイルを使い続けてしまう(通常のリロードではサーバーへの問い合わせ
+# すら行われない)ため、JSファイルのみ毎回サーバーへ再検証させるよう上書きする。
+# (HTMLファイルはCloudflare Pagesのデフォルトで既にmax-age=0のため対象外)
+/*.js
+  Cache-Control: public, max-age=0, must-revalidate
